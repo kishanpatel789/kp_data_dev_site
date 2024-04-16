@@ -1,6 +1,6 @@
 AUTHOR = 'Kishan Patel'
 SITENAME = 'KP Data Dev'
-SITEURL = ""
+SITEURL = "https://kpdata.dev"
 
 PATH = "content"
 
@@ -33,3 +33,9 @@ DEFAULT_PAGINATION = 10
 
 # Uncomment following line if you want document-relative URLs when developing
 # RELATIVE_URLS = True
+
+# custom conf
+ARTICLE_URL = 'blog/{slug}'
+ARTICLE_SAVE_AS = 'blog/{slug}/index.html'
+PAGE_URL = '{slug}'
+PAGE_SAVE_AS = 'pages/{slug}/index.html'
