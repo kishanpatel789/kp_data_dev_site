@@ -25,8 +25,8 @@ LINKS = (
 
 # Social widget
 SOCIAL = (
-    ("You can add links in your config file", "#"),
-    ("Another social link", "#"),
+    ("LinkedIn", "https://www.linkedin.com/company/kp-data-dev/"),
+    ("Email", "mailto:info@kpdata.dev"),
 )
 
 DEFAULT_PAGINATION = 10
@@ -39,3 +39,7 @@ ARTICLE_URL = 'blog/{slug}/'
 ARTICLE_SAVE_AS = 'blog/{slug}/index.html'
 PAGE_URL = '{slug}/'
 PAGE_SAVE_AS = '{slug}/index.html'
+
+THEME = 'simple'
+
+DIRECT_TEMPLATES = ['index', 'archives']
