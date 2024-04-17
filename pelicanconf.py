@@ -40,6 +40,6 @@ ARTICLE_SAVE_AS = 'blog/{slug}/index.html'
 PAGE_URL = '{slug}/'
 PAGE_SAVE_AS = '{slug}/index.html'
 
-THEME = 'simple'
+THEME = './theme'
 
 DIRECT_TEMPLATES = ['index', 'archives']
