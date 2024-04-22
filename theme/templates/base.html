@@ -8,9 +8,8 @@
         {% if SITESUBTITLE %}
         <meta name="description" content="{{ SITESUBTITLE }}" />
         {% endif %}
-        {% if STYLESHEET_URL %}
-        <link rel="stylesheet" type="text/css" href="{{ STYLESHEET_URL }}" />
-        {% endif %}
+        <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/{{ CSS_FILE }}" />
+        <script src="https://cdn.tailwindcss.com"></script>
         {% endblock head %}
 </head>
 
@@ -21,6 +20,9 @@
           <li><a href="{{ SITEURL }}/about/">About</a></li>
           <li><a href="{{ SITEURL }}/archives.html">Blog</a></li>
           <li><a href="{{ SITEURL }}/contact/">Contact</a></li>
+          <h1 class="text-3xl font-bold underline">
+            Hello world!
+          </h1>
         </header>
         <main>
         {% block content %}
