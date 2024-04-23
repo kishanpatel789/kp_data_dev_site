@@ -1,43 +1,60 @@
 <!DOCTYPE html>
 <html lang="{% block html_lang %}{{ DEFAULT_LANG }}{% endblock html_lang %}">
 <head>
-        {% block head %}
-        <title>{% block title %}{{ SITENAME|striptags }}{% endblock title %}</title>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        {% if SITESUBTITLE %}
-        <meta name="description" content="{{ SITESUBTITLE }}" />
-        {% endif %}
-        <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/{{ CSS_FILE }}" />
-        <script src="https://cdn.tailwindcss.com"></script>
-        {% endblock head %}
+  {% block head %}
+  <title>{% block title %}{{ SITENAME|striptags }}{% endblock title %}</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Turn raw data into actionable insights. Our expert team designs and implements efficient data pipelines, making your data accessible from any source – ERPs, web APIs, siloed databases, or spreadsheets – within a curated data warehouse." />
+  <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/{{ CSS_FILE }}" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            kpddmain: "#293c47",
+            kpddsec: "#3f5765",
+            kpddaccent: "c2ae45"
+          }
+        }
+      }
+    }
+  </script>
+  {% endblock head %}
 </head>
 
 <body>
-        <header>
-              <hgroup><h1><a href="{{ SITEURL }}/">{{ SITENAME }}</a></h1>{% if SITESUBTITLE %}<p>{{ SITESUBTITLE }}</p>{% endif %}</hgroup>
-        <nav><ul>
-          <li><a href="{{ SITEURL }}/about/">About</a></li>
-          <li><a href="{{ SITEURL }}/archives.html">Blog</a></li>
-          <li><a href="{{ SITEURL }}/contact/">Contact</a></li>
-          <h1 class="text-3xl font-bold underline">
-            Hello world!
-          </h1>
-        </header>
-        <main>
-        {% block content %}
-        {% endblock %}
-        </main>
-        <footer>
-               <span>KP Data Dev</span> 
-               <ul>
-                <li>
-                  <a href="https://www.linkedin.com/company/kp-data-dev/">LinkedIn</a>
-                </li>
-                <li>
-                  <a href="mailto:info@kpdata.dev">Email</a>
-                </li>
-               </ul>
-        </footer>
+  <header class="bg-white text-black">
+    <nav class="container mx-auto px-2 py-5 flex items-center justify-between">
+      <h1 class="font-semibold text-xl"><a href="{{ SITEURL }}/">{{ SITENAME }}</a></h1>
+      <ul class="flex space-x-4">
+        <li class=""><a href="{{ SITEURL }}/about/">About</a></li>
+        <li><a href="{{ SITEURL }}/archives.html">Blog</a></li>
+        <li><a href="{{ SITEURL }}/contact/">Contact</a></li>
+      </ul>
+    </nav>
+  </header>
+  <main class="container mx-auto p-2">
+    {% block content %}
+    {% endblock %}
+  </main>
+  <footer class="bg-kpddmain text-white">
+    <div class="container mx-auto px-2 py-5 text-center">
+      <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/LightLogo.svg" alt="KP Data Dev logo" class="h-16 mx-auto">
+      <ul class="flex items-center justify-center space-x-4 pt-2">
+        <li>
+          <a href="https://www.linkedin.com/company/kp-data-dev/">
+            <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/LinkedInIcon.svg" alt="LinkedIn icon" class="h-6 w-6">
+          </a>
+        </li>
+        <li>
+          <a href="mailto:info@kpdata.dev">
+            <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/MailIcon.svg" alt="Mail icon" class="h-6 w-6">
+          </a>
+        </li>
+      </ul>
+    </div>
+  </footer>
 </body>
 </html>
