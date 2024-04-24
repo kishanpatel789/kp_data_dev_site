@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{% block html_lang %}{{ DEFAULT_LANG }}{% endblock html_lang %}">
+<html lang="en" class="h-full">
 <head>
   {% block head %}
   <title>{% block title %}{{ SITENAME|striptags }}{% endblock title %}</title>
@@ -24,8 +24,8 @@
   {% endblock head %}
 </head>
 
-<body>
-  <header class="bg-white text-kpddmain-500">
+<body class="text-kpddmain flex flex-col h-full">
+  <header class="bg-white">
     <nav class="container mx-auto px-2 py-5 flex items-center justify-between">
       <a href="{{ SITEURL }}/">
         <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/MainLogo.svg" alt="KP Data Dev logo" class="h-16">
@@ -38,12 +38,12 @@
     </nav>
   </header>
   {% block main %}
-    <main class="container mx-auto p-2">
+    <main class="container mx-auto p-2 grow">
       {% block content %}
       {% endblock %}
     </main>
   {% endblock %}
-  <footer class="bg-kpddmain text-white">
+  <footer class="bg-kpddmain text-white mt-auto">
     <div class="container mx-auto px-2 py-5 text-center">
       <a href="{{ SITEURL }}/">
         <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/LightLogo.svg" alt="KP Data Dev logo" class="h-16 mx-auto">
@@ -60,6 +60,7 @@
           </a>
         </li>
       </ul>
+      <p class="text-xs mt-8">&copy; 2024 KP Data Dev. All rights reserved.</p>
     </div>
   </footer>
 </body>
