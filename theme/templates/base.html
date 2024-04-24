@@ -37,12 +37,14 @@
       </ul>
     </nav>
   </header>
-  {% block main %}
-    <main class="container mx-auto p-2 grow">
-      {% block content %}
-      {% endblock %}
-    </main>
-  {% endblock %}
+  <main class="grow">
+    {% block main %}
+      <div class="container mx-auto p-2">
+        {% block content %}
+        {% endblock %}
+      </div>
+    {% endblock %}
+  </main>
   <footer class="bg-kpddmain text-white mt-auto">
     <div class="container mx-auto px-2 py-5 text-center">
       <a href="{{ SITEURL }}/">
