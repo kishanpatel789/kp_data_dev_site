@@ -1,27 +1,23 @@
 {% extends "base.html" %}
-{% block content %}
-{% block content_title %}
-<h2>All articles</h2>
+
+{% block main %}
+
+  <div class="bg-slate-200">
+    <div class="container mx-auto p-2 h-48">
+      <h1 class="text-6xl">We make data usable.</h1>
+      <p class="text-2xl">Businesses have untapped data.</p>
+      <p class="text-2xl">We integrate fragmented data sources into a single data platform,
+        empowering businesses to make informed decisions.</p>
+    </div>
+  </div>
+
+  <h2>Our Services</h2>
+
+  <h2>Why Choose Us?</h2>
+
+  <div class="text-center">
+    <p class="text-5xl">Your data doesn't have to be chaotic.</p>
+    <p class="text-5xl">We'll help you connect the dots.</p>
+  </div>
+    
 {% endblock %}
-
-
-{% for article in articles_page.object_list %}
-        <article>
-                <header> <h2><a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark" title="Permalink to {{ article.title|striptags }}">{{ article.title }}</a></h2> </header>
-                <section>{{ article.summary }}</section>
-                <footer>
-                    <p>Published: <time datetime="{{ article.date.isoformat() }}"> {{ article.locale_date }} </time></p>
-                    <address>By
-                    {% for author in article.authors %}
-                        <a href="{{ SITEURL }}/{{ author.url }}">{{ author }}</a>
-                    {% endfor %}
-                    </address>
-                </footer>
-        </article>
-{% endfor %}
-
-{% if articles_page.has_other_pages() %}
-    {% include 'pagination.html' %}
-{% endif %}
-
-{% endblock content %}
