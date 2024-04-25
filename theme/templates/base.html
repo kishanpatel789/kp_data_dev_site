@@ -27,7 +27,7 @@
 
 <body class="text-kpddmain flex flex-col h-screen">
   <header class="bg-white">
-    <nav class="container mx-auto px-2 py-5 flex items-center justify-between">
+    <nav class="max-w-5xl mx-auto px-2 py-5 flex items-center justify-between">
       <a href="{{ SITEURL }}/">
         <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/MainLogo.svg" alt="KP Data Dev logo" class="h-16">
       </a>
@@ -40,14 +40,14 @@
   </header>
   <main class="grow">
     {% block main %}
-      <div class="container mx-auto p-2">
+      <div class="max-w-5xl mx-auto p-2">
         {% block content %}
         {% endblock %}
       </div>
     {% endblock %}
   </main>
   <footer class="bg-kpddmain text-white mt-auto">
-    <div class="container mx-auto px-2 py-5 text-center">
+    <div class="mx-auto max-w-5xl px-2 py-5 text-center">
       <a href="{{ SITEURL }}/">
         <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/LightLogo.svg" alt="KP Data Dev logo" class="h-16 mx-auto">
       </a>
