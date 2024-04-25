@@ -31,3 +31,9 @@ CATEGORY_SAVE_AS = ''  # don't generate category pages
 THEME = './theme'
 
 DIRECT_TEMPLATES = ['index', 'archives']
+
+STATIC_PATHS = ['static']
+
+EXTRA_PATH_METADATA = {
+    'static/robots.txt': {'path': 'robots.txt'},
+    }
