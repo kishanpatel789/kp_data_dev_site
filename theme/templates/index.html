@@ -2,6 +2,7 @@
 
 {% block main %}
 <div class="flex flex-col">
+
   <div class="bg-slate-200">
     <div class="container mx-auto px-2 py-8 h-min-">
       <h1 class="text-5xl">We make data usable.</h1>
@@ -10,41 +11,63 @@
         empowering businesses to make informed decisions.</p>
     </div>
   </div>
-  <div class="container mx-auto p-2 my-12">
+
+  <div class="container max-w-5xl mx-auto px-2 py-12">
     <h2 class="text-5xl text-center mb-4">Our Services</h2>
 
     <div class="flex flex-col md:flex-row md:gap-x-8">
 
-      <div class="flex flex-col items-center py-4 px-2 border-b-2 border-kpddaccent md:flex-1 md:border-y-2">
+      <div class="flex flex-col items-center py-4 border-b-2 border-kpddaccent md:flex-1 md:border-y-2">
         <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/Databaseicon.svg" alt="" class="h-16">
         <h3 class="text-3xl py-2 text-center">Data Engineering</h3>
         <p>Turn raw data into actionable insights. Our expert team designs and implements efficient data pipelines, making your data accessible from any source &mdash; ERPs, web APIs, siloed databases, or spreadsheets &mdash; within a curated data warehouse.</p>
       </div>
 
-      <div class="flex flex-col items-center py-4 px-2 border-b-2 border-kpddaccent md:flex-1 md:border-y-2">
+      <div class="flex flex-col items-center py-4 border-b-2 border-kpddaccent md:flex-1 md:border-y-2">
         <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/CloudInfrastructureicon.svg" alt="" class="h-16">
         <h3 class="text-3xl py-2 text-center">Cloud Data Infrastructure</h3>
         <p>Elevate your data to the cloud effortlessly. We deploy and manage platforms like Snowflake and Databricks on AWS, ensuring scalability, security, and peak performance.</p>
       </div>
 
-      <div class="flex flex-col items-center py-4 px-2 border-kpddaccent md:flex-1 md:border-y-2">
+      <div class="flex flex-col items-center py-4 border-kpddaccent md:flex-1 md:border-y-2">
         <img src="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/RoboticArmicon.svg" alt="" class="h-16">
         <h3 class="text-3xl py-2 text-center">Process Automation</h3>
         <p>Supercharge productivity with automation. We transform error-prone, manual tasks into reliable, automated workflows, freeing your team to focus on high-value initiatives.</p>
       </div>
 
-    </div>
-
-    
+    </div> 
     
   </div>
-</div>
 
-  <h2>Why Choose Us?</h2>
+  <div class="bg-stone-100 px-2 py-12">
+    <div class="container max-w-2xl mx-auto items-center">
+      <h2 class="text-5xl text-center mb-4">Why Choose Us?</h2>
+
+      <div class="py-4">
+        <h3 class="text-2xl font-semibold">Sustainability</h3>
+        <p>Through documentation and training, we ensure that our work can be easily maintained past our contract with you. We are committed to ongoing support as your needs evolve.</p>
+      </div>
+
+      <div class="py-4">
+        <h3 class="text-2xl font-semibold">Transparent Communication</h3>
+        <p>Your time is valuable. We keep our clients informed at every stage of the project, providing regular updates, and promptly addressing any questions or concerns you may have.</p>
+      </div>
+
+      <div class="py-4">
+        <h3 class="text-2xl font-semibold">Simplicity</h3>
+        <p>The modern data stack can be complex. We prioritize simple implementations, making it easier for you to adopt and integrate new technologies into your existing systems.</p>
+      </div>
+
+    </div>
+  </div>
 
   <div class="text-center">
     <p class="text-5xl">Your data doesn't have to be chaotic.</p>
     <p class="text-5xl">We'll help you connect the dots.</p>
   </div>
+
+</div>
+
+
     
 {% endblock %}
