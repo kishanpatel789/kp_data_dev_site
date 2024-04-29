@@ -40,3 +40,5 @@ STATIC_PATHS = ['static']
 EXTRA_PATH_METADATA = {
     'static/robots.txt': {'path': 'robots.txt'},
     }
+
+DEFAULT_DATE_FORMAT = '%d %b %Y'

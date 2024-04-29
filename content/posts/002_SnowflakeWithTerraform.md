@@ -2,6 +2,7 @@ Title: Snowflake with Terraform
 Date: 2024-04-24
 Slug: snowflake-with-terraform
 Tags: cloud, terraform, snowflake
+Summary: Cut down on your Snowflake project costs by managing cloud infrastructure with Terraform!
 
 When developing a new project on a cloud platform, it's nice to be able to quickly tear down what you built at the end of the day so you don't incur storage and compute costs overnight. Even more helpful is being able to re-provision your cloud resources the next day to continue your work. 
 

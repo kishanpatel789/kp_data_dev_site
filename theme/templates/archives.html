@@ -3,12 +3,29 @@
 {% block title %}{{ SITENAME|striptags }} - Archives{% endblock %}
 
 {% block content %}
-<h2>Archives for {{ SITENAME }}</h2>
 
-<dl>
-{% for article in dates %}
-    <dt>{{ article.locale_date }}</dt>
-    <dd><a href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></dd>
-{% endfor %}
-</dl>
+<h2 class="text-6xl mb-4">Blog</h2>
+
+<ul>
+  {% for article in articles %}
+    <li class="mb-3">
+      <h3 class="text-2xl">
+        <a href="{{ SITEURL }}/{{ article.url }}" class="hover:text-kpddaccent duration-200">{{ article.title }}</a>
+      </h3>
+      <div class="text-gray-400 text-sm">
+        {{ article.summary }}
+      </div>
+      <div class="text-gray-400 text-sm flex items-start gap-2">
+        <span>{{ article.locale_date }}</span>
+        <span>&middot;</span>
+        <span>
+          {% for tag in article.tags %}
+            <a href="{{ SITEURL }}/{{ tag.url }}" class="hover:text-kpddaccent duration-200">#{{ tag }}</a>
+          {% endfor %}
+        </span>
+      </div>
+    </li>
+  {% endfor %}
+</ul>
+
 {% endblock %}
