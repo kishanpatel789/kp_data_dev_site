@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 article p {
-    
+    @apply mb-2
+}
+
+article ul {
+    @apply mb-2 list-disc list-inside
 }

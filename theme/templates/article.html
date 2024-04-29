@@ -16,33 +16,25 @@
 {% endblock %}
 
 {% block content %}
-<article>
-  <header>
-    <h2 class="text-5xl mb-4">
+<article class="mb-16">
+  <header class="mb-4">
+    <h2 class="text-5xl mb-2">
       <a href="{{ SITEURL }}/{{ article.url }}" rel="bookmark">{{ article.title }}</a>
     </h2>
+    <div class="text-gray-400 text-sm flex items-start gap-2">
+      <span>{{ article.locale_date }}</span>
+      {% if article.tags %}
+        <span>&middot;</span>
+        <span>
+          {% for tag in article.tags %}
+            <a href="{{ SITEURL }}/{{ tag.url }}" class="hover:text-kpddaccent duration-200">#{{ tag }}</a>
+          {% endfor %}
+        </span>
+      {% endif %}
+    </div>
   </header>
 
   {{ article.content }}
   
-  <footer>
-    <p>Published: <time datetime="{{ article.date.isoformat() }}">
-      {{ article.locale_date }}
-    </time></p>
-    {% if article.modified %}
-    <p>Last updated: <time datetime="{{ article.modified.isoformat() }}">
-      {{ article.locale_modified }}
-    </time></p>
-    {% endif %}
-        
-    {% if article.tags %}
-      <p>
-        Tags:
-        {% for tag in article.tags %}
-          <a href="{{ SITEURL }}/{{ tag.url }}">{{ tag }}</a>
-        {% endfor %}
-      </p>
-    {% endif %}
-  </footer>
 </article>
 {% endblock %}
