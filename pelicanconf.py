@@ -30,7 +30,10 @@ CATEGORY_SAVE_AS = ''  # don't generate category pages
 
 THEME = './theme'
 
-DIRECT_TEMPLATES = ['index', 'archives']
+DIRECT_TEMPLATES = ['index']
+TEMPLATE_PAGES = {
+    'archives.html': 'blog/index.html'
+}
 
 STATIC_PATHS = ['static']
 
