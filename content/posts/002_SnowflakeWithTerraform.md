@@ -8,11 +8,6 @@ When developing a new project on a cloud platform, it's nice to be able to quick
 
 On a recent data engineering project, I used Snowflake as a data warehouse. The setup included a three schemas and a service user that would be used to manage data objects within the databases. What follows is a brief description of how you can use Terraform to provision a basic data warehouse. 
 
-database
-three schemas
-service user
-privileges
-
 Here's the directory of files we need:
 
 - main.tf
@@ -42,6 +37,7 @@ This dependency management is perhaps most important when assigning permissions 
 Before the terraform configuration can take affect, a target Snowflake account and configuration need to be established. A Snowflake account can be created here: [insert url]
 The user used to create the account should have the ACCOUNTADMIN role. 
 On the local computer, create a configuration file `~/.snowflake/config` that contains Snowflake credentials for the user with the ACCOUNTADMIN role:
+
 ```toml
 [default]
 account='<snowflake-account-identifier>'
@@ -59,6 +55,7 @@ Then execute the following command to create the Snowflake resources:
 The CLI will present a summary of resources to be provisioned and give a prompt asking for confirmation before proceeding. Entering "yes" will cause the Terraform executable to provision the outlined resources. 
 
 This approach is much faster than manually creating resources through the UI. Destruction of cloud resources is just as fast and can be executed with a destroy command: 
+
 ```bash
 terraform destroy
 ```
@@ -67,12 +64,34 @@ As with creation, terraform will prompt a list of all resources scheduled for de
 
 And that's it! This configuration will quickly allow the spinning up and tearing donw of Snowflake databases. After resource creation, you can implement data pipelines to materialize tables and views within the three schemas. Destroying the resources via Terraform at the end of the day will ensure you do not pay for storage costs overnight. 
 
+```python
+from typing import Iterator
 
+# This is an example
+class Math:
+    @staticmethod
+    def fib(n: int) -> Iterator[int]:
+        """Fibonacci series up to n."""
+        a, b = 0, 1
+        while a < n:
+            yield a
+            a, b = b, a + b
 
+result = sum(Math.fib(42))
+print(f"The answer is {result}")
+```
 
+```sql
+-- test query
+SELECT * FROM mY_table
+WHERE col = 'spicy';
+```
 
-
-
+	#!python {linenums=False}
+	# This line is emphasized
+	# This line isn't
+	# This line is emphasized
+	
 
 
 

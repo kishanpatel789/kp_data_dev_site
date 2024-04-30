@@ -42,3 +42,15 @@ EXTRA_PATH_METADATA = {
     }
 
 DEFAULT_DATE_FORMAT = '%d %b %Y'
+
+MARKDOWN = {
+    'extension_configs': {
+        'markdown.extensions.codehilite': {
+            'css_class': 'highlight',
+            'linenums': False,    
+        },
+        'markdown.extensions.extra': {},
+        'markdown.extensions.meta': {},
+    },
+    'output_format': 'html5',
+}

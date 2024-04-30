@@ -3,9 +3,21 @@
 @tailwind utilities;
 
 article p {
-    @apply mb-2
+    @apply py-2
 }
 
 article ul {
-    @apply mb-2 list-disc list-inside
+    @apply py-2 list-disc list-inside
+}
+
+/* article ul ul {
+    list-style-type: revert;
+} */
+
+article .highlight {
+    @apply p-4 rounded-lg text-sm
+}
+
+article p code {
+    @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm
 }
