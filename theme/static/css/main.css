@@ -836,6 +836,12 @@ video {
   transition-duration: 300ms;
 }
 
+article h2 {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  line-height: 2rem;
+}
+
 article p {
   margin-top: 0.5rem;
 }
@@ -865,6 +871,13 @@ article p code {
   color: rgb(31 41 55 / var(--tw-text-opacity));
 }
 
+article hr {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  --tw-border-opacity: 1;
+  border-color: rgb(209 213 219 / var(--tw-border-opacity));
+}
+
 .hover\:scale-110:hover {
   --tw-scale-x: 1.1;
   --tw-scale-y: 1.1;
@@ -874,11 +887,6 @@ article p code {
 .hover\:text-kpddaccent:hover {
   --tw-text-opacity: 1;
   color: rgb(194 174 69 / var(--tw-text-opacity));
-}
-
-.hover\:text-kpddsec:hover {
-  --tw-text-opacity: 1;
-  color: rgb(63 87 101 / var(--tw-text-opacity));
 }
 
 @media (min-width: 768px) {

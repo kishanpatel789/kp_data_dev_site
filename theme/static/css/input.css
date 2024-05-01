@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+article h2 {
+    @apply text-2xl mt-4
+}
+
 article p {
     @apply mt-2
 }
@@ -17,4 +21,8 @@ article .highlight {
 
 article p code {
     @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm
+}
+
+article hr {
+    @apply border-gray-300 my-4
 }
