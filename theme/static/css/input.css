@@ -3,19 +3,16 @@
 @tailwind utilities;
 
 article p {
-    @apply py-2
+    @apply mt-2
 }
 
 article ul {
-    @apply py-2 list-disc list-inside
+    padding: 0 0 0 25px;
+    @apply list-disc list-inside
 }
 
-/* article ul ul {
-    list-style-type: revert;
-} */
-
 article .highlight {
-    @apply p-4 rounded-lg text-sm
+    @apply p-4 mt-2 rounded-lg text-sm
 }
 
 article p code {

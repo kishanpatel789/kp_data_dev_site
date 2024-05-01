@@ -837,22 +837,17 @@ video {
 }
 
 article p {
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  margin-top: 0.5rem;
 }
 
 article ul {
+  padding: 0 0 0 25px;
   list-style-position: inside;
-  list-style-type: disc;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
+  list-style-type: disc
 }
 
-/* article ul ul {
-    list-style-type: revert;
-} */
-
 article .highlight {
+  margin-top: 0.5rem;
   border-radius: 0.5rem;
   padding: 1rem;
   font-size: 0.875rem;
