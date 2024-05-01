@@ -43,6 +43,10 @@ EXTRA_PATH_METADATA = {
 
 DEFAULT_DATE_FORMAT = '%d %b %Y'
 
+DEFAULT_METADATA = {
+    'status': 'draft',
+}
+
 MARKDOWN = {
     'extension_configs': {
         'markdown.extensions.codehilite': {

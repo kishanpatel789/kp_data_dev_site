@@ -3,6 +3,7 @@ Date: 2024-04-24
 Slug: what-is-data-engineering-for-your-mom
 Tags: data-engineering
 Summary: Have you ever had trouble explaining your job as a data engineer? This one's for you, Mom.
+Status: published
 
 There was a time when I didn't have to explain what I did for a living. I said I was a teacher and people instantly understood the nature of my day-to-day. Then I entered into the analytics field. When people asked, "What do you do?", I would answer, "I'm a data engineer." The response was consistent: blank stares or confused looks. The reaction is quite reasonable. Everyone's had a teacher and teachers have been around since the dawn of time. A data engineer, on the other hand, well that title didn't exist 10 years ago. I typically fill the awkward silence after my initial answer with something like "I'm like a data plumber. I build data pipelines to move data from one place to another." This occasionally generates a few laughs and moves the conversation to another topic, but it still doesn't help a person better understand what I do for a living. 
 
