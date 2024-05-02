@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
 {% block title %}{{ SITENAME|striptags }} - {{ page.title|striptags }}{%endblock%}
+{% block meta_og_title %}{{ SITENAME|striptags }} - {{ page.title|striptags }}{%endblock%}
+{% block meta_twitter_title %}{{ SITENAME|striptags }} - {{ page.title|striptags }}{%endblock%}
+
+{% block meta_og_url %}{{ page.url }}{%endblock%}
+{% block meta_twitter_url %}{{ page.url }}{%endblock%}
 
 {% block main %}
 
