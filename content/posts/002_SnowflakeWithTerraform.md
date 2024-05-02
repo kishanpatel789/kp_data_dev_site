@@ -4,9 +4,21 @@ Slug: snowflake-with-terraform
 Tags: cloud, terraform, snowflake
 Summary: Cut down on your Snowflake project costs by managing cloud infrastructure with Terraform!
 
-When developing a new project on a cloud platform, it's nice to be able to quickly tear down what you built at the end of the day so you don't incur storage and compute costs overnight. Even more helpful is being able to re-provision your cloud resources the next day to continue your work. 
+It's a lot of fun to develop a new project using a cloud platform like Snowflake. You can quickly spin up databases and virtual compute with the click of a button to test new features. What's not fun is the unexpected bill that comes at the end of the month. When developing proof-of-concepts, these costs can be drastically reduced by simply destroying the resources created in Snowflake when you're not using them. Ideally, you could spend your day working in the cloud platform and at the end of the day, you could quickly tear down what you built to avoid storage and compute costs overnight. Even more ideally, you could re-provision your cloud resources the next day to continue your work. 
 
-On a recent data engineering project, I used Snowflake as a data warehouse. The setup included a three schemas and a service user that would be used to manage data objects within the databases. What follows is a brief description of how you can use Terraform to provision a basic data warehouse. 
+On a recent data engineering project, I used Snowflake as a data warehouse. The setup included a three schemas and a service user that would be used to manage data objects within the databases. Below is a brief description of how you can use Terraform to provision a basic data warehouse. Terraform is an Infrasturcture-As-Code (IAC) solution for managing cloud resources. Terraform allows you to define the target state of your cloud resources and keeps a log of the current state. The Terraform executable then attempts to create, modify, and delete cloud resources to make the current state match the target state. For small projects, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers. 
+
+## Setup
+
+Download Terraform executable
+
+Create snowflake account
+
+Download repo
+
+modify variables
+
+## Explanation of repo
 
 Here's the directory of files we need:
 
@@ -14,10 +26,10 @@ Here's the directory of files we need:
 - outputs.tf
 - variables.tf
 - modules
-	- snowflake
-		- main.tf
-		- outputs.tf
-		- variables.tf
+  - snowflake
+    - main.tf
+    - outputs.tf
+    - variables.tf
 
 The code can be found in this repo: [link here]
 
@@ -46,6 +58,8 @@ password='<user-password>'
 role='ACCOUNTADMIN'
 ```
 
+## Let's get this show on the road
+
 Within the root Terraform directory, execute the following command to load the environment variables: 
 `source .env`
 
@@ -64,33 +78,6 @@ As with creation, terraform will prompt a list of all resources scheduled for de
 
 And that's it! This configuration will quickly allow the spinning up and tearing donw of Snowflake databases. After resource creation, you can implement data pipelines to materialize tables and views within the three schemas. Destroying the resources via Terraform at the end of the day will ensure you do not pay for storage costs overnight. 
 
-```python
-from typing import Iterator
-
-# This is an example
-class Math:
-    @staticmethod
-    def fib(n: int) -> Iterator[int]:
-        """Fibonacci series up to n."""
-        a, b = 0, 1
-        while a < n:
-            yield a
-            a, b = b, a + b
-
-result = sum(Math.fib(42))
-print(f"The answer is {result}")
-```
-
-```sql
--- test query
-SELECT * FROM mY_table
-WHERE col = 'spicy';
-```
-
-	#!python {linenums=False}
-	# This line is emphasized
-	# This line isn't
-	# This line is emphasized
 	
 
 
