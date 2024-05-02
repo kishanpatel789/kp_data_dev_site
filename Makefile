@@ -15,6 +15,8 @@ SSH_TARGET_DIR=/var/www
 
 S3_BUCKET=kp-data-dev-site
 
+CLOUDFRONT_ID=E3LKPMK8I8304X
+
 
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
@@ -90,6 +92,9 @@ rsync_upload: publish
 
 s3_upload: publish
 	aws s3 sync "$(OUTPUTDIR)"/ s3://$(S3_BUCKET) --delete
+
+cf_invalidate:  
+	aws cloudfront create-invalidation --distribution-id $(CLOUDFRONT_ID) --paths "/*"
 
 
 .PHONY: html help clean regenerate serve serve-global devserver devserver-global publish ssh_upload sftp_upload rsync_upload s3_upload
