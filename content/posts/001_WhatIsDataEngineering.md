@@ -7,7 +7,7 @@ Status: published
 
 There was a time when I didn't have to explain what I did for a living. I said I was a teacher and people instantly understood the nature of my day-to-day. Then I entered into the analytics field. When people asked, "What do you do?", I would answer, "I'm a data engineer." The response was consistent: blank stares or confused looks. The reaction is quite reasonable. Everyone's had a teacher and teachers have been around since the dawn of time. A data engineer, on the other hand... well that title didn't exist 10 years ago. I typically fill the awkward silence after my answer with something like "I'm like a data plumber. I build data pipelines to move data from one place to another." This occasionally generates a few laughs and moves the conversation to another topic, but it still doesn't help a person better understand what I do for a living. 
 
-The ability to communicate my skillset is a barrier as I market my services. So here, I'm going to try to explain what exactly data engineering is. In most simple terms, a data engineer writes code to move data from one location to another location, occasionally making changes to the data to make it more usable. This then leads to the following questions: 
+Communicating my skillset is a barrier as I market my services. So here, I'll try to explain what exactly data engineering is. In most simple terms, a data engineer writes code to move data from one location to another location, occasionally making changes to the data to make it more usable. This then leads to the following questions: 
 
 - What data are we talking about?
 - Why do we need to move data at all if it already exists somewhere?
@@ -25,6 +25,6 @@ This then leads to the final question: Why do data engineers use code or automat
 
 ---
 
-So that's basically it. A data engineer is someone who understands a business problem and writes code to move data from one location to another to address that problem. Embedded in this work is the need to transform and cleanse the original data into a format that's more helpful for others to use. They're the unsung heroes behind the data scientists building the cool machine learning models or the data analysts making a ground-breaking discovery about the company's customer base. You know... a data plumber. 
+So that's basically it. A data engineer is someone who understands a business problem and writes code to move data from one location to another to address that problem. Embedded in this work is the need to transform and cleanse the original data into a format that's more helpful for others to use. They're the unsung heroes behind the data scientists building the cool machine learning models or the analysts making a ground-breaking discovery about the company's customer base. You know... a data plumber. 
 
 Do you have a collection of data that's unused? Or do you have a tedious, manual method of managing your data? Reach out to your local data plumber at KP Data Dev. We're happy to jump in and get the job done so you can move on to building your amazing business. 
