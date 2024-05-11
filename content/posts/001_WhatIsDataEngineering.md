@@ -1,5 +1,5 @@
 Title: What is Data Engineering? (For Your Mom)
-Date: 2024-04-24
+Date: 2024-05-11
 Slug: what-is-data-engineering-for-your-mom
 Tags: data-engineering
 Summary: Have you ever had trouble explaining your job as a data engineer? This one's for you, Mom.
