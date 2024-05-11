@@ -4,8 +4,8 @@
 {% block meta_og_title %}<meta property="og:title" content="{{ SITENAME|striptags }} - {{ page.title|striptags }}">{% endblock %}
 {% block meta_twitter_title %}<meta name="twitter:title" content="{{ SITENAME|striptags }} - {{ page.title|striptags }}">{% endblock %}
 
-{% block meta_og_url %}<meta property="og:url" content="{{ page.url }}">{% endblock %}
-{% block meta_twitter_url %}<meta property="twitter:url" content="{{ page.url }}">{% endblock %}
+{% block meta_og_url %}<meta property="og:url" content="{{ SITEURL }}/{{ page.url }}">{% endblock %}
+{% block meta_twitter_url %}<meta property="twitter:url" content="{{ SITEURL }}/{{ page.url }}">{% endblock %}
 
 
 {% block main %}
