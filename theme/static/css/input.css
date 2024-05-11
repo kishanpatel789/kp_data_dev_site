@@ -26,3 +26,7 @@ article p code {
 article hr {
     @apply border-gray-300 my-4
 }
+
+article p a {
+    @apply underline underline-offset-4 hover:text-kpddaccent transition-colors duration-200
+}

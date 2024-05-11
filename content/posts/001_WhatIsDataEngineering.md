@@ -36,4 +36,4 @@ This then leads to the final question: Why do data engineers use code or automat
 
 So that's basically it. A data engineer is someone who understands a business problem and writes code to move data from one location to another to address that problem. Embedded in this work is the need to transform and cleanse the original data into a format that's more helpful for others to use. They're the unsung heroes behind the data scientists building the cool machine learning models or the analysts making a ground-breaking discovery about the company's customer base. You know... a data plumber. 
 
-Do you have a collection of data that's unused? Or do you have a tedious, manual method of managing your data? Reach out to your local data plumber at KP Data Dev. We're happy to jump in and get the job done so you can move on to building your amazing business. 
+Do you have a collection of data that's unused? Or do you have a tedious, manual method of managing your data? Reach out to your [local data plumber at KP Data Dev](https://kpdata.dev). We're happy to jump in and get the job done so you can move on to building your amazing business. 
