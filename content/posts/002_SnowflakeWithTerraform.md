@@ -3,6 +3,7 @@ Date: 2024-04-24
 Slug: snowflake-with-terraform
 Tags: cloud, terraform, snowflake
 Summary: Cut down on your Snowflake project costs by managing cloud infrastructure with Terraform!
+Status: draft
 
 It's a lot of fun to develop a new project using a cloud platform like Snowflake. You can quickly spin up databases and virtual compute with the click of a button to test new features. What's not fun is the unexpected bill that comes at the end of the month. When developing proof-of-concepts, these costs can be drastically reduced by simply destroying the resources created in Snowflake when you're not using them. Ideally, you could spend your day working in the cloud platform and at the end of the day, you could quickly tear down what you built to avoid storage and compute costs overnight. Even more ideally, you could re-provision your cloud resources the next day to continue your work. 
 

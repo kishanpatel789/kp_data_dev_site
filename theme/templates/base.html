@@ -2,28 +2,30 @@
 <html lang="en" class="h-screen">
 <head>
   {% block head %}
-  <title>{% block title %}{{ SITENAME|striptags }}{% endblock title %}</title>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ SITENAME|striptags }}{% endblock title %}</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta name="description" content="{% block meta_description %}Turn raw data into actionable insights. Our expert team designs and implements efficient data pipelines, making your data accessible from any source - ERPs, web APIs, siloed databases, or spreadsheets - within a curated data warehouse.{% endblock %}" />
+    {% block meta_description %}
+      <meta name="description" content="Turn raw data into actionable insights. Our expert team designs and implements efficient data pipelines, making your data accessible from any source - ERPs, web APIs, siloed databases, or spreadsheets - within a curated data warehouse." />
+    {% endblock %}
 
-  <meta property="og:title" content="{% block meta_og_title %}KP Data Dev{% endblock %}">
-  <meta property="og:type" content="{% block meta_og_type %}website{% endblock %}">
-  <meta property="og:description" content="{% block meta_og_description %}Turn raw data into actionable insights. Our expert team designs and implements efficient data pipelines, making your data accessible from any source - ERPs, web APIs, siloed databases, or spreadsheets - within a curated data warehouse.{% endblock %}">
-  <meta property="og:image" content="https://kpdata.dev/theme/svg/LightLogo_OG.svg">
-  <meta property="og:url" content="{% block meta_og_url %}https://kpdata.dev{% endblock %}">
-  <meta property="og:site_name" content="kpdata.dev">
+    {% block meta_og_title %}<meta property="og:title" content="KP Data Dev">{% endblock %}
+    {% block meta_og_type %}<meta property="og:type" content="website">{% endblock %}
+    {% block meta_og_description %}<meta property="og:description" content="Turn raw data into actionable insights. Our expert team designs and implements efficient data pipelines, making your data accessible from any source - ERPs, web APIs, siloed databases, or spreadsheets - within a curated data warehouse.">{% endblock %}
+    {% block meta_og_image %}<meta property="og:image" content="https://kpdata.dev/theme/svg/LightLogo_OG.svg">{% endblock %}
+    {% block meta_og_url %}<meta property="og:url" content="https://kpdata.dev">{% endblock %}
+    <meta property="og:site_name" content="kpdata.dev">
 
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{% block meta_twitter_title %}KP Data Dev{% endblock %}">
-  <meta name="twitter:description" content="{% block meta_twitter_description %}Turn raw data into actionable insights. Our expert team designs and implements efficient data pipelines, making your data accessible from any source - ERPs, web APIs, siloed databases, or spreadsheets - within a curated data warehouse.{% endblock %}">
-  <meta name="twitter:image" content="https://kpdata.dev/theme/svg/LightLogo_OG.svg">
-  <meta property="twitter:url" content="{% block meta_twitter_url %}https://kpdata.dev{% endblock %}">
-  <meta property="twitter:domain" content="kpdata.dev">
-  
-  <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/main.css" />
-  <link rel="icon" type="image/svg+xml" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/Favicon.svg">
+    <meta name="twitter:card" content="summary_large_image">
+    {% block meta_twitter_title %}<meta name="twitter:title" content="KP Data Dev">{% endblock %}
+    {% block meta_twitter_description %}<meta name="twitter:description" content="Turn raw data into actionable insights. Our expert team designs and implements efficient data pipelines, making your data accessible from any source - ERPs, web APIs, siloed databases, or spreadsheets - within a curated data warehouse.">{% endblock %}
+    {% block meta_twitter_image %}<meta name="twitter:image" content="https://kpdata.dev/theme/svg/LightLogo_OG.svg">{% endblock %}
+    {% block meta_twitter_url %}<meta property="twitter:url" content="https://kpdata.dev">{% endblock %}
+    <meta property="twitter:domain" content="kpdata.dev">
+    
+    <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/main.css" />
+    <link rel="icon" type="image/svg+xml" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/Favicon.svg">
   {% endblock head %}
 </head>
 
