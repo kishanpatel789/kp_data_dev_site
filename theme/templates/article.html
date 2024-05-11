@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
 {% block title %}{{ article.title|striptags }}{% endblock %}
-{% block meta_og_title %}<meta property="og:title" content="{{ SITENAME|striptags }} - {{ article.title|striptags }}">{% endblock %}
-{% block meta_twitter_title %}<meta name="twitter:title" content="{{ SITENAME|striptags }} - {{ article.title|striptags }}">{% endblock %}
+{% block meta_og_title %}<meta property="og:title" content="{{ article.title|striptags }}">{% endblock %}
+{% block meta_twitter_title %}<meta name="twitter:title" content="{{ article.title|striptags }}">{% endblock %}
 
 {% block meta_og_url %}<meta property="og:url" content="{{ SITEURL }}/{{ article.url }}">{% endblock %}
 {% block meta_twitter_url %}<meta property="twitter:url" content="{{ SITEURL }}/{{ article.url }}">{% endblock %}
