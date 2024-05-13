@@ -5,19 +5,31 @@ Tags: cloud, terraform, snowflake
 Summary: Cut down on your Snowflake project costs by managing cloud infrastructure with Terraform!
 Status: draft
 
-It's a lot of fun to develop a new project using a cloud platform like Snowflake. You can quickly spin up databases and virtual compute with the click of a button to test new features. What's not fun is the unexpected bill that comes at the end of the month. When developing proof-of-concepts, these costs can be drastically reduced by simply destroying the resources created in Snowflake when you're not using them. Ideally, you could spend your day working in the cloud platform and at the end of the day, you could quickly tear down what you built to avoid storage and compute costs overnight. Even more ideally, you could re-provision your cloud resources the next day to continue your work. 
+It's a lot of fun to develop a new project using a cloud platform like [Snowflake](https://www.snowflake.com/). You can quickly spin up databases and virtual compute with the click of a button to test new features. What's not fun is the unexpected bill that comes at the end of the month. When developing proof-of-concepts, these costs can be drastically reduced by simply destroying the resources created in Snowflake when you're not using them. Ideally, you could spend your day working in the cloud platform and at the end of the day, you could quickly tear down what you built to avoid storage and compute costs overnight. Even more ideally, you could re-provision your cloud resources the next day to continue your work. 
 
-On a recent data engineering project, I used Snowflake as a data warehouse. The setup included a three schemas and a service user that would be used to manage data objects within the databases. Below is a brief description of how you can use Terraform to provision a basic data warehouse. Terraform is an Infrasturcture-As-Code (IAC) solution for managing cloud resources. Terraform allows you to define the target state of your cloud resources and keeps a log of the current state. The Terraform executable then attempts to create, modify, and delete cloud resources to make the current state match the target state. For small projects, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers. 
+On a recent data engineering project, I used Snowflake as a data warehouse. The setup included a three schemas and a service user that would be used to manage data objects within the databases. Below is a brief description of how you can use Terraform to provision a basic data warehouse. [Terraform](https://www.terraform.io/) is an Infrasturcture-As-Code (IAC) solution for managing cloud resources. Terraform allows you to define the target state of your cloud resources and keeps a log of the current state. The Terraform executable then attempts to create, modify, and delete cloud resources to make the current state match the target state. For small projects, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers. 
 
 ## Setup
 
-Download Terraform executable
+Download Terraform executable: https://developer.hashicorp.com/terraform/install
 
-Create snowflake account
+Create snowflake account: https://signup.snowflake.com/
 
-Download repo
+Download repo: https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/snowflake_with_terraform
 
 modify variables
+
+Before the terraform configuration can take affect, a target Snowflake account and configuration need to be established. A Snowflake account can be created here: [insert url]
+The user used to create the account should have the ACCOUNTADMIN role. 
+On the local computer, create a configuration file `~/.snowflake/config` that contains Snowflake credentials for the user with the ACCOUNTADMIN role:
+
+```toml
+[default]
+account='<snowflake-account-identifier>'
+user='<user-name>'
+password='<user-password>'
+role='ACCOUNTADMIN'
+```
 
 ## Explanation of repo
 
@@ -47,17 +59,7 @@ One might expect that the order of resource creation matters. For example, a dat
 Similar dependencies can be used to ensure that a user is created after the warehouse and role it will assume is created. 
 This dependency management is perhaps most important when assigning permissions to roles in Snowflake. To ensure the role has rights on both current tables and future tables, a pair of "grant privileges" resources can be created for each schema. 
 
-Before the terraform configuration can take affect, a target Snowflake account and configuration need to be established. A Snowflake account can be created here: [insert url]
-The user used to create the account should have the ACCOUNTADMIN role. 
-On the local computer, create a configuration file `~/.snowflake/config` that contains Snowflake credentials for the user with the ACCOUNTADMIN role:
 
-```toml
-[default]
-account='<snowflake-account-identifier>'
-user='<user-name>'
-password='<user-password>'
-role='ACCOUNTADMIN'
-```
 
 ## Let's get this show on the road
 
