@@ -32,7 +32,7 @@ THEME = './theme'
 
 DIRECT_TEMPLATES = ['index']
 TEMPLATE_PAGES = {
-    'archives.html': 'blog/index.html'
+    'archives.html': 'blog/index.html',
 }
 
 STATIC_PATHS = ['static']
