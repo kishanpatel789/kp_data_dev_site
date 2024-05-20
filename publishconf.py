@@ -13,6 +13,10 @@ RELATIVE_URLS = False
 
 DELETE_OUTPUT_DIRECTORY = True
 
+# custom conf
+DRAFT_URL = ''
+DRAFT_SAVE_AS = ''
+
 # Following items are often useful when publishing
 
 # DISQUS_SITENAME = ""
