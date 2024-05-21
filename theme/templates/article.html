@@ -41,6 +41,8 @@
 
 {% endblock %}
 
+{% block link_canonical %}<link rel="canonical" href="{{ SITEURL }}/{{ article.url }}" />{% endblock %}
+
 {% block content %}
 <article class="mb-16">
   <header class="mb-4">
