@@ -31,6 +31,8 @@ TAG_SAVE_AS = ''  # don't generate tag pages
 DRAFT_URL = 'drafts/{slug}/'
 DRAFT_SAVE_AS = 'drafts/{slug}/index.html'
 
+PLUGINS = ['sitemap']
+
 THEME = './theme'
 
 DIRECT_TEMPLATES = ['index']
@@ -60,4 +62,8 @@ MARKDOWN = {
         'markdown.extensions.meta': {},
     },
     'output_format': 'html5',
+}
+
+SITEMAP = {
+    'format': 'xml',
 }
