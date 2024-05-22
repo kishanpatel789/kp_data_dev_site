@@ -20,4 +20,4 @@ DRAFT_SAVE_AS = ''
 # Following items are often useful when publishing
 
 # DISQUS_SITENAME = ""
-# GOOGLE_ANALYTICS = ""
+GOOGLE_ANALYTICS = "G-5D6LDTCWT9"
