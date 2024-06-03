@@ -13,19 +13,12 @@ On a recent data engineering project, I used Snowflake as a data warehouse. The 
 
 ## Setup
 
-For small projects, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers.
+### 1. Create Snowflake Account
+First thing's first: You need a Snowflake account. If you don't have one, you can create a free trial here: [https://signup.snowflake.com/](https://signup.snowflake.com/). 
 
-Download Terraform executable: https://developer.hashicorp.com/terraform/install
+Next, we need to identify a user in the Snowflake account that Terraform will impersonate when managing Snowflake resources. It's helpful for this user to have the `ACCOUNTADMIN` role. By default, the user that creates the Snowflake account should have the `ACCOUNTADMIN` role. 
 
-Create snowflake account: https://signup.snowflake.com/
-
-Download repo: https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/snowflake_with_terraform
-
-modify variables
-
-Before the terraform configuration can take affect, a target Snowflake account and configuration need to be established. A Snowflake account can be created here: [insert url]
-The user used to create the account should have the ACCOUNTADMIN role. 
-On the local computer, create a configuration file `~/.snowflake/config` that contains Snowflake credentials for the user with the ACCOUNTADMIN role:
+For this tutorial, we can allow Terraform to authenticate in Snowflake via username and password. (Other methods of authentication can be found [here](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs#authentication)). On your local computer, create a configuration file `~/.snowflake/config` that contains Snowflake credentials for the user with the ACCOUNTADMIN role:
 
 ```toml
 [default]
@@ -34,6 +27,22 @@ user='<user-name>'
 password='<user-password>'
 role='ACCOUNTADMIN'
 ```
+
+Replace this template with the account identifier and user credentials in your scenario. Terraform will look use this "default" profile to connect to your Snowflake account. 
+
+### 2. Install Terraform
+Next, to use Terraform, you gotta get Terraform: [https://developer.hashicorp.com/terraform/install](https://developer.hashicorp.com/terraform/install)
+
+Download the Terraform binary package for your operating system. In practice, we'll use Terraform from a terminal, so the Terraform executable must be in your terminal's `PATH` variable. You can verify your installation was successfully by running the command `terraform -help`. 
+
+### 3. Download Repo
+
+
+Download repo: https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/snowflake_with_terraform
+
+modify variables
+
+
 
 ## Explanation of repo
 
@@ -49,6 +58,8 @@ Here's the directory of files we need:
 ├── outputs.tf
 └── variables.tf
 ```
+
+For small projects, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers.
 
 
 The root directory's `main.tf` file can be considered the entry point for the terraform configuration. It lists the required providers and modules that will be maintained by the repo. In this case, we define the snowflake provider sourced from `Snowflake-Labs/snowflake` and specify a local backend. The local backend simply states that the "status" of the current cloud resources is stored on your local machine. In production, you'd want this to be in a shared location like Terraform Cloud for team collaboration and increased reliability. 
