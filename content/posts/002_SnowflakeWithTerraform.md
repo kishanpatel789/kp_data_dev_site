@@ -7,9 +7,13 @@ Status: draft
 
 It's a lot of fun to develop a new project using a cloud platform like [Snowflake](https://www.snowflake.com/). You can quickly spin up databases and virtual compute with the click of a button to test new features. What's not fun is the unexpected bill that comes at the end of the month. When developing proof-of-concepts, these costs can be drastically reduced by simply destroying the resources created in Snowflake when you're not using them. Ideally, you could spend your day working in the cloud platform and at the end of the day, you could quickly tear down what you built to avoid storage and compute costs overnight. Even more ideally, you could re-provision your cloud resources the next day to continue your work. 
 
-On a recent data engineering project, I used Snowflake as a data warehouse. The setup included a three schemas and a service user that would be used to manage data objects within the databases. Below is a brief description of how you can use Terraform to provision a basic data warehouse. [Terraform](https://www.terraform.io/) is an Infrasturcture-As-Code (IAC) solution for managing cloud resources. Terraform allows you to define the target state of your cloud resources and keeps a log of the current state. The Terraform executable then attempts to create, modify, and delete cloud resources to make the current state match the target state. For small projects, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers. 
+[Terraform](https://www.terraform.io/) is an Infrasturcture-As-Code (IAC) solution for managing cloud resources. That's a fancy way of saying that you use programming to create stuff in the cloud instead of using the traditional click-and-type steps in a user interface or instead of using a custom API made available by the cloud provider. Terraform allows you to define the target state of your cloud resources and keeps a log of the current state. The Terraform executable then attempts to create, modify, and delete cloud resources to make the current state match the target state.  
+
+On a recent data engineering project, I used Snowflake as a data warehouse. The setup included a database, three schemas and a service user that would be used to manage data objects within the database. Below is a brief description of how you can use Terraform to provision a basic data warehouse. 
 
 ## Setup
+
+For small projects, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers.
 
 Download Terraform executable: https://developer.hashicorp.com/terraform/install
 
@@ -35,16 +39,17 @@ role='ACCOUNTADMIN'
 
 Here's the directory of files we need:
 
-- main.tf
-- outputs.tf
-- variables.tf
-- modules
-  - snowflake
-    - main.tf
-    - outputs.tf
-    - variables.tf
+```bash
+├── main.tf
+├── modules
+│   └── snowflake
+│       ├── main.tf
+│       ├── outputs.tf
+│       └── variables.tf
+├── outputs.tf
+└── variables.tf
+```
 
-The code can be found in this repo: [link here]
 
 The root directory's `main.tf` file can be considered the entry point for the terraform configuration. It lists the required providers and modules that will be maintained by the repo. In this case, we define the snowflake provider sourced from `Snowflake-Labs/snowflake` and specify a local backend. The local backend simply states that the "status" of the current cloud resources is stored on your local machine. In production, you'd want this to be in a shared location like Terraform Cloud for team collaboration and increased reliability. 
 We have one module "snowflake" which requires a single variable for the service user's password. The variable is passed to the Terraform executable at runtime as an environment to avoid committing the password to the code's repository. The password can be stored in the file .env and declared in the variables.tf file.
