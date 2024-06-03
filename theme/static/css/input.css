@@ -6,6 +6,10 @@ article h2 {
     @apply text-2xl mt-4
 }
 
+article h3 {
+    @apply text-xl mt-2
+}
+
 article p {
     @apply mt-2
 }
