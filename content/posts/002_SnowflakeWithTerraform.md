@@ -33,36 +33,27 @@ Replace this template with the account identifier and user credentials in your s
 ### 2. Install Terraform
 Next, to use Terraform, you gotta get Terraform: [https://developer.hashicorp.com/terraform/install](https://developer.hashicorp.com/terraform/install)
 
-Download the Terraform binary package for your operating system. In practice, we'll use Terraform from a terminal, so the Terraform executable must be in your terminal's `PATH` variable. You can verify your installation was successfully by running the command `terraform -help`. 
+Terraform is bundled as a compiled binary package that can run on your local machine. Download the package for your operating system. In practice, we'll use Terraform from a terminal, so the Terraform executable must be in your terminal's `PATH` variable. You can verify your installation was successfully by running the command `terraform -help`. 
 
 ### 3. Download Repo
-
-
-Download repo: https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/snowflake_with_terraform
-
-modify variables
-
-
+The code for this walkthrough can be downloaded from this [Github repo](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/snowflake_with_terraform). We'll walk through the Terraform configuration within these files and modify variables as we go. 
 
 ## Explanation of repo
-
-Here's the directory of files we need:
+Alright, let's talk about the Terraform configuration files. Here's the full directory of files: 
 
 ```bash
 ├── main.tf
+├── outputs.tf
+├── variables.tf
 ├── modules
 │   └── snowflake
 │       ├── main.tf
 │       ├── outputs.tf
 │       └── variables.tf
-├── outputs.tf
-└── variables.tf
 ```
 
-For small projects, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers.
+The [standard module structure](https://developer.hashicorp.com/terraform/language/modules/develop/structure) of Terraform has a root module containing three files: `main.tf`, `variables.tf`, and `outputs.tf`. The root directory's `main.tf` file serves as the entry point for the terraform configuration. It lists the required providers and modules that will be maintained by the repo. In this case, we define the snowflake provider sourced from `Snowflake-Labs/snowflake` and specify a local backend. The local backend simply states that the "status" of the current cloud resources is stored on your local machine. For small projects like this, you can keep store the current state on your local machine. For production environments, it's best to use Terraform Cloud to manage the current state, especially when collaborating with other developers.
 
-
-The root directory's `main.tf` file can be considered the entry point for the terraform configuration. It lists the required providers and modules that will be maintained by the repo. In this case, we define the snowflake provider sourced from `Snowflake-Labs/snowflake` and specify a local backend. The local backend simply states that the "status" of the current cloud resources is stored on your local machine. In production, you'd want this to be in a shared location like Terraform Cloud for team collaboration and increased reliability. 
 We have one module "snowflake" which requires a single variable for the service user's password. The variable is passed to the Terraform executable at runtime as an environment to avoid committing the password to the code's repository. The password can be stored in the file .env and declared in the variables.tf file.
 
 Within the snowflake module, we define two variables for the service user password as well as the snowflake configuration profile name set in the local machine. 
