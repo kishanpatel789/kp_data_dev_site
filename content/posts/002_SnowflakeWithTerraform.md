@@ -98,7 +98,7 @@ provider "snowflake" {
 # ... cloud resources defined below ...
 ```
 
-Let's talk briefly about dependency management. You may expect that the order in which you create Snowflake objects matters. For example, a database must be created before an attempt is made to create a schema within that database. Terraform handles such dependencies implicitly through the use of references to other resources. For example, referencing the database name by the Terraform resource handler instead of a hard-coded database name informs the Terraform engine that the schema requires the database to be available first: 
+Let's talk briefly about dependency management. As you may expect, the order in which you create Snowflake objects matters. For example, you need to create a database before you try creating a schema within that database. Terraform handles such dependencies implicitly through the use of references to other resources. For example, referencing the database name by the Terraform resource handler instead of a hard-coded database name informs the Terraform engine that the schema requires the database to be available first: 
 
 ```terraform
 # ./modules/snowflake/main.tf
@@ -116,11 +116,24 @@ resource "snowflake_schema" "raw" {
 # ...
 ```
 
-Similar dependencies can be used to ensure that a user is created after the warehouse and role it will assume are created. 
+When Terraform sees such dependencies, the Terraform executable will ensure resources are created in the proper order. Conversely, if you use hard-coded string values to reference the database your schema resides in, you may have receive an error saying something like "schema cannot be created because database does not exist." Similar dependencies can be used to ensure that a user is created after the warehouse and role it will assume are created. 
 
-This dependency management is perhaps most important when assigning permissions to Snowflake roles. To ensure the role has rights on both current tables and future tables, a pair of "grant privileges" resources can be created for each schema. 
+If you scroll through the rest of `./modules/snowflake/main.tf`, you'll see resources for the service user and role as well as several privileges that allow the service role to use the database, schemas, tables, and virtual warehouse in our Snowflake account. 
 
+Lastly, the module has an output file `./modules/snowflake/outputs.tf` that does what's perhaps obvious: it declares the module's output variables. 
 
+```terraform
+# ./modules/snowflake/outputs.tf
+output "snowflake_warehouse_name" {
+  value = snowflake_warehouse.hogwarts_wh.name
+}
+
+output "snowflake_service_user_username" {
+  value = snowflake_user.svc_hogwarts.name
+}
+```
+
+These output variables can then be used by other modules. For example, you may want to store the use the Snowflake warehouse name and service user name in another module that manages AWS resources 
 
 ## Let's get this show on the road
 
