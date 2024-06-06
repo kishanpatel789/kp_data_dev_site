@@ -33,7 +33,7 @@ Replace this template with the account identifier and user credentials in your s
 ### 2. Install Terraform
 Next, to use Terraform, you gotta get Terraform: [https://developer.hashicorp.com/terraform/install](https://developer.hashicorp.com/terraform/install)
 
-Terraform is bundled as a compiled binary package that can run on your local machine. Download the package for your operating system. In practice, we'll use Terraform from a terminal, so the Terraform executable must be in your terminal's `PATH` variable. You can verify your installation was successfully by running the command `terraform -help`. 
+Terraform is bundled as a compiled binary package that can run on your local machine. Download the package for your operating system. In practice, we'll use Terraform from a terminal, so the Terraform executable must be in your terminal's `PATH` variable. You can verify your installation was successful by running the command `terraform -help`. 
 
 ### 3. Download Repo
 The code for this walkthrough can be downloaded from this [Github repo](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/snowflake_with_terraform). We'll walk through the Terraform configuration within these files and modify variables as we go. 
@@ -77,6 +77,11 @@ module "snowflake" {
 ```
 
 The root `main.tf` file also lists modules that are loaded into the configuration. [Terraform modules](https://developer.hashicorp.com/terraform/language/modules) are a great way to group resources that are used together; they can be also be used to package and reuse Terraform configurations between projects. We have one module "snowflake" which expects a variable for the service user's password. The variable is passed to the Terraform executable at runtime as an environment variable to avoid committing the password to the code's repository. The password can be stored in the file `.env` and declared in the `variables.tf` file.
+
+```bash
+# .env
+export TF_VAR_snowflake_service_user_password=<enter-your-password>
+```
 
 Next, let's look at the files within the snowflake module. In `./modules/snowflake/variables.tf`, we define two variables: one variable stores the snowflake configuration profile name (with "default" as the default value); another variable stores the service user password. The module's `main.tf` file configures the provider to use this profile and then defines the cloud resources to provision. 
 
@@ -133,9 +138,9 @@ output "snowflake_service_user_username" {
 }
 ```
 
-These output variables can then be used by other modules. For example, you may want to store the use the Snowflake warehouse name and service user name in another module that manages AWS resources 
+These output variables can then be used by other modules. For example, you may want to use the Snowflake warehouse name and service user name in another module that manages AWS resources, like AWS Glue for pipelines that deliver data to Snowflake via the service user. 
 
-## Let's get this show on the road
+## Enough talk, I wanna see some action 
 
 Within the root Terraform directory, execute the following command to load the environment variables: 
 `source .env`
