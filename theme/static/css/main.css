@@ -934,6 +934,11 @@ article p a:hover {
   color: rgb(194 174 69 / var(--tw-text-opacity));
 }
 
+.highlight pre {
+  overflow-x: auto;
+  white-space: pre;
+}
+
 .hover\:scale-110:hover {
   --tw-scale-x: 1.1;
   --tw-scale-y: 1.1;

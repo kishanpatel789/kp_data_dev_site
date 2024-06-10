@@ -34,3 +34,7 @@ article hr {
 article p a {
     @apply underline underline-offset-4 hover:text-kpddaccent transition-colors duration-200
 }
+
+.highlight pre {
+    @apply overflow-x-auto whitespace-pre
+}
