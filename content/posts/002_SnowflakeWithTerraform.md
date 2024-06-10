@@ -1,5 +1,5 @@
 Title: Snowflake with Terraform
-Date: 2024-04-24
+Date: 2024-06-10
 Slug: snowflake-with-terraform
 Tags: cloud, terraform, snowflake
 Summary: Cut down on your Snowflake project costs by managing cloud infrastructure with Terraform!
@@ -21,6 +21,7 @@ Next, we need to identify a user in the Snowflake account that Terraform will im
 For this tutorial, we can allow Terraform to authenticate in Snowflake via username and password. (Other methods of authentication can be found [here](https://registry.terraform.io/providers/Snowflake-Labs/snowflake/latest/docs#authentication)). On your local computer, create a configuration file `~/.snowflake/config` that contains Snowflake credentials for the user with the ACCOUNTADMIN role:
 
 ```toml
+# ~/.snowflake/config
 [default]
 account='<snowflake-account-identifier>'
 user='<user-name>'
@@ -76,14 +77,19 @@ module "snowflake" {
 }
 ```
 
-The root `main.tf` file also lists modules that are loaded into the configuration. [Modules](https://developer.hashicorp.com/terraform/language/modules) are a great way to group resources that are used together; they can be also be used to package and reuse Terraform configurations between projects. We have one module "snowflake" which expects a variable for the service user's password. The variable is passed to the Terraform executable at runtime as an environment variable to avoid committing the password to the code's repository. The variable is declared in the `variables.tf` file. The password can be stored in the file `.env` with the prefix `TF_VAR_`. Terraform will read environment variables with this prefix and load them to any variables defined in the Terraform configuration files... which brings us to another point; you need to create an `.env` file in the root directory that defines the password of your service user: 
+The root `main.tf` file also lists modules that are loaded into the configuration. [Modules](https://developer.hashicorp.com/terraform/language/modules) are a great way to group resources that are used together; they can be also be used to package and reuse Terraform configurations between projects. We have one module called "snowflake" which expects a variable for the service user's password. The variable is passed to the Terraform executable at runtime as an environment variable to avoid committing the password to the code's repository. The variable is declared in the `variables.tf` file. The password can be stored in the file `.env` with the prefix `TF_VAR_`. Terraform will read environment variables with this prefix and load them to any variables defined in the Terraform configuration files... which brings us to another point; you need to create an `.env` file in the root directory that defines the password of your service user: 
 
 ```bash
 # .env
 export TF_VAR_snowflake_service_user_password=<enter-your-password>
 ```
 
-Next, let's look at the files within the snowflake module. In `./modules/snowflake/variables.tf`, we define two variables: one variable stores the snowflake configuration profile name (with "default" as the default value); another variable stores the service user password. The module's `main.tf` file configures the provider to use this profile and then defines the cloud resources to provision. 
+Next, let's look at the files within the snowflake module. In `./modules/snowflake/variables.tf`, we define two variables: 
+
+- `snowflake_profile`: the snowflake configuration profile name (with "default" as the default value). The value you use should match the profile name you set up in `~/.snowflake/config` above. 
+- `service_user_password`: the password for the service user. When creating the service user, Terraform will ensure the user has this password. 
+
+The module's `main.tf` file configures the provider to use our local Snowflake profile and then defines the cloud resources to provision. 
 
 ```terraform
 # ./modules/snowflake/main.tf
@@ -146,16 +152,21 @@ It's time to use Terraform to create Snowflake resources. Within the root Terraf
 
 Next we need to initialize the Terraform project. Run the command `terraform init` to download the required dependencies for managing Snowflake resources. 
 Then execute the following command to create the Snowflake resources: 
-`terraform apply`.
+`terraform apply`. 
+
+<img alt="terraform apply" src="/static/images/post002/TerraformApply.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
+
 Behind the scenes, the Teraform executable with parse the files in the directory to see what you want in Snowflake; it will then use the credentials defined the configuration file `~/.snowflake/config` to access Snowflake's API and see what is currently within your Snowflake account. The CLI will present a summary of resources to be provisioned and give a prompt asking for confirmation before proceeding. Type "yes" and hit "enter"; this will cause the Terraform executable to provision the outlined resources. 
 
-And boom! You have a database, three schemas, a service user, a virtual warehouse, and all the permissions needed created in _ seconds. 
+And boom! You have a database, three schemas, a service user, a virtual warehouse, and all the permissions needed created in 1.73 seconds. 
 
-[insert screenshot of snowflake resources (maybe before and after)]
+![Terraform Before and After](/static/images/post002/TerraformBeforeAndAfter.jpeg)
 
 Aside from writing the Terraform code, this approach of creating Snowflake resources is much faster than manually creating them through the UI. 
 
-Destruction of cloud resources is just as fast and can be executed with a destroy command: `terraform destroy`. As with creation, Terraform will prompt a list of all resources scheduled for destruction. You should read the list carefully before entering "yes". 
+Destruction of cloud resources is just as fast and can be executed with a destroy command: `terraform destroy`. As with creation, Terraform will prompt a list of all resources scheduled for destruction. You should read the list carefully before entering "yes". As the prompt wisely warns, "There is no undo."
+
+<img alt="terraform destroy" src="/static/images/post002/TerraformDestroy.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
 
 And that's it! This configuration will quickly allow the spinning up and tearing down of Snowflake databases. After resource creation, you can implement data pipelines to materialize tables and views within the three schemas. Destroying the resources via Terraform at the end of the day will ensure you do not pay for storage costs overnight. This framework makes it easier to play with Snowflake resources without stressing about running up a high bill because you forgot to shut down a VM. 
 
