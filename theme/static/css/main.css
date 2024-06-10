@@ -890,9 +890,13 @@ article p {
 }
 
 article ul {
-  padding: 0 0 0 25px;
   list-style-position: inside;
-  list-style-type: disc
+  list-style-type: disc;
+}
+
+article li {
+  padding-left: 25px;
+  text-indent: -22px;
 }
 
 article .highlight {

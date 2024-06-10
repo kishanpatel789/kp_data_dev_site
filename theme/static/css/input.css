@@ -15,8 +15,12 @@ article p {
 }
 
 article ul {
-    padding: 0 0 0 25px;
     @apply list-disc list-inside
+}
+
+article li {
+    padding-left: 25px;
+    text-indent: -22px;
 }
 
 article .highlight {
