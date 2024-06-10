@@ -31,6 +31,10 @@ article p code {
     @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm
 }
 
+article li code {
+    @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm
+}
+
 article hr {
     @apply border-gray-300 my-4
 }

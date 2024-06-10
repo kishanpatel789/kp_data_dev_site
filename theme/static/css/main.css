@@ -918,6 +918,17 @@ article p code {
   color: rgb(31 41 55 / var(--tw-text-opacity));
 }
 
+article li code {
+  border-radius: 0.375rem;
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity));
+  padding: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity));
+}
+
 article hr {
   margin-top: 1rem;
   margin-bottom: 1rem;
