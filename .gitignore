@@ -4,3 +4,4 @@ notes.md
 __pycache__
 output
 scratch.txt
+.DS_Store
