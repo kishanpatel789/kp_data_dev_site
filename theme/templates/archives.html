@@ -6,6 +6,12 @@
 
 <h2 class="text-6xl mb-4">Blog</h2>
 
+<div class="mb-4">
+  {% for tag, articles in tags | sort %}
+    <a href="{{ SITEURL }}/{{ tag.url }}" class="text-gray-400 hover:text-kpddaccent duration-200">#{{ tag }}</a>&nbsp;
+  {% endfor %}
+</div>
+
 <ul>
   {% for article in articles %}
     <li class="mb-3">
@@ -17,12 +23,14 @@
       </div>
       <div class="text-gray-400 text-sm flex items-start gap-2">
         <span>{{ article.locale_date }}</span>
-        <span>&middot;</span>
-        <span>
-          {% for tag in article.tags %}
-            <a href="{{ SITEURL }}/{{ tag.url }}" class="hover:text-kpddaccent duration-200">#{{ tag }}</a>
-          {% endfor %}
-        </span>
+        {% if article.tags %}
+          <span>&middot;</span>
+          <span>
+            {% for tag in article.tags %}
+              <a href="{{ SITEURL }}/{{ tag.url }}" class="hover:text-kpddaccent duration-200">#{{ tag }}</a>
+            {% endfor %}
+          </span>
+        {% endif %}
       </div>
     </li>
   {% endfor %}
