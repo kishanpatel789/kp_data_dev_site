@@ -559,10 +559,6 @@ video {
   margin-right: auto;
 }
 
-.mb-1 {
-  margin-bottom: 0.25rem;
-}
-
 .mb-16 {
   margin-bottom: 4rem;
 }
@@ -593,10 +589,6 @@ video {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.mb-5 {
-  margin-bottom: 1.25rem;
 }
 
 .block {
@@ -908,6 +900,11 @@ article p {
 article ul {
   list-style-position: inside;
   list-style-type: disc;
+}
+
+article ol {
+  list-style-position: inside;
+  list-style-type: decimal;
 }
 
 article li {
