@@ -21,7 +21,7 @@ Ugh... The regret and embarrassment weighed heavier as I scrolled through my pas
 
 "I can't believe I took up Internet real estate with this junk." 
 
-Now it's 2024. I have a Twitter account littered with stupid status updates. Since I haven't used my Twitter account in a few years, the easiest way to erase history is to delete the account. But I want to retain my account for future use and remove the Tweets marking my infancy. I have close to 1,000 Tweets, and there's no way I'm going to manually delete them one-by-one. 
+Now it's 2024. I have a Twitter account littered with stupid status updates. I haven't used my Twitter account in a few years, so the easiest way to erase history is to delete the account. But I want to retain my account for future use and remove the Tweets marking my infancy. I have about 1,000 Tweets, and there's no way I'm going to manually delete them one-by-one. 
 
 I needed a bot, a personal assistant, to do the grunt work for me. Thus started a journey to explore the Twitter API and develop a programmatic way of deleting Tweets. Below you'll see my Twitter magic eraser, a couple of quick python scripts. The scripts make use of the [tweepy](https://www.tweepy.org/) package to interact with the Twitter API. You can repurpose the code to wash away your own Tweets of the past.
 
@@ -47,7 +47,7 @@ Now comes the hairy part: generating the credentials that will eventually be use
 
 That's a lot of secrets; let's break it down. The API key and API key secret are credentials that will be used by the script. They say, "Hey Twitter, I'm the bot representing the project and app you already know about." The access token and access token secret, on the other hand, represent credentials for your specific Twitter account; they allow the script to delete Tweets on your behalf. Specifically, the access token and token secret are user-specific credentials used to authenticate via the OAuth1.0a protocol. 
 
-Save these four secrets somewhere safe. Our code will need them to actually make any changes to your Tweets.
+Save these four secrets somewhere safe. Our code will need them to make changes to your Tweets.
 
 ### 3. Get the Code
 Download the magic eraser from this Github repo, featuring two scripts: 
@@ -107,7 +107,7 @@ Next, we'll run the first script to get our Tweet IDs. It helps to have the unzi
 python extract_tweet_ids.py --file_name=<path/to/tweets.js>
 ```
 
-Like I said earlier, this will generate a CSV file `tweet_ids.csv` listing the Tweet IDs and a starter status of "pending". I recommend you manually rename this file to something like `tweet_tracker.csv` that can serve as your up-to-date log of which Tweets you've actually deleted. This manual renaming helps prevent accidentally deleting your progress if you re-run the first script a second time, which would overwrite `tweets_ids.csv`. 
+Like I said earlier, this will generate a CSV file `tweet_ids.csv` listing the Tweet IDs and a starter status of "pending". I recommend you manually rename this file to something like `tweet_tracker.csv` that can serve as your up-to-date log of which Tweets you've actually deleted. This manual renaming prevents accidentally deleting your progress if you re-run the first script a second time, which would overwrite `tweets_ids.csv`. 
 
 Before we move to the second script, create an `.env` file in the same code directory. Enter the four secrets you saved earlier for your developer app. Also include the path to your tracker file. These variables will be used in the second script. 
 
@@ -126,15 +126,12 @@ Alright, here we go. We're ready to pull the trigger. Run the following command 
 python delete_tweets.py
 ```
 
-Throughout the process, logs are sent to the console and a log file to keep you informed of what's going on. 
+If things go smoothly, you'll see 50 of your Tweets disappear. Throughout the process, logs are sent to the console and a log file to keep you informed of what's going on. 
 
-- create virutal python env and install packages
-- run script 1
-  - rename output file as tweet_tracker.csv to avoid overwriting
-	- To avoid potentially re-running the script and overwriting your extract file, you should manually rename the file to something like `tweet_tracker.json`. 
-- create .env file
-- run script 2
-- wait 24 hours
-- run script 2 as many times as necessary
+Again the free access to the Twitter API limits you to 50 delete requests per 24 hours. I re-ran this script everyday until I was left with zero Tweets. Spending a minute a day for a couple of weeks got me to a clean Twitter slate, free of my youthful blabbering. 
 
-Maybe you're like me. Most of us used social media in our younger years. We grew up, and our  thoughts and philosophies changed. Revisiting our content of yesteryear makes us wonder,  "Did I really say that?" "I can't believe I took up Internet real estate with this junk." 
+Maybe you're like me. Perhaps you began using social media in your younger years. We grow up, and our thoughts and philosophies change. Revisiting our content of yesteryear makes us wonder, "What was I thinking?" It's okay. We can have a fresh start. 
+
+---
+
+I recognize Twitter is now X. I don't care. It's still Twitter to me. 
