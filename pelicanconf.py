@@ -59,6 +59,7 @@ MARKDOWN = {
             'css_class': 'highlight',
             'linenums': False,    
         },
+        # 'markdown.extensions.footnotes': {},
         'markdown.extensions.extra': {},
         'markdown.extensions.meta': {},
     },
