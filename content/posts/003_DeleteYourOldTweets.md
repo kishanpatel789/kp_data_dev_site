@@ -3,7 +3,8 @@ Date: 2024-07-04
 Slug: delete-your-old-tweets
 Tags: automation
 Summary: Wash away your digital regret by sending a bot to delete those embarrassing Tweets. 
-Status: draft
+Status: published
+MetaImage: /static/images/post003/BotWithPhone.jpeg
 
 It was 2009. Twitter was the new kid on the block. I was in college, and all my friends were using the platform to share their statuses in 140 characters or less. Peer pressure pulled in me in; I became a Tweeter. It started out simple &mdash; I shared what I was doing on the weekend. Then I got the hang of using puns to get a quick Retweet. Before long, I was a Twitter regular, posting updates everyday. 
 
@@ -21,7 +22,7 @@ Ugh... The regret and embarrassment weighed heavier as I scrolled through my pas
 
 "I can't believe I took up Internet real estate with this junk." 
 
-Now it's 2024. I have a Twitter account littered with stupid status updates. I haven't used my Twitter account in a few years, so the easiest way to erase history is to delete the account. But I want to retain my account for future use and remove the Tweets marking my infancy. I have about 1,000 Tweets, and there's no way I'm going to manually delete them one-by-one. 
+Now it's 2024. I have a Twitter account littered with dumb Tweets. I haven't used Twitter in a few years, so the easiest way to erase history is to delete my profile. But I want to keep my account for future use and remove the Tweets marking my infancy. I have about 1,000 Tweets, and there's no way I'm going to manually delete them one-by-one. 
 
 I needed a bot, a personal assistant, to do the grunt work for me. Thus started a journey to explore the Twitter API and develop a programmatic way of deleting Tweets. Below you'll see my Twitter magic eraser, a couple of quick python scripts. The scripts make use of the [tweepy](https://www.tweepy.org/) package to interact with the Twitter API. You can repurpose the code to wash away your own Tweets of the past.
 
@@ -44,7 +45,7 @@ You first need to identify the Tweets you want to delete. Head over to your [Twi
         └── ...
 ```
 
-This file contains info about each of your Tweets like when you posted the Tweet, how many times it was liked, and, of course, the text content itself. But the most important part is the Tweet ID. We use the ID to target the Tweets we want to delete. 
+This file describes each of your Tweets, like when you posted the Tweet, how many times it was liked, and the message of the Tweet. But the most important part is the Tweet ID. We use the ID to target Tweets for deletion. 
 
 ### 2. Become a Twitter Developer
 Go to the [Twitter Developer Portal](https://developer.twitter.com/en/portal/dashboard) and use your existing Twitter account to log in. You'll likely be asked to pick an access level. For this small project, the "Free" access level should suffice. 
@@ -53,7 +54,7 @@ The Twitter developer platform is organized into projects that contain applicati
 
 ![App authentication settings](/static/images/post003/AppSettings.jpeg)
 
-Now comes the hairy part: generating the credentials that will eventually be used by your script to delete Tweets. In the app settings, you need to generate the following: 
+Now comes the rough part: generating the credentials that will eventually be used by your script to delete Tweets. In the app settings, you need to generate the following: 
 
 - API Key
 - API Key Secret
@@ -105,10 +106,10 @@ def delete_tweets(client: tweepy.Client, tweet_list: List[str]) -> None:
 # ...
 ```
 
-You may be wondering, "Why delete only 50 Tweets?" Well, here's the rub. A Free Access project using the Twitter API only allows 50 delete requests per day. If you have the cash, you can fork over $5,000 per month to get Pro Access, granting a blazing 50 delete requests per 15 minutes (4,800 requests per day). But for most of us, that's overkill, and the cost can't be justified. 
+You may be wondering, "Why delete only 50 Tweets?" Well, there's the rub. A Free Access project using the Twitter API only allows 50 delete requests per day. If you have the cash, you can fork over $5,000 per month to get Pro Access, granting a blazing 50 delete requests per 15 minutes (4,800 requests per day). But for most of us, that's overkill, and the cost can't be justified. 
 
 ## Do the Deed
-Let's delete some Tweets. Fire up your terminal and create a python virtual environment and install the packages we'll need. The `requirements.txt` file contains the two primary packages `tweepy` and `python-dotenv` as well as their dependencies. 
+Let's delete some Tweets. Fire up your terminal and create a python virtual environment. The `requirements.txt` file lists the two primary packages `tweepy` and `python-dotenv` as well as their dependencies. You can install them with these 3 commands:
 
 ```bash
 python -m venv venv
@@ -141,13 +142,13 @@ Alright, here we go. We're ready to pull the trigger. Run the following command 
 python delete_tweets.py
 ```
 
-If things go smoothly, you'll see 50 of your Tweets disappear. Throughout the process, logs are sent to the console and a log file to keep you informed of what's going on. 
+If things go smoothly, you'll see 50 of your Tweets disappear. Throughout the process, logs are sent to the console and to a log file to keep you informed of what's going on. 
 
 <img alt="Deletion log" src="/static/images/post003/DeletionLog.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
 
-Again, the Free Access to the Twitter API limits you to 50 delete requests per 24 hours. I re-ran this script daily, deleting 50 Tweets at a time until I was left with none. Spending a minute a day for a couple of weeks got me to a clean Twitter slate, free of my youthful blabbering. 
+Again, the Free Access to the Twitter API limits you to 50 delete requests per 24 hours. I re-ran this script daily, deleting 50 Tweets at a time until I was left with none. Spending a minute a day for a couple of weeks got me to a clean slate on Twitter, free of my youthful blabbering. 
 
 ---
 
-Maybe you're like me. Perhaps you began using social media in your younger years. We grow up, and our thoughts and philosophies change. Revisiting our content of yesteryear makes us wonder, "What was I thinking?" It's okay. You can have a fresh start. Use the [code](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/delete_your_old_tweets) to send out your own bot, and [call me](https://kpdata.dev) if you need more of your life automated. 
+Maybe you're like me. Perhaps you began using social media in your younger years. We grow up, and our opinions and perspectives change. Revisiting our content of yesteryear makes us wonder, "What was I thinking?" It's okay. You can have a fresh start. Use the [code](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/delete_your_old_tweets) to send out your own bot, and [call me](https://kpdata.dev) if you need more of your life automated. 
 
