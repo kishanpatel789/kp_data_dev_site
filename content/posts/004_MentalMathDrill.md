@@ -19,21 +19,44 @@ I recognized this flaw in myself. I am formally trained in advanced calculus and
 After de-cluttering my email inbox, I filled the void with wholesome content that would make me better. I created a simple script that pitches me 5 arithmetic problems every morning at 6:05 AM. Each morning, I open my inbox and make these 5 problems the first thing I tackle in my workday. Here's how I did it. If you're a developer, you can use the code to set up your own drill. Who knows... if there's interest, maybe I'll set up an email subscription so anyone can subscribe to the drill without needing to know cloud infrastructure. 
 
 ## Architecture
-Here's what we're using. AWS is the cloud solution. AWS Lambda executes a python script to create 5 problems and generates an email. Then the functions sends the email to AWS SES for distribution. An AWS EventBridge scheduler invokes the Lambda function on a recurring basis. All of this infrastructure is defined in code. You know me. My favorite way to spell I-a-C is T-e-r-r-a-f-o-r-m.
+Here's what we're using. AWS is the cloud solution. AWS Lambda executes a python script to create 5 problems and generates an email. Then the function sends the email to AWS SES for distribution. An AWS EventBridge Scheduler invokes the Lambda function on a recurring basis. All of this infrastructure is defined in code. You know me; my favorite way to spell I-a-C is T-e-r-r-a-f-o-r-m.
 
-[INSERT ARCHITECTURE DIAGRAM]
+![Architecture diagram](/static/images/post004/MentalMathDrillArch.jpeg)
 
-Let's dig deeper. This time, we create two IAM roles -- one for the lambda execution role and another for the cloudwatch schedule. The lambda execution role gives the function permission to send an email to the SES service. The EventBridge  role gives permission to the scheduler to invoke the lambda function. 
+Let's dig deeper. Our Lambda function has two main components: the code and the dependencies. The code consists of a couple of python modules and some template files for generating the email. These files are archived into a single .zip file. Dependencies are needed because some required packages (Jinja 2.0) are not part of the standard Lambda python 3.10 runtime. These dependencies are archived into a .zip file and uploaded to AWS as a Lambda Layer. Don't worry; our Terraform configuration handles the zipping and uploading of both the code and dependencies for you. 
 
-Regarding, the Lambda service, there are two main components: the code and the dependencies. The code consists of a couple of python modules and some template files for generating the email. These files are archived into a single .zip file. The dependencies are specific python packages that are not part of the standard Lambda python 3.10 runtime. In particular, Jinja 2.0 is needed for our project and not standard in teh Lambda runtime. These dependencies can also be archived into a .zip file and uploaded to AWS as a Lambda Layer. Don't worry; this Terraform configuration handles the zipping and uploading of both the code and dependencies for you. 
+Next, Terraform sets up an EventBridge Scheduler to invoke the lambda function. A simple cron expression can be used to send the email when you want. I've defaulted to Monday to Saturday at 6:05am (`5 11 ? * 2-7 *` in UTC).  You can modify the scheduled time by adjusting the Terraform variables. 
 
-Next, Terraform sets up an Eventbridge schedule to invoke the lambda function. A simple cron expression can be used to send the email when you want. I've defaulted to Monday to Saturday at 6:05am.  You can modify the scheduled time by adjusting the Terraform variables. 
+Before EventBridge, Lambda, and SES can talk to one another, we need two IAM roles -- one for the Lambda execution role and another for the EventBridge execution role. The Lambda role gives the function permission to send an email to the SES service. The EventBridge role gives permission to the Scheduler to invoke the Lambda function. 
 
 ## Set Up
-Before you execute the Terraform configuration files, you'll need to do a bit of set up in SES, especially if you haven't used the service before. First, activate SES for your AWS account. Then enter a domain or individual email address that you will send emails from. Before you can actually send emails, you'll need to verify that you actually own the domain or email address.  Walk through this guide: [INSERT AWS LINK]
+Have I piqued your interest yet? Let's get you up and running. 
+
+Before you execute the Terraform configuration files, you'll need to do a bit of set up in SES, especially if you haven't used the service before. First, activate SES for your AWS account. Then enter a domain or individual email address that you will send emails from. Before you can send emails, you'll need to verify that you actually own the domain or email address you're sending from. Walk through this [AWS guide](https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html) for more info. 
 SES features a sandbox environment that allows you to send 200 emails a day. For me, this is all I need. If you want to go all the way and productionize your email service, you'll need to request approval to move out of the SES sandbox. While in the sandbox, you also need to verify the email you're sending to. 
 
-Get the code from this repo. Here's the lay of the land:  [ENTER DIRECTORY TREE]
+Get the code from this [Github repo](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/mental_math_drill). Here's the lay of the land: 
+
+```bash
+├── requirements.txt
+├── src
+│   ├── greeting.py
+│   ├── main.py
+│   ├── problem.py
+│   └── templates
+│       ├── template.html
+│       └── template.txt
+└── terraform
+    ├── main.tf
+    ├── modules
+    │   └── aws
+    │       ├── main.tf
+    │       ├── outputs.tf
+    │       └── variables.tf
+    ├── outputs.tf
+    ├── terraform.tfvars
+    └── variables.tf
+```
 
 Create a python virtual env - needed to load lambda layer
 `python3.10 -m venv venv`
