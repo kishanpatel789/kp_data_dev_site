@@ -10,29 +10,32 @@ Two things are true in life: Your email is filled with junk and your mental math
 
 Most email is noise. Go through your inbox. Count how many messages are marketing ads. How many are newsletters you haven't read in several weeks? This clutter distracts you and slows you down. What would a worthwhile email look like? One that sharpens your mind and helps your day-to-day life? 
 
-How about one that tests your noggin with good ole' arithmetic? Adding, subtracting, multiplying, dividing. The lessons you learn in 1st grade are the some of the most important ones. But in an age of calculators and automation, our basic math skills atrophy when we become adults. We pull out our phones to do a quick calculation. If we're brave enough, we attempt to do some mental math, stumble when carrying the 1, and just give up. 
+How about one that tests your noggin with good ole' arithmetic? Adding, subtracting, multiplying, dividing. The lessons you learn in 1st grade are the some of the most important ones. But in an age of calculators and automation, our basic math skills atrophy when we become adults. We pull out our phones to do a quick calculation. If we're brave enough, we attempt to do some mental math, stumble while carrying the 1, and just give up. 
 
 Like exercise or learning a new language, mental math takes practice. The longer you go without practicing, the worse you'll be. 
 
 I recognized this flaw in myself. I am formally trained in advanced calculus and numerical analysis. But my basic arithmetic skills suck. Somewhere along the way, I outsourced adding and subtracting in my head to calculators. I spent more time studying theoretical concepts like the mean value theorem or the finer points of gradient descent. But the math concepts that I really need in life (to budget my finances, plan a party, or determine if I have enough underwear for the week) require basic arithmetic. 
 
-After de-cluttering my email inbox, I filled the void with wholesome content that would make me better. I wrote a script that pitches me 5 arithmetic problems every morning at 6:05 AM. Each morning, I open my inbox and make these 5 problems the first thing I tackle in my workday. Here's how I did it. If you're a developer, you can use the code to set up your own drill. Who knows... if there's interest, maybe I'll set up an email subscription so anyone can subscribe to the drill without needing to know cloud infrastructure. 
+After de-cluttering my email inbox, I filled the void with wholesome content that would make me better. I wrote a script that pitches me 5 math problems every morning at 6:05 AM. Each morning, I open my inbox and make this 5-problem drill the first thing I tackle. Here's how I did it. If you're a developer, you can use the code to set up your own drill. Who knows... if there's interest, maybe I'll set up an email subscription so anyone can sign up for the drill without needing to be a developer. 
+
+<img alt="Math drill email screenshot" src="/static/images/post004/EmailSample.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
+
 
 ## Architecture
-Here's what we're using. AWS is the cloud solution. AWS Lambda executes a python script to create 5 problems and generates an email. Lambda passes the email to AWS SES for distribution. AWS EventBridge Scheduler invokes the Lambda function on a recurring basis. All of this infrastructure is defined in code. You know me; my favorite way to spell I-a-C is T-e-r-r-a-f-o-r-m.
+Here's what we're using. AWS is the cloud solution. AWS Lambda runs a python script that creates 5 problems and generates an email. Lambda passes the email content to AWS SES for distribution. AWS EventBridge Scheduler invokes the Lambda function on a recurring basis. All of this infrastructure is defined in code. You know me; my favorite way to spell I-a-C is T-e-r-r-a-f-o-r-m.
 
 <img alt="Architecture diagram" src="/static/images/post004/MentalMathDrillArch.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
 
 Let's dig deeper. Our Lambda function has two main components: the code and the dependencies. The code consists of a couple of python modules and some template files for generating the email. These files are archived into a .zip file. Dependencies are needed because some required packages (Jinja 2.0) are not part of the standard Lambda python 3.10 runtime. These dependencies are archived into a second .zip file and uploaded to AWS as a Lambda Layer. Don't worry; our Terraform configuration handles the zipping and uploading of both the code and dependencies for you. 
 
-Next, Terraform sets up an EventBridge Scheduler to invoke the Lambda function. A simple cron expression can be used to send the email when you want. I've defaulted to Monday to Saturday at 6:05 AM (`5 11 ? * 2-7 *` in UTC).  You can modify the scheduled time by adjusting the Terraform variables. 
+Next, Terraform sets up an EventBridge Scheduler to invoke the Lambda function. A simple cron expression can be used to send the email when you want. I've defaulted to Monday to Saturday at 6:05 AM CDT (`5 11 ? * 2-7 *` in UTC). You can modify the scheduled time by adjusting the Terraform variables. 
 
-Before EventBridge, Lambda, and SES can talk to one another, we need two IAM roles &mdash; one for the Lambda execution role and another for the EventBridge execution role. The Lambda role gives the function permission to call the SES service. The EventBridge role allows the Scheduler to invoke the Lambda function. 
+Before EventBridge, Lambda, and SES can talk to one another, we need two IAM roles &mdash; the Lambda execution role and the EventBridge execution role. The Lambda role gives the function permission to call the SES service. The EventBridge role allows the Scheduler to invoke the Lambda function. 
 
 ## Set Up
 Have I piqued your interest yet? Let's get you up and running. 
 
-Before you execute the Terraform configuration files, you need to do a bit of set up in SES, especially if you haven't used the service before. First, activate SES for your AWS account. Then enter a domain or individual email address that you will send emails from. Before you can send emails, you'll need to verify that you actually own the domain or email address you're sending from. Walk through this [AWS guide](https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html) for more info. 
+Before you execute the Terraform configuration files, you need to do some setup in SES. If you haven't already, activate SES for your AWS account. Then enter a domain or individual email address that you will send emails from. Before you can send emails, you need to verify that you actually own the domain or email address you're sending from. (You can't spoof an email from mark.zuckerburg@facebook.com.) Walk through this [AWS guide](https://docs.aws.amazon.com/ses/latest/dg/creating-identities.html) for more info. 
 SES features a sandbox environment that allows you to send 200 emails a day. For me, this is all I need. If you want to go all the way and productionize your email service, you'll need to request approval to move out of the SES sandbox. While in the sandbox, you also need to verify the email you're sending to. 
 
 Get the code from this [Github repo](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/mental_math_drill). Here's the lay of the land: 
