@@ -1,7 +1,7 @@
 Title: Delete Your Old Tweets
 Date: 2024-07-04
 Slug: delete-your-old-tweets
-Tags: automation
+Tags: automation, python
 Summary: Wash away your digital regret by sending a bot to delete those embarrassing Tweets. 
 Status: published
 MetaImage: /static/images/post003/BotWithPhone.jpeg
