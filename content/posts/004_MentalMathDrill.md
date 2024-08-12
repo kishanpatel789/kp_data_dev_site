@@ -3,8 +3,8 @@ Date: 2024-08-12
 Slug: mental-math-drill
 Tags: automation, python
 Summary: Sharpen your mind with a daily email of math problems. 
-Status: draft
-MetaImage: None
+Status: published
+MetaImage: /static/images/post004/KidDoingMath.jpeg
 
 Two things are true in life: Your email is filled with junk and your mental math stinks. 
 
