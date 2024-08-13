@@ -1,7 +1,7 @@
 Title: Mental Math Drill
 Date: 2024-08-12
 Slug: mental-math-drill
-Tags: automation, python
+Tags: automation, python, terraform
 Summary: Sharpen your mind with a daily email of math problems. 
 Status: published
 MetaImage: /static/images/post004/KidDoingMath.jpeg
