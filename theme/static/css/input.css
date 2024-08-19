@@ -15,16 +15,15 @@ article p {
 }
 
 article ul {
-    @apply list-disc list-inside
+    @apply list-disc list-outside
 }
 
 article ol {
-    @apply list-decimal list-inside
+    @apply list-decimal list-outside
 }
 
 article li {
-    padding-left: 25px;
-    text-indent: -22px;
+    @apply ms-8 ps-2
 }
 
 article .highlight {

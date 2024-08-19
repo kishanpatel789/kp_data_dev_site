@@ -898,18 +898,18 @@ article p {
 }
 
 article ul {
-  list-style-position: inside;
+  list-style-position: outside;
   list-style-type: disc;
 }
 
 article ol {
-  list-style-position: inside;
+  list-style-position: outside;
   list-style-type: decimal;
 }
 
 article li {
-  padding-left: 25px;
-  text-indent: -22px;
+  margin-inline-start: 2rem;
+  padding-inline-start: 0.5rem;
 }
 
 article .highlight {
@@ -991,10 +991,6 @@ article p a:hover {
     max-width: 28rem;
   }
 
-  .sm\:max-w-sm {
-    max-width: 24rem;
-  }
-
   .sm\:space-x-4 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
     margin-right: calc(1rem * var(--tw-space-x-reverse));
@@ -1013,14 +1009,6 @@ article p a:hover {
 
   .md\:max-w-xl {
     max-width: 36rem;
-  }
-
-  .md\:max-w-lg {
-    max-width: 32rem;
-  }
-
-  .md\:max-w-md {
-    max-width: 28rem;
   }
 
   .md\:flex-1 {
