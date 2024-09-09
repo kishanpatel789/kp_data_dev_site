@@ -155,12 +155,50 @@ TABLESAMPLE SYSTEM (5 PERCENT);
 ```
 
 ## ARRAY and STRUCT Column Types
-Call me outdated, but I grew up with plain 'ole tables. You know, the ones that have columns and rows with only one value at each intersection of column and row. BigQuery is different. In BigQuery tables, a single column of a single row can have *multiple* values of the same type, embedded in an array. 
+Call me outdated, but I grew up with plain 'ole tables. You know, the ones that have columns and rows with only one value at each intersection of column and row. BigQuery is different. In BigQuery tables, a single column of a single row can have *multiple* values of the same type, embedded in an array. This can be a data warehousing technique that reduces the number of joins or table lookups. For example, instead of having to look up the series of house points our Hogwarts students earned or lost in a separate table, we can access those values directly in the same Gradebook table: 
+
+```sql
+SELECT 
+	FirstName,
+	LastName,
+	House,
+	HousePoints  --  <---------- Here's the ARRAY column
+FROM HOGWARTS.GRADEBOOK;
+
+
+| FirstName | LastName | House      |                     HousePoints |
+| --------- | -------- | ---------- | ------------------------------: |
+| Harry     | Potter   | Gryffindor |                  [10, -150, 50] |
+| Draco     | Malfoy   | Slytherin  |               [10, 30, 15, -50] |
+| Hermione  | Granger  | Gryffindor | [10, 10, 25, 10, 5, 15, 10, 30] |
+| Ron       | Weasley  | Gryffindor |                      [10, -150] |
+```
+
+```sql
+SELECT 
+	FirstName, 
+	LastName,
+	SUM(points) HousePoints_Total
+FROM
+	HOGWARTS.GRADEBOOK, HOGWARTS.GRADEBOOK.HousePoints AS points
+GROUP BY 1, 2;
+
+
+| FirstName | LastName | HousePoints |
+| --------- | -------- | ----------: |
+| Harry     | Potter   |         -90 |
+| Draco     | Malfoy   |           5 |
+| Hermione  | Granger  |         115 |
+| Ron       | Weasley  |        -140 |
+```
+
 
 But wait... there's more. A single column of a single row can have multiple values of different types. STRUCT types create a "row-within-a-row" effect. (Not to different from a dream-within-a-dream from Inception.) 
 
 
-STRUCT and ARRAY column types This is new for me. I'm used to plain 'ole tables, the ones that have columns and rows and only one value per each intersection of column and role. BigQuery is different. It features the ability to embed arrays within a single column of a single row. The values of each element of the array must be the same. In addition, BigQuery has nested column types. Think row within a row. These two features introduce a host of new SQL functions for data manipulation.  `array_to_string` - this converts an array column into a string by combining the elements with a given separator
+STRUCT and ARRAY column types This is new for me. I'm used to plain 'ole tables, the ones that have columns and rows and only one value per each intersection of column and role. BigQuery is different. It features the ability to embed arrays within a single column of a single row. The values of each element of the array must be the same. In addition, BigQuery has nested column types. Think row within a row. These two features introduce a host of new SQL functions for data manipulation.  
+
+`array_to_string` - this converts an array column into a string by combining the elements with a given separator
 `unnnest` - this essentially explodes an array or nested column into as many rows as there are elements in the array
 `array_agg` is an aggregation function that can combine several records of scalar values into a single array. 
 [ need to confirm types of nested and array ] 
