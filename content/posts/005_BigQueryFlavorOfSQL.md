@@ -9,10 +9,10 @@ It comes in many flavors. Some old, some new. Some mainstream, some flat-out qui
 
 ANSI SQL, T-SQL, PL/SQL, MySQL, PostgreSQL, SQLite, SparkSQL, HiveQl, GoogleSQL, ... 
 
-SQL is a household name (at least among developers). The language has been around for decades, and new varieties came out every few years. The core of the language is the same, but each flavor has a unique spin on how we wrangle our relational tables. A few months ago, I took my first bite of BigQuery's SQL, called [GoogleSQL](https://cloud.google.com/bigquery/docs/introduction-sql). This flavor has some cool features to make your daily querying tasks easier. Let's check them out: 
+SQL is a household name (at least among developers). The language has been around for decades, and new varieties came out every few years. The core of the language is the same, but each flavor has a unique spin on how we wrangle our relational tables. A few months ago, I took my first bite of BigQuery's SQL, called [GoogleSQL](https://cloud.google.com/bigquery/docs/introduction-sql). This flavor has some cool features to make your daily querying tasks easier. Let's check them out. 
 
 ## SELECT * EXCEPT
-Picture this: You have a column with hundreds of columns. You're doubtful even 10% of them are being used, but hey you're not the decision-maker for this OneBigTable design. Let's say you need most of the columns for your query but not others. Do you want to write out the hundreds of columns individually? 
+Picture this: You have a table with hundreds of columns. You're doubtful even 10% of them are being used, but hey you're not the decision-maker for this OneBigTable design. Let's say you need most of the columns for your query but not others. Do you want to write out the hundreds of columns individually? 
 
 Rather than going the painful exercise, BigQuery SQL offers [`SELECT * EXCEPT()`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#select_except). You can quickly capture the same columns by writing the few columns you do NOT want. The two options below generate the same results. But one of them preserves your sanity. 
 
@@ -88,7 +88,7 @@ Side note: Using `SELECT *` can be expensive as it loads all columns into memory
 ## QUALIFY
 What's the thorn in any data engineer's day? Duplicate records. They're the bump in the road that screws up your otherwise flawless query logic. 
 
-A common "de-dup" tactic is to sort and rank the records by some grouping and then take one record from each group. Most often, this is done by writing a subquery to determine the rank and an outer query to filter for one row from each group, which could look messy. 
+A common "de-dup" tactic is to sort and rank the records by some grouping and then take one record from each group. A common tactic is writing a subquery to determine the rank and an outer query to filter for one row from each group. This gets the job done, but it can be verbose and hard to read. 
 
 BigQuery's [`QUALIFY`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#qualify_clause) statement makes de-duping via analytics functions easier. You can simply add a single line to the end of the query that automatically filters the results of your window function. Take a look at the two options and you tell me which one is better. Here, we want the Hogwarts student with the highest Potions grade for each Year: 
 
@@ -154,8 +154,8 @@ FROM HOGWARTS.GRADEBOOK
 TABLESAMPLE SYSTEM (5 PERCENT);
 ```
 
-## ARRAY and STRUCT Column Types
-Call me outdated, but I grew up with plain 'ole tables. You know, the ones that have columns and rows with only one value at each intersection of column and row. BigQuery is different. In BigQuery tables, a single column of a single row can have *multiple* values of the same type, embedded in an array. This can be a data warehousing technique that reduces the number of joins or table lookups. For example, instead of having to look up the house points our Hogwarts students earned in a separate table, we can access those values directly in the same Gradebook table: 
+## ARRAY Column Type
+Call me outdated, but I grew up with plain 'ole tables. You know, the ones that have columns and rows with only one value at each intersection of column and row. BigQuery is different. In BigQuery tables, a single column of a single row can have *multiple* values of the same type, embedded in an array. Here's an example where we track house points earned by our favorite students: 
 
 ```sql
 SELECT 
@@ -174,35 +174,43 @@ FROM HOGWARTS.GRADEBOOK;
 | Ron       | Weasley  | Gryffindor |                      [10, -150] |
 ```
 
-If you want to access elements within an array or perform some kind of aggregation, you can use the `UNNEST` SQL function. Below, we include the `UNNEST` function in the `FROM` clause to make the house points available for aggregation. 
+Alright, so why the heck would we use `ARRAY` data types? The traditional rules of data modeling emphasize normalizing our tables. That is, we would have a completely separate table tracking the house point accumulation with one row for each time a witch or wizard earned or lost points. 
+
+This `ARRAY` data type opens the door to more modern data warehousing techniques. By embedding multiple values in a single column-row intersection, we reduce the number of joins or table lookups. Instead of needing to look up the house points our Hogwarts students earned in a separate table, we can access those values directly in the same Gradebook table. This improves read performance of our queries and can be especially effective for large tables. 
+
+If you want to access elements within an array, you can use the `UNNEST` SQL function. Below, we use `UNNEST` to make the house points available for aggregation. 
 
 ```sql
 -- total house points earned or lost by student
-SELECT 
-	FirstName, 
+SELECT
+	FirstName,
 	LastName,
-	SUM(points) HousePoints_Total
+	(
+		SELECT
+			SUM(p)
+		FROM
+			UNNEST (g.HOUSEPOINTS) AS p
+	) AS HousePoints_Total
 FROM
-	HOGWARTS.GRADEBOOK
-	CROSS JOIN UNNEST(HOGWARTS.GRADEBOOK.HousePoints) AS points
-GROUP BY 1, 2;
+	HOGWARTS.GRADEBOOK AS g;
 
-
-| FirstName | LastName | HousePoints |
-| --------- | -------- | ----------: |
-| Harry     | Potter   |         -90 |
-| Draco     | Malfoy   |           5 |
-| Hermione  | Granger  |         115 |
-| Ron       | Weasley  |        -140 |
+| FirstName | LastName | HousePoints_Total |
+| --------- | -------- | ----------------: |
+| Harry     | Potter   |               -90 |
+| Draco     | Malfoy   |                 5 |
+| Hermione  | Granger  |               115 |
+| Ron       | Weasley  |              -140 |
 ```
 
-Behind the scenes, `UNNEST` expands the array into as many rows as there are elemnts within the array; when used in the `FROM` clause, the function performs a correlated cross join with the original row the array is associated with. This sounds more complicated than it really is. 
+Behind the scenes, `UNNEST` expands the array into as many rows as there are elements; it essentially creates a "mini-table" with one row for each element in the array. Once the array contents are unpacked, we can then perform aggregation functions, like the `SUM()` function in the example above. Or we can create filter our original table by array element by using `UNNEST` in a `WHERE` clause. 
+
+This is just the tip of the iceberg for the `ARRAY` data type and its sister data type `STRUCT`. For more examples of how you can play with repeated or nested data types, check out the [Google docs](https://cloud.google.com/bigquery/docs/arrays). 
+
 
 
 But wait... there's more. A single column of a single row can have multiple values of different types. STRUCT types create a "row-within-a-row" effect. (Not too different from a dream-within-a-dream from Inception.) 
 
 
-STRUCT and ARRAY column types This is new for me. I'm used to plain 'ole tables, the ones that have columns and rows and only one value per each intersection of column and role. BigQuery is different. It features the ability to embed arrays within a single column of a single row. The values of each element of the array must be the same. In addition, BigQuery has nested column types. Think row within a row. These two features introduce a host of new SQL functions for data manipulation.  
 
 `array_to_string` - this converts an array column into a string by combining the elements with a given separator
 `unnnest` - this essentially explodes an array or nested column into as many rows as there are elements in the array
@@ -216,3 +224,4 @@ WITH OFFSET
 
 ---
 
+What'd I miss? Give me a [shout](mailto:kishan@kpdata.dev) if you want to share more of your favorite features of the GoogleSQL flavor. 
