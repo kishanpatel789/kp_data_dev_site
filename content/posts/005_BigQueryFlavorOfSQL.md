@@ -155,7 +155,7 @@ TABLESAMPLE SYSTEM (5 PERCENT);
 ```
 
 ## ARRAY and STRUCT Column Types
-Call me outdated, but I grew up with plain 'ole tables. You know, the ones that have columns and rows with only one value at each intersection of column and row. BigQuery is different. In BigQuery tables, a single column of a single row can have *multiple* values of the same type, embedded in an array. This can be a data warehousing technique that reduces the number of joins or table lookups. For example, instead of having to look up the series of house points our Hogwarts students earned or lost in a separate table, we can access those values directly in the same Gradebook table: 
+Call me outdated, but I grew up with plain 'ole tables. You know, the ones that have columns and rows with only one value at each intersection of column and row. BigQuery is different. In BigQuery tables, a single column of a single row can have *multiple* values of the same type, embedded in an array. This can be a data warehousing technique that reduces the number of joins or table lookups. For example, instead of having to look up the house points our Hogwarts students earned in a separate table, we can access those values directly in the same Gradebook table: 
 
 ```sql
 SELECT 
@@ -174,13 +174,17 @@ FROM HOGWARTS.GRADEBOOK;
 | Ron       | Weasley  | Gryffindor |                      [10, -150] |
 ```
 
+If you want to access elements within an array or perform some kind of aggregation, you can use the `UNNEST` SQL function. Below, we include the `UNNEST` function in the `FROM` clause to make the house points available for aggregation. 
+
 ```sql
+-- total house points earned or lost by student
 SELECT 
 	FirstName, 
 	LastName,
 	SUM(points) HousePoints_Total
 FROM
-	HOGWARTS.GRADEBOOK, HOGWARTS.GRADEBOOK.HousePoints AS points
+	HOGWARTS.GRADEBOOK
+	CROSS JOIN UNNEST(HOGWARTS.GRADEBOOK.HousePoints) AS points
 GROUP BY 1, 2;
 
 
@@ -192,8 +196,10 @@ GROUP BY 1, 2;
 | Ron       | Weasley  |        -140 |
 ```
 
+Behind the scenes, `UNNEST` expands the array into as many rows as there are elemnts within the array; when used in the `FROM` clause, the function performs a correlated cross join with the original row the array is associated with. This sounds more complicated than it really is. 
 
-But wait... there's more. A single column of a single row can have multiple values of different types. STRUCT types create a "row-within-a-row" effect. (Not to different from a dream-within-a-dream from Inception.) 
+
+But wait... there's more. A single column of a single row can have multiple values of different types. STRUCT types create a "row-within-a-row" effect. (Not too different from a dream-within-a-dream from Inception.) 
 
 
 STRUCT and ARRAY column types This is new for me. I'm used to plain 'ole tables, the ones that have columns and rows and only one value per each intersection of column and role. BigQuery is different. It features the ability to embed arrays within a single column of a single row. The values of each element of the array must be the same. In addition, BigQuery has nested column types. Think row within a row. These two features introduce a host of new SQL functions for data manipulation.  
