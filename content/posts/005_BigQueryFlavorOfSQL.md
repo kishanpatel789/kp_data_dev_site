@@ -1,9 +1,10 @@
 Title: BigQuery Flavor of SQL
 Date: 2024-09-12
 Slug: bigquery-flavor-of-sql
-Tags: sql, gcp, data-engineering
+Tags: sql, bigquery, gcp, data-engineering
 Summary: What are some of the unique features of BigQuery's GoogleSQL? Let's dive into some helpful syntax for day-to-day querying.  
 Status: published
+MetaImage: /static/images/post005/IceCreamSQL.jpeg
 
 It comes in many flavors. 
 
@@ -20,7 +21,7 @@ SQL is a household name (at least among developers). The language has been aroun
 ## SELECT * EXCEPT
 Picture this: You have a table with hundreds of columns. You're doubtful even 10% of them are being used, but hey you're not the decision-maker for this OneBigTable design. Let's say you need *most* of the columns for your query but not others. Ready to write out the hundreds of columns one-by-one? There has to be an easier (i.e. less painful) way.
 
-BigQuery SQL offers [`SELECT * EXCEPT()`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#select_except). You can quickly capture the same columns by calling out the few columns you do NOT want. The two options below generate the same result. But one of them preserves your sanity. 
+GoogleSQL offers [`SELECT * EXCEPT()`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#select_except). You can quickly capture the same columns by calling out the few columns you do NOT want. The two options below generate the same result. But one of them preserves your sanity. 
 
 ```sql
 -- option 1: list the columns you want
@@ -102,7 +103,7 @@ A common deduplication tactic is to...
 
 Most of us write a subquery to handle the first two steps and an outer query to grab one row from each group (the 3rd step). This gets the job done, but it can be verbose and hard to read. 
 
-BigQuery's [`QUALIFY`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#qualify_clause) clause makes de-duping easier. You simply add a single line to the end of the query that magically filters the results of your window function. Take a look at these two options, and tell me which one is better. Here, we want the Hogwarts student with the highest Potions grade in each Year: 
+GoogleSQL's [`QUALIFY`](https://cloud.google.com/bigquery/docs/reference/standard-sql/query-syntax#qualify_clause) clause makes de-duping easier. You simply add a single line to the end of the query that magically filters the results of your window function. Take a look at these two options, and tell me which one is better. Here, we want the Hogwarts student with the highest Potions grade in each Year: 
 
 ```sql
 -- option 1: traditional filtering by window function
