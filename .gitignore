@@ -5,3 +5,4 @@ __pycache__
 output
 scratch.txt
 .DS_Store
+.python-version
