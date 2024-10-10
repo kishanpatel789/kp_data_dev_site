@@ -14,13 +14,13 @@ I sit down in my cubicle and start my computer. It's Monday morning.
 <img alt="Initial DAG config" src="/static/images/post006/InitialConfig.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
 
 
-What the heck is this? How do I tell it which python script to run? Does the DAG need to know anything else? I lean back in my chair and take a breath. It's 8:30 now. This DAG can't be that complicated. It just test runs python scripts with a service account. The python script I need to test is somewhere in a S3 bucket. I'll just throw different config objects at it until the DAG runs. Then I'll move on to my task list.
+What the heck is this? How do I tell the DAG which python script to run? Does it need to know anything else? I lean back in my chair and take a breath. It's 8:30 now. This pipeline can't be that complicated. It just runs scripts with a service account. The python script I need to test is somewhere in a S3 bucket. I'll just throw different config objects at it until the DAG runs. Then I'll move on to my task list.
 
 Several minutes later, my screen is bleeding red with failed DAG runs.
 
 <img alt="Initial DAG config" src="/static/images/post006/BleedingDag.jpeg" class="w-full md:w-auto md:max-w-2xl mx-auto">
 
-I slowly realize I'm not going to finish this before lunch. Worse, I realize I need to pop the hood and study the code behind the DAG. Of course, there's no documentation for this pipeline. I need to figure out how someone designed the DAG to run. 
+I slowly realize I'm not going to finish this before lunch. Worse, I realize I need to pop the hood and look the code behind the DAG. Of course, there's no documentation for this pipeline. I need to figure out how someone designed the DAG to run. 
 
 I study the code like that guy with a metal detector on the beach every weekend. I'm desperate. My eyes scan through lines of code, looking for the proper input the DAG needs. 
 
@@ -30,21 +30,21 @@ Finally, I build a DAG config that successfully tests the python script. I shoot
 
 I swivel the chair around and look out the window. I'm happy I found a solution. But I'm also mad. 
 
-It shouldn't be this way. I shouldn't have to dig through someone else's code just to see how to run a DAG. There has to be another way, a better way. I swivel the chair back to my computer and search through the Airflow docs. I'm still desperate, but now I'm hunting for something that will keep me from reliving a morning like this. 
+It shouldn't be this way. I shouldn't have to dig through someone else's code just to know how to use it. There has to be another way, a better way. I swivel the chair back to my computer and search through the Airflow docs. I'm still desperate, but now I'm hunting for something that will keep me from reliving a morning like this. 
 
-And then I find my treasure. 
+And then I find my treasure...
 
-An hour later, I have a DAG that looks like this: 
+I open a new file. My fingers dance across the keyboard. An hour later, I have a DAG that looks like this: 
 
-![Better DAG UI](/static/images/post006/BetterDagUI.jpeg)
+<img alt="Better DAG UI" src="/static/images/post006/BetterDagUI.jpeg" class="mx-auto">
 
-Two DAGS. Both do the same thing. But one is helpful, like the family member you actually want to see over the holidays. What makes the difference? [Airflow Params](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html). 
+Two DAGs. Both do the same thing. But one is helpful, like the family member you actually want to see over the holidays. What makes the difference? [Airflow Params](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html). 
 
 ---
 
-Params let you pass runtime configuration to a DAG, perfect for a DAG that's supposed to test some python script living in the cloud. When defining Params in a DAG file, Airflow magically generates a helpful UI and gives some basic form validation. But what's most helpful is the ability to add descriptions and helpful messages for each input. 
+Params let you pass runtime configuration to a DAG. That's a fancy of way of saying, "When you need to run a DAG manually, you use Params to make any final tweaks." When Params are defined in a DAG file, Airflow magically generates a web form and handles basic input validation. But what's most helpful is the ability to add descriptions and helpful messages for each expected input. 
 
-Here's a snapshot of the Params definition in my better DAG: 
+Here's a snippet how Params are defined in my better DAG: 
 
 ```python
 from airflow.models.param import Param
@@ -74,7 +74,9 @@ params = {
 }
 ```
 
-Notice how the python code translates into the UI. Also, you can define documentation for the DAG in markdown, which is then rendered when you pull up the DAG. 
+Notice how the python code translates into the generated UI. The [Airflow docs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html) show the full range of data types available. 
+
+Also, you can define documentation for the DAG in markdown, which is then rendered when you pull up the DAG. 
 
 Check out the full code behind both DAGs here: [insert repo link]
 
