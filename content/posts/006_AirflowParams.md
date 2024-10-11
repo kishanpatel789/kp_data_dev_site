@@ -4,12 +4,13 @@ Slug: airflow-params
 Tags: airflow, data-engineering
 Summary: Want to make friends? Design your Airflow DAGs with Params. Your co-workers (or you 6 months from now) will thank you.
 Status: published
+MetaImage: /static/images/post007/ConfusedDeveloper.jpeg
 
 I sit down in my cubicle and start my computer. It's Monday morning. 
 
-*Ding.* In comes a request to test some python script with Airflow. 
+*Ding.* In comes a request to test some python script with [Airflow](https://airflow.apache.org/). 
 
-"Okay...", I think, why not? I have a ton of other tasks to complete, but I'm a decent engineer. This won't take long. I pull up the [Airflow](https://airflow.apache.org/) DAG and hit "trigger with config" to find this: 
+"Okay...", I think, why not? I have a ton of other tasks to complete, but I'm a decent engineer. This won't take long. I pull up the Airflow DAG and hit "trigger with config" to find this: 
 
 <img alt="Initial DAG config" src="/static/images/post006/InitialConfig.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
 
