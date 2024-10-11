@@ -4,7 +4,7 @@ Slug: airflow-params
 Tags: airflow, data-engineering
 Summary: Want to make friends? Design your Airflow DAGs with Params. Your co-workers (or you 6 months from now) will thank you.
 Status: published
-MetaImage: /static/images/post007/ConfusedDeveloper.jpeg
+MetaImage: /static/images/post006/ConfusedDeveloper.jpeg
 
 I sit down in my cubicle and start my computer. It's Monday morning. 
 
