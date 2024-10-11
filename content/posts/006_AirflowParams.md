@@ -3,24 +3,23 @@ Date: 2024-10-10
 Slug: airflow-params
 Tags: airflow, data-engineering
 Summary: Want to make friends? Design your Airflow DAGs with Params. Your co-workers (or you 6 months from now) will thank you.
-Status: draft
+Status: published
 
 I sit down in my cubicle and start my computer. It's Monday morning. 
 
-*Ding.* In comes a request to test some python script using Airflow. 
+*Ding.* In comes a request to test some python script with Airflow. 
 
 "Okay...", I think, why not? I have a ton of other tasks to complete, but I'm a decent engineer. This won't take long. I pull up the [Airflow](https://airflow.apache.org/) DAG and hit "trigger with config" to find this: 
 
 <img alt="Initial DAG config" src="/static/images/post006/InitialConfig.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
 
-
-What the heck is this? How do I tell the DAG which python script to run? Does it need to know anything else? I lean back in my chair and take a breath. It's 8:30 now. This pipeline can't be that complicated. It just runs scripts with a service account. The python script I need to test is somewhere in a S3 bucket. I'll just throw different config objects at it until the DAG runs. Then I'll move on to my task list.
+What the heck is this? How do I tell the DAG which python script to run? Does it need to know anything else? I lean back in my chair and take a breath. It's 8:30 now. This pipeline can't be that complicated. It just runs scripts with a service account. The python script I need to test is somewhere in a S3 bucket. I'll just throw different config objects at the DAG until it runs. Then I'll move on to my task list.
 
 Several minutes later, my screen is bleeding red with failed DAG runs.
 
 <img alt="Initial DAG config" src="/static/images/post006/BleedingDag.jpeg" class="w-full md:w-auto md:max-w-2xl mx-auto">
 
-I slowly realize I'm not going to finish this before lunch. Worse, I realize I need to pop the hood and look the code behind the DAG. Of course, there's no documentation for this pipeline. I need to figure out how someone designed the DAG to run. 
+I slowly realize I'm not going to finish this before lunch. Worse, I realize I need to pop the hood and look at the code behind the DAG. Of course, there's no documentation for this pipeline. I need to figure out how someone designed the DAG to run. 
 
 I study the code like that guy with a metal detector on the beach every weekend. I'm desperate. My eyes scan through lines of code, looking for the proper input the DAG needs. 
 
@@ -42,12 +41,13 @@ Two DAGs. Both do the same thing. But one is helpful, like the family member you
 
 ---
 
-Params let you pass runtime configuration to a DAG. That's a fancy of way of saying, "When you need to run a DAG manually, you use Params to make any final tweaks." When Params are defined in a DAG file, Airflow magically generates a web form and handles basic input validation. But what's most helpful is the ability to add descriptions or hints for each expected input. 
+Params let you pass runtime configuration to a DAG. That's a fancy of way of saying, "When you run a DAG manually, use Params to make the final tweaks." Airflow takes any Params written in a DAG file and magically generates a web form, which handles basic input validation. But what's most helpful is the ability to add descriptions or hints for each expected input. 
 
 Here's a snippet how Params are defined in my better DAG: 
 
 ```python
 # 02_better_dag.py
+# ...
 from airflow.models.param import Param
 params = {
     "python_file_path": Param(
@@ -73,11 +73,12 @@ params = {
         type="boolean",
     ),
 }
+# ...
 ```
 
-Notice how the python code translates to the generated UI. This DAG uses inputs like strings, arrays, objects, and booleans. The [Airflow docs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html) show the full range of data types available. 
+Notice how the code translates to the generated UI. This DAG uses inputs like strings, arrays, objects, and booleans. The [Airflow docs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html) show the full range of data types available. 
 
-Also, you can create documentation for the DAG using the `doc_md` argument. This argument takes markdown content and renders it as HTML when you pull up the DAG in the UI. This
+Beyond Params, you can create documentation for the DAG using the `doc_md` argument. This argument takes Markdown content and renders it as HTML when you pull up the DAG in the UI. 
 
 ```python
 # 02_better_dag.py
@@ -98,12 +99,9 @@ with DAG(
     # task definitions below...
 ```
 
-Check out the full code behind both DAGs here: [insert repo link]
+Check out the entire [code behind both DAGs](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/airflow_params/airflow/dags). 
 
-If you want to play around with the code, you can clone the full repo here: 
-
-Check out the README file for more details on getting set up. Terraform will take care of your AWS resources. Docker will run your local Airflow instance. 
-
+If you want to meet the DAGs in real life, clone the [full project folder](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/airflow_params). Use the README to get set up. Terraform will take care of your AWS resources. Docker will run your local Airflow instance. 
 
 ---
 
