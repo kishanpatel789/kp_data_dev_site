@@ -42,11 +42,12 @@ Two DAGs. Both do the same thing. But one is helpful, like the family member you
 
 ---
 
-Params let you pass runtime configuration to a DAG. That's a fancy of way of saying, "When you need to run a DAG manually, you use Params to make any final tweaks." When Params are defined in a DAG file, Airflow magically generates a web form and handles basic input validation. But what's most helpful is the ability to add descriptions and helpful messages for each expected input. 
+Params let you pass runtime configuration to a DAG. That's a fancy of way of saying, "When you need to run a DAG manually, you use Params to make any final tweaks." When Params are defined in a DAG file, Airflow magically generates a web form and handles basic input validation. But what's most helpful is the ability to add descriptions or hints for each expected input. 
 
 Here's a snippet how Params are defined in my better DAG: 
 
 ```python
+# 02_better_dag.py
 from airflow.models.param import Param
 params = {
     "python_file_path": Param(
@@ -74,18 +75,36 @@ params = {
 }
 ```
 
-Notice how the python code translates into the generated UI. The [Airflow docs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html) show the full range of data types available. 
+Notice how the python code translates to the generated UI. This DAG uses inputs like strings, arrays, objects, and booleans. The [Airflow docs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html) show the full range of data types available. 
 
-Also, you can define documentation for the DAG in markdown, which is then rendered when you pull up the DAG. 
+Also, you can create documentation for the DAG using the `doc_md` argument. This argument takes markdown content and renders it as HTML when you pull up the DAG in the UI. This
+
+```python
+# 02_better_dag.py
+with DAG(
+    dag_id="02_better_dag",
+    schedule="0 0 * * *",
+    start_date=pendulum.datetime(2024, 9, 1, tz="UTC"),
+    catchup=False,
+
+    doc_md=textwrap.dedent("""
+        # Super Cool Python Runner
+        - This dag runs a python file and should be executed with run-time configuration.
+        - The target python file must be located in AWS S3 and contain a `main()` function.
+    """),
+    # ^^^ Talk about your DAG here!
+
+) as dag:
+    # task definitions below...
+```
 
 Check out the full code behind both DAGs here: [insert repo link]
 
-If you want to play around with the code, you can clone the fully repo here: 
+If you want to play around with the code, you can clone the full repo here: 
 
-Terraform will set up your AWS resources. Docker will set up your local Airflow instance. 
+Check out the README file for more details on getting set up. Terraform will take care of your AWS resources. Docker will run your local Airflow instance. 
 
-also use dag docs
 
 ---
 
-Friends don't let friends DAG blindly. The next time you're building an Airflow pipeline, consider using Params with helpful documentation. Someone will thank you; it may even be you 6 months from now. 
+Friends don't let [friends](https://kpdata.dev) DAG blindly. The next time you're building an Airflow pipeline, consider using Params with helpful documentation. Someone will thank you for your effort; it may even be you 6 months from now. 
