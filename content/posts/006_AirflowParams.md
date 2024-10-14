@@ -14,7 +14,9 @@ I sit down in my cubicle and start my computer. It's Monday morning.
 
 <img alt="Initial DAG config" src="/static/images/post006/InitialConfig.jpeg" class="w-full md:w-auto md:max-w-xl mx-auto">
 
-What the heck is this? How do I tell the DAG which python script to run? Does it need to know anything else? I lean back in my chair and take a breath. It's 8:30 now. This pipeline can't be that complicated. It just runs scripts with a service account. The python script I need to test is somewhere in a S3 bucket. I'll just throw different config objects at the DAG until it runs. Then I'll move on to my task list.
+What the heck is this? How do I tell the DAG which python script to run? Does it need to know anything else? 
+
+I lean back in my chair and take a breath. It's 8:30 now. This pipeline can't be that complicated. It just runs scripts with a service account. The python script I need to test is somewhere in a S3 bucket. I'll just throw different config objects at the DAG until it runs. Then I'll move on to my task list.
 
 Several minutes later, my screen is bleeding red with failed DAG runs.
 
@@ -44,7 +46,7 @@ Two DAGs. Both do the same thing. But one is helpful, like the family member you
 
 Params let you pass runtime configuration to a DAG. That's a fancy of way of saying, "When you run a DAG manually, use Params to make the final tweaks." Airflow takes any Params written in a DAG file and magically generates a web form, which handles basic input validation. But what's most helpful is the ability to add descriptions or hints for each expected input. 
 
-Here's a snippet how Params are defined in my better DAG: 
+Here's a snippet of how Params are defined in my better DAG: 
 
 ```python
 # 02_better_dag.py
@@ -79,7 +81,7 @@ params = {
 
 Notice how the code translates to the generated UI. This DAG uses inputs like strings, arrays, objects, and booleans. The [Airflow docs](https://airflow.apache.org/docs/apache-airflow/stable/core-concepts/params.html) show the full range of data types available. 
 
-Beyond Params, you can create documentation for the DAG using the `doc_md` argument. This argument takes Markdown content and renders it as HTML when you pull up the DAG in the UI. 
+Beyond Params, you can create documentation for the DAG using the `doc_md` argument. The argument takes Markdown content and renders it as HTML when you pull up the DAG in the UI. 
 
 ```python
 # 02_better_dag.py
