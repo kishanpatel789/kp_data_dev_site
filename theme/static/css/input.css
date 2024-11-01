@@ -3,49 +3,50 @@
 @tailwind utilities;
 
 article h2 {
-    @apply text-2xl mt-4
+  @apply text-2xl mt-4;
 }
 
 article h3 {
-    @apply text-xl mt-2
+  @apply text-xl mt-2;
 }
 
 article p {
-    @apply mt-2
+  @apply mt-2;
 }
 
 article ul {
-    @apply list-disc list-outside
+  @apply list-disc list-outside;
 }
 
 article ol {
-    @apply list-decimal list-outside
+  @apply list-decimal list-outside;
 }
 
 article li {
-    @apply ms-8 ps-2
+  @apply ms-8 ps-2;
 }
 
 article .highlight {
-    @apply p-4 mt-2 rounded-lg text-sm
+  @apply p-4 mt-2 rounded-lg text-sm;
 }
 
 article p code {
-    @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm
+  @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm;
 }
 
 article li code {
-    @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm
+  @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm;
 }
 
 article hr {
-    @apply border-gray-300 my-4
+  @apply border-gray-300 my-4;
 }
 
-article p a {
-    @apply underline underline-offset-4 hover:text-kpddaccent transition-colors duration-200
+article p a,
+article li a {
+  @apply underline underline-offset-4 hover:text-kpddaccent transition-colors duration-200;
 }
 
 .highlight pre {
-    @apply overflow-x-auto whitespace-pre
+  @apply overflow-x-auto whitespace-pre;
 }
