@@ -3,6 +3,7 @@ node_modules
 notes.md
 __pycache__
 output
-scratch.txt
+scratch*
 .DS_Store
 .python-version
+.vscode

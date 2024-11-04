@@ -42,15 +42,15 @@ schemas = {
             "wiki",
         ],
     },
+    #...
 }
-
 ```
 
 Like almost all REST APIs, Potter DB returns JSON objects, which can contain nested values. The Movie and Character objects have nested arrays to account for things like multiple producers or multiple love interests. Our database will feature relational tables, so we need to do a bit of transfiguration. 
 
 To create relational tables, the nested arrays will be normalized into separate tables. For example, each character's array of romances will be written to a separate table called `character_romances`. When querying later, joins can be created between `character` and `character_romances` as needed. 
 
-[INSERT DIAGRAM - json nested objects mapped to multiple relational tables]
+![Data transfiguration](/static/images/post007/DataTransfiguration.jpeg)
 
 Lastly, there's no guard dog named Fluffy (i.e. authentication requirements) protecting the API. Instead the API limits usage by tracking your IP address. If we accidentally overuse the API and get 429 errors, the script uses exponential backoff to try again later. 
 
@@ -60,7 +60,7 @@ Alright, let's cast the first spell!
 
 
 ## Part 2: Loading the Database (Wingardium Leviosa)
-Now that we have our data in CSV format, we can load it into a database. Our second script `seed_db.py` uses SQLAlchemy to initialize a SQLite database. The script then parses the CSV files and inserts records into the database. 
+Now that we have our data in CSV format, we can load it into a database. Our second script `seed_db.py` uses SQLAlchemy to initialize a SQLite database. The script then reads the CSV files and inserts records into the database. 
 
 The file `models.py` defines our tables as SQLAlchemy models, which describe our columns and foreign key relationships. Here's an example of the `Book` model: 
 
@@ -95,15 +95,15 @@ class Book(Base):
 
 Before we load data into our tables, we need to prepare for some stricter data modeling rules, like data types and uniqueness. 
 
-First, everything in a CSV file is a string. We need to make sure any datetimes in the CSV are interpreted as true datetime objects. The script performs this parsing and type conversion when instantiating the ORM object for each row. 
+First, everything in a CSV file is a string. We need to make sure any datetimes in the CSV are interpreted as true datetime objects. The script performs this parsing and type conversion when creating the ORM object for each row. 
 
-Second, we need to account for any duplicate records returned by the API. As the script walks through the CSV file, it logs a hash of the row's ID or the entire row itself. If a duplicate ID is found, it is not written to the database; instead the record is emitted to a text file `errors.txt` for later review. 
+Second, we need to handle any duplicate records returned by the API. As the script walks through the CSV file, it logs a hash of the row's ID or the entire row itself. If a duplicate record is found, it is not written to the database; instead the record is sent to a text file `errors.txt` for later review. 
 
-Cast the second spell and watch the CSV file content levitate into the database. 
+Step right up and cast the second spell! Watch the CSV file content levitate into the database. 
 
 <img alt="Run seed_db.py" src="/static/images/post007/TerminalSeedDb.jpeg" class="w-full md:w-auto md:max-w-2xl mx-auto">
 
-Log into the database to make sure everything looks good. Give it a whirl and test out a query. 
+Log into the database at `./data/sqlite/potter.db` to make sure everything looks good. Give it a whirl and test out a query: 
 
 ```sql
 SELECT *
@@ -125,12 +125,11 @@ bcae9def-6584-4300-ac63-ff007974bf3c  harry-potter      Harry James Potter      
 d67ddb5d-192b-4d75-8f18-c55a1b5ce442  ronald-weasley    Ronald Bilius Weasley                    1 March 1980, Ottery St Catchpole, Devon, England, Great Britain                                                                                                         Male    Human    5'9'    152 lbs                                   Red                          Blue          Pale        Pure-blood    Married         English                Aragog                            Gryffindor  Jack Russell terrier  https://static.wikia.nocookie.net/harrypotter/images/4/44/Ronald_Weasley_DHF1.jpg                https://harrypotter.fandom.com/wiki/Ronald_Weasley
 ```
 
-## My Turn!
-Download the code from this [Github repo folder](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/accio_database). The README gives detailed setup instructions. 
-
 ---
 
-Mischief managed. You just used magic (programming) to capture data from an API and bottle it away in your private database. You're a wizard, Harry. 
+Mischief managed. You just used magic (programming) to capture data from an API and bottle it away in your private database. Yer a wizard, Harry. 
 
-[Send me an owl](https://kpdata.dev) when you need help with your next challenge. 
+Want to go deeper as you study for your OWLs? Download the [code](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/accio_database) and check out the README. 
+
+On that note, [send me an owl](https://kpdata.dev) when you need help with your next magical challenge. 
 
