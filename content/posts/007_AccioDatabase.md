@@ -3,7 +3,8 @@ Date: 2024-11-01
 Slug: accio-database
 Tags: api, python, data-engineering
 Summary: Let's summon a database by scraping the Potter DB API!
-Status: draft
+Status: published
+MetaImage: /static/images/post007/HarryPotterSummoning.jpeg
 
 Listen up, you witches and wizards. Today we're summoning a database. 
 
