@@ -1,9 +1,10 @@
 Title: Pytest Your FastAPI App
-Date: 2024-12-02
+Date: 2024-12-03
 Slug: pytest-your-fastapi-app
 Tags: api, python
-Summary: Protect your future app by creating software tests today. Here's how you integrate pytest into your FastAPI app.
-Status: draft
+Summary: Protect your future app by creating software tests today! Here's how you integrate pytest into your FastAPI app.
+Status: published
+MetaImage: /static/images/post008/HappyRobotWithTests.jpeg
 
 I love my wife. I want to help her any way I can. 
 
@@ -44,12 +45,12 @@ That's it. A test is just a function that does something and checks for assertio
 
 How do you run these tests, you ask? Just enter the command `pytest -v` in your command line. (We'll talk specifics later.)
 
-<img alt="Run tests" src="/static/images/post008/RunTests.jpeg" class="w-full md:w-auto md:max-w-2xl mx-auto">
+<img alt="Run tests" src="/static/images/post008/RunTests.jpeg" class="w-full my-4 md:w-auto md:max-w-2xl mx-auto">
 
 Boom. 21 tests just ran in 1.61 seconds. I hope you're as excited about tests as I am! Let's dig deeper. 
 
 ## Get the Code
-Grab the [code from this repo folder](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/pytest_your_fastapi_app). Follow the README if you want to run this yourself. Here's what we have this time:
+Grab the [code from this repo folder](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/pytest_your_fastapi_app). Follow the README if you want to run this yourself. Here's what we have:
 
 
 ```bash
@@ -79,7 +80,7 @@ Grab the [code from this repo folder](https://github.com/kishanpatel789/kp_data_
     └── ...
 ```
 
-On a high level, the FastAPI application is a CRUD app for recipes. The backend database is in [SQLite](https://www.sqlite.org/) and communication with the database is handled with [SQLAlchemy](https://www.sqlalchemy.org/) models. The FastAPI app is an interface to read, edit, or create recipes. 
+On a high level, the FastAPI application is a CRUD app for recipes. The backend database is in [SQLite](https://www.sqlite.org/) and communication with the database is handled with [SQLAlchemy](https://www.sqlalchemy.org/) models. FastAPI serves as an interface to read, edit, or create recipes. 
 
 Today, we're focusing on one directory: `./api/tests/`. This folder contains all the material for our tests. 
 
@@ -89,7 +90,7 @@ The three files with the prefix `test_` are where the 21 tests are defined. The 
 
 First thing's first: We don't want to muck up our production database when testing our app. You may have a test that creates a recipe called "My Test Recipe", but you don't want that to appear next to your "Grandma's Chocolate Chip Cookies" recipe in the actual app. 
 
-Instead, every time we run a test, we want a separate database specifically for testing. [Pytest fixtures](https://docs.pytest.org/en/6.2.x/fixture.html) ensure that certain criteria are implemented before testing begins and then torn down when the test ends. In our scenario, we're using a fixture `test_db` to do the following:
+Instead, each time we run a test, we want a separate database specifically for testing. [Pytest fixtures](https://docs.pytest.org/en/6.2.x/fixture.html) ensure that certain criteria are implemented before testing begins and then torn down when the test ends. In our scenario, we're using a fixture `test_db` to do the following:
 
 1. Spin up a test database and load seed data
 1. Override the FastAPI database dependency (so the app points to the test database instead of the prod database)
@@ -131,9 +132,9 @@ def test_client(test_db):
     yield TestClient(app)
 ```
 
-After that, the `test_db` fixture is passed to a second fixture: `test_client`. It's this `test_client` fixture that is used by every single test to ensure the database configuration is consistent between tests. The fixture simply makes a client object available to the test to make HTTP requests to the FastAPI app.
+After that, the `test_db` fixture is passed to a second fixture: `test_client`. It's this `test_client` fixture that is used by every single test to ensure the database configuration is consistent between tests. The fixture simply makes a client object available for the test to send HTTP requests to the API.
 
-Fixtures are also helpful for reference a certain data point among tests. For example, the `test_recipes.py` module defines a sample recipe as a fixture. That sample recipe is then used in multiple tests so it doesn't have to be re-defined each time. 
+Fixtures are also helpful for re-using sample data. For example, the `test_recipes.py` module defines a sample recipe as a fixture. That sample recipe is then used in multiple tests so it doesn't have to be re-defined within each test. 
 
 ```python
 # test_recipes.py
@@ -183,15 +184,17 @@ def test_read_recipe_by_id(
 
 The fixtures rabbit hole goes deep. Visit the [docs](https://docs.pytest.org/en/6.2.x/fixture.html) to learn more. 
 
-Alright, getting back to how we run the test. The pytest framework operates from the command line. When in the project directory, execute `pytest`. Pytest will then collect the tests defined in the directory and execute them. The PASS/FAIL of each test will be presented. 
+Alright, getting back to how we run the test suite. The pytest framework operates on the command line. In the project directory, enter the command `pytest`. The pytest worker frolics through the directory, collects any tests it finds, and then executes them. The PASS/FAIL of each test is presented on the terminal. 
 
-Just to simulate a failure, here's a test run where a test is intentionally designed to fail. Note how the output clearly indicates what went wrong. The test expected a recipe name of "Channa Masala" but got "gobbledegook": 
+Just to simulate a failure, here's a run where a test is intentionally set to fail. Note how the output clearly indicates what went wrong. The test expected a recipe name of "gobbledegook" but got "Channa Masala": 
 
-<img alt="Test failure" src="/static/images/post008/TestFailure.jpeg" class="w-full md:w-auto md:max-w-2xl mx-auto">
+<img alt="Test failure" src="/static/images/post008/TestFailure.jpeg" class="w-full my-4 md:w-auto md:max-w-2xl mx-auto">
+
+Pytest provides error messages like these out-of-the-box, which make testing very useful for catching bugs early and maintaining your app throughout its lifecycle. 
+
+Meander through the [rest of the code](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/pytest_your_fastapi_app) and check out the [FastAPI testing tutorial](https://fastapi.tiangolo.com/tutorial/testing/) to see how easy it is to integrate tests into a FastAPI app.
 
 ---
-
-Pytest is one of the most popular testing frameworks in the python ecosystem. Writing your tests is a breeze and the error messages you get out-of-the-box are very useful for catching bugs early. 
 
 Be a better husband than me. Write software tests from the beginning of your project. Your wife will thank you, and [you'll thank me](https://kpdata.dev). 
 
