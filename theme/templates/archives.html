@@ -1,6 +1,15 @@
 {% extends "base.html" %}
 
 {% block title %}{{ SITENAME|striptags }} - Blog{% endblock %}
+{% block meta_og_title %}<meta property="og:title" content="{{ SITENAME|striptags }} - Blog">{% endblock %}
+{% block meta_twitter_title %}<meta name="twitter:title" content="{{ SITENAME|striptags }} - Blog">{% endblock %}
+
+{% block meta_og_url %}<meta property="og:url" content="{{ SITEURL }}/blog/">{% endblock %}
+{% block meta_twitter_url %}<meta property="twitter:url" content="{{ SITEURL }}/blog/">{% endblock %}
+
+{% block meta_description %}<meta name="description" content="Check out what we're learning, building, and thinking about." />{% endblock %}
+{% block meta_og_description %}<meta property="og:description" content="Check out what we're learning, building, and thinking about.">{% endblock %}
+{% block meta_twitter_description %}<meta name="twitter:description" content="Check out what we're learning, building, and thinking about.">{% endblock %}
 
 {% block content %}
 
