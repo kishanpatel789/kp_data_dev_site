@@ -4,12 +4,14 @@
 {% block meta_og_title %}<meta property="og:title" content="{{ article.title|striptags }}">{% endblock %}
 {% block meta_twitter_title %}<meta name="twitter:title" content="{{ article.title|striptags }}">{% endblock %}
 
-{% block meta_og_url %}<meta property="og:url" content="{{ SITEURL }}/{{ article.url }}">{% endblock %}
-{% block meta_twitter_url %}<meta property="twitter:url" content="{{ SITEURL }}/{{ article.url }}">{% endblock %}
-
 {% block meta_description %}<meta name="description" content="{{ article.summary|striptags }}" />{% endblock %}
 {% block meta_og_description %}<meta property="og:description" content="{{ article.summary|striptags }}">{% endblock %}
 {% block meta_twitter_description %}<meta name="twitter:description" content="{{ article.summary|striptags }}">{% endblock %}
+
+{% block meta_og_url %}<meta property="og:url" content="{{ SITEURL }}/{{ article.url }}">{% endblock %}
+{% block meta_twitter_url %}<meta property="twitter:url" content="{{ SITEURL }}/{{ article.url }}">{% endblock %}
+
+{% block link_canonical %}<link rel="canonical" href="{{ SITEURL }}/{{ article.url }}" />{% endblock %}
 
 {% block meta_og_type %}<meta property="og:type" content="article">{% endblock %}
 
@@ -38,10 +40,7 @@
   {% endfor %}
 
   <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/pygments.css" />
-
 {% endblock %}
-
-{% block link_canonical %}<link rel="canonical" href="{{ SITEURL }}/{{ article.url }}" />{% endblock %}
 
 {% block content %}
 <article class="mb-16">
