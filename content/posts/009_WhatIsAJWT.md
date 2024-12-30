@@ -182,6 +182,6 @@ Assuming the token passes validation, your app logic can use the payload to iden
 
 --- 
 
-JWTs are amazing. They live in your browser and silently tell websites who you are, sparing you the pain of repeatingly entering your username and password. And they reduce the chances of someone pretending to be you and taking over your online account. 
+JWTs are amazing. They live in your browser and silently tell websites who you are, sparing you the pain of repeatedly entering your username and password. And they reduce the chances of someone impersonating you and taking over your online account. 
 
 Do you need help setting up an authorization system with JWT? You know where to [find me](https://kpdata.dev/). And if you're still ordering your midnight snack, order some cookies for me. 
