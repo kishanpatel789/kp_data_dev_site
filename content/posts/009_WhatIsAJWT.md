@@ -2,8 +2,9 @@ Title: What is a JWT?
 Date: 2025-01-01
 Slug: what-is-a-jwt
 Tags: system-design, python
-Summary: You use it every day but hardly think about. Let's talk about the Javascript Web Tokens you've been throwing around the Internet.
-Status: draft
+Summary: You use it everyday but hardly think about. Let's talk about the Javascript Web Tokens you've been throwing around the Internet.
+Status: published
+MetaImage: /static/images/post009/JWTCoin.jpeg
 
 It's 11:00 PM. You have the munchies, so you start an order from your favorite midnight cookie delivery service. You go to the website, enter your username and password, and are logged in. 
 
