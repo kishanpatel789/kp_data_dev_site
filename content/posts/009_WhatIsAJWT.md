@@ -105,7 +105,7 @@ Last, the `aud` claim indicates that this token is to be used by the `accio-cook
 
 If I'm feeling sneaky, I could create my own JWT using Mr. Potter's name and send it with my HTTP requests to the website. Then I could order cookies using his account (but have them delivered to my door). The question is, how does the web server know the JWT it receives is legit, that it hasn't been forged or tampered with? 
 
-When the server creates the token, is uses a secret that only it knows to sign the token. In the future, when the server receives a JWT from a user, it checks the token's signature to see if the token was truly created by the server. 
+When the server creates the token, it uses a secret that only it knows to sign the token. In the future, when the server receives a JWT from a user, it checks the token's signature to see if the token was truly created by the server. 
 
 This is where the header and signature parts of the JWT come in. The header declares the type of token (e.g. `JWT`) and a hashing algorithm (e.g. `HS256`) that will be used to later create a signature. 
 
