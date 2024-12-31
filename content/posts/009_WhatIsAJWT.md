@@ -2,7 +2,7 @@ Title: What is a JWT?
 Date: 2025-01-01
 Slug: what-is-a-jwt
 Tags: system-design, python
-Summary: You use it everyday but hardly think about. Let's talk about the Javascript Web Tokens you've been throwing around the Internet.
+Summary: You use it everyday but hardly think about. Let's talk about the JSON Web Tokens you've been throwing around the Internet.
 Status: published
 MetaImage: /static/images/post009/JWTCoin.jpeg
 
@@ -12,13 +12,13 @@ As you load your shopping cart with a dozen snickerdoodle cookies and the regret
 
 As you enter your credit card info, you remember that HTTP (the way you interact with websites) is stateless. That's a fancy way of saying the website doesn't keep an ongoing connection with your web browser. Every time you interact with the site and click on different buttons, your browser opens a new connection to the website, so you need to tell the web server who you are again... but you somehow don't need to give your username and password more than once. 
 
-This is where Javascript Web Tokens, or JWTs, come into play. JWTs are little bits of text that are sent to your browser after you log in with your username and password. As you interact with the site, your browser sends that JWT back to the server with each HTTP request. The server reads the JWT to understand who is sending the request. 
+This is where JSON Web Tokens, or JWTs, come into play. JWTs are little bits of text that are sent to your browser after you log in with your username and password. As you interact with the site, your browser sends that JWT back to the server with each HTTP request. The server reads the JWT to understand who is sending the request. 
 
 <img alt="HTTP Flow" src="/static/images/post009/HTTPFlow.jpeg" class="w-full my-4 md:w-auto md:max-w-2xl mx-auto">
 
 ## What exacty is in a JWT?
 
-What does a Javascript Web Token look like? Here's an example:
+What does a JSON Web Token look like? Here's an example:
 
 ```text
 eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJoYXJyeSBwb3R0ZXIiLCJpYXQiOjE3MzUzMjE3OTIsImV4cCI6MTczNTMyODk5MiwibmJmIjoxNzM1MzIxNzg3LCJhdWQiOiJhY2Npby1jb29raWVzLXdlYnNpdGUifQ.SprmLvf2SgcDnH1CFVMIU20WOyNUzp-lCyCCYYjT8lM
@@ -77,7 +77,7 @@ base64_urldecode(
 
 Well well well... if it isn't Mr. Potter. 
 
-It looks like this payload is just a JSON object of 5 key-value pairs, or claims. The payload says who the user is and gives some info about when the token is valid. The [Javascript Web Token industry standard](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1) defines some claims that can be in a JWT:
+It looks like this payload is just a JSON object of 5 key-value pairs, or claims. The payload says who the user is and gives some info about when the token is valid. The [JSON Web Token industry standard](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1) defines some claims that can be in a JWT:
 
 - `sub` (subject): The subject or user represented by the token; this is usually a username
 - `iat` (issued at): The time at which the JWT was created
