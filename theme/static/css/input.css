@@ -30,11 +30,9 @@ article .highlight {
   @apply p-4 mt-2 rounded-lg text-sm;
 }
 
-article p code {
-  @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm;
-}
-
-article li code {
+article p code,
+article li code,
+article table code {
   @apply bg-gray-100 p-1 rounded-md text-gray-800 text-sm;
 }
 
@@ -45,6 +43,15 @@ article hr {
 article p a,
 article li a {
   @apply underline underline-offset-4 hover:text-kpddaccent transition-colors duration-200;
+}
+
+article table {
+  @apply table-auto mx-auto border border-collapse my-2 min-w-full;
+}
+
+article table th,
+article table td {
+  @apply border px-4 py-1;
 }
 
 .highlight pre {
