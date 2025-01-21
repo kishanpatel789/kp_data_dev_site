@@ -9,7 +9,7 @@ Life is short. Way to short to do mundane tasks.
 
 So when Mr. Client says, "Hey, I need this report generated and sent to me every Friday at 9AM," I look for the option that does not sacrifice all Friday mornings for the rest of my life. (I have big dreams for my Friday mornings.)
 
-Airflow orchestrates the tasks you need to execute. You tell the framework when you need the work done and how to do it, and like a helpful minion, it will get the job done. This is especially helpful when you have repetitive tasks that need to be executed every-so-often. 
+[Airflow](https://airflow.apache.org/) orchestrates the tasks you need to execute. You tell the framework when you need the work done and how to do it, and like a helpful minion, it will get the job done. This is especially helpful when you have repetitive tasks that need to be executed every-so-often. 
 
 Today, we'll check out the various ways to schedule data pipelines in Airflow. Let's go!
 
@@ -28,12 +28,11 @@ with DAG(
     # do something amazing here
 ```
 
-When do you think the very first run of this DAG will occur? You may think the first run will be on 2025-01-01 at 12:00 AM. 
+When do you think the very first run of this DAG will occur? You may think the first run will be 1/1/25 at 12:00 AM. 
 
-But the first run will actually be on 2025-01-**02** at 12:00AM, or one day after the start date. 
+But the first run will actually be on 1/**2**/25 at 12:00AM, or one day after the start date. 
 
-
-The actual time a DAG runs can be can be confusing. Airflow uses a concept called "data interval" where each DAG run is designed to process data associated with a certain time window. In Airflow, the first run of a DAG occurs at `start_date + schedule`, or when the first time window has closed. 
+The actual time a DAG runs can be can be confusing. Airflow uses a concept called "data interval" where each DAG run is designed to process data associated with a certain time window. Typically, a DAG runs at the end of each data interval. In Airflow, the first run of a DAG occurs at `start_date + schedule`, or when the first time window has closed. 
 
 [insert diagram showing time intervals]
 
@@ -64,7 +63,7 @@ Cron expressions are made of 5 parts: minute, hour, day-of-month, month, and day
 
 These expressions may be hard to understand at first. Tools like [crontab.guru](https://crontab.guru/) can help interpret cron expressions or create new ones.
 
-Given that some cron expressions are used so frequently, Airflow features cron "presets" as an alternative. The following "human-readable" preset values can be entered as the schedule in place of their cron equivalent: 
+Given that some cron expressions are used so frequently, Airflow features cron "presets" as an alternative. The following human-friendly preset values can be entered as the schedule in place of their cron equivalent: 
 
 | Preset        | Meaning                                                    | Cron          |
 | ------------- | ---------------------------------------------------------- | ------------- |
@@ -85,16 +84,44 @@ The hash symbol (`#`) can be used in the day-of-week position to indicate which 
 The division symbol (`/`) creates step values. For example, `*/10 * * * *` represents every 10 minutes. This is essentially a shortcut for the more verbose `0,10,20,30,40,50 * * * *`. 
 
 ## Timedelta
-A cron expression works great... until it doesn't. Mr. Client says, "I need this report every 3 days." Uh... how do we schedule that in cron? You can't. 
+A cron expression works great... until it doesn't. Mr. Client says, "I need this report every 4 days." Uh... how do we schedule that in cron? You can't. 
 
-Cron is stateless, meaning that the standard does not keep track of the last time a job ran. It's a glorified pattern that is regularly compared against the current time to see if the pipeline should run. 
+Cron is stateless, meaning it does not keep track of the last time a job ran. It's a glorified pattern matching system that regularly compares the expression against the current time to see if the pipeline should run. 
 
-This is where frequency-based scheduling comes into place. 
+You could try forcing a cron expression that represents every 4 days by hard-coding every 4th day (eg. 1st, 5th, 9th, 13th, ... of the month). But you'd have an issue at the end of the month; the DAG would run on the 29th of this month and the 1st of next month, which would break the every-4-days goal.
+
+This is where frequency-based scheduling comes into place. Python's [timedelta object](https://docs.python.org/3/library/datetime.html#timedelta-objects) can be supplied to the `schedule` parameter to schedule DAGs at a regular frequency. 
+
+```python
+from datetime import datetime, timedelta
+from airflow import DAG
+
+with DAG(
+    dag_id="my_frequency_based_dag",
+    start_date=datetime(2025, 1, 1),
+    schedule=timedelta(days=4),  # every 4 days after 1/1/25
+):
+    # do stuff
+```
+
+For example, `schedule = timedelta(days=4)` will execute the DAG every 4 days while `schedule = timedelta(minutes=17)` will run the DAG every 17 minutes.
 
 ## Dataset
-Mr. Client says, "I need this pipeline to report once our vendor-supplied file is processed, but that can vary." 
+Mr. Client says, "I need this report to run after our vendor-supplied file is processed. But the file is processed at different times, sometimes different days..."
+
+Sometimes, you don't have a time-based schedule. Instead you have an event-driven one. 
+
+Airflow has push-based models like the 
+and pull-based frameworks like the external task sensor. But these can be a bit clunky. 
+
+A relatively new feature in Airflow is the Dataset. 
+
 For such data dependencies with inconsistent deliveries, using Airflow's Dataset feature can help. 
 
 ## Timetable
 eventsTimetable for set datetimes
 custom timetable plugin for more complex times
+
+--- 
+
+Grab the [code](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/airflow_scheduling). 
