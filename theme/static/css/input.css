@@ -46,7 +46,7 @@ article li a {
 }
 
 article table {
-  @apply table-auto mx-auto border border-collapse my-2 min-w-full;
+  @apply table-auto mx-auto border border-collapse my-2;
 }
 
 article table th,

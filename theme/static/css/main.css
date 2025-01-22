@@ -558,6 +558,14 @@ video {
   position: static;
 }
 
+.fixed {
+  position: fixed;
+}
+
+.relative {
+  position: relative;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -977,7 +985,6 @@ article table {
   margin-right: auto;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-  min-width: 100%;
   table-layout: auto;
   border-collapse: collapse;
   border-width: 1px;
