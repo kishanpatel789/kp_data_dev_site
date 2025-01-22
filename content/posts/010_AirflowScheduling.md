@@ -173,9 +173,60 @@ In the consumer DAG, pass the `Dataset` object to the `schedule` argument of the
 This scratches the surface of how Dataset can be used. Check out the [docs](https://airflow.apache.org/docs/apache-airflow/stable/authoring-and-scheduling/datasets.html) for more advanced scenarios of data-aware scheduling. 
 
 ## Timetable
-eventsTimetable for set datetimes
-custom timetable plugin for more complex times
+Mr. Client says, "I need a special report run on holidays and ONLY on holidays."
+
+Cron expressions and timedelta objects won't serve us well here. For such complex scheduling, we can create a timetable and pass that to the `schedule` parameter. 
+
+[Airflow timetables](https://airflow.apache.org/docs/apache-airflow/stable/authoring-and-scheduling/timetable.html) determine the data interval and execution date of each DAG run. When we schedule with cron expressions or timedelta objects, Airflow automatically converts our input into its internal timetable representation. For this unique sitaution, we need to create our own timetable.
+
+We can use the built-in `EventsTimetable` class to record the dates the DAG should run: 
+
+```python
+from datetime import datetime
+import pendulum
+
+from airflow import DAG
+from airflow.timetables.events import EventsTimetable
+
+my_events = EventsTimetable(  # <--- define custom Timetable
+    event_dates=[
+        pendulum.datetime(2025, 1, 1), # New Years Day
+        pendulum.datetime(2025, 1, 20), # MLK Jr Day
+        pendulum.datetime(2025, 2, 17), # Presidents' Day
+        pendulum.datetime(2025, 5, 26), # Memorial Day
+        pendulum.datetime(2025, 6, 19), # Juneteenth
+        pendulum.datetime(2025, 7, 4), # Independence Day
+        pendulum.datetime(2025, 7, 31), # Harry Potter's Birthday
+        pendulum.datetime(2025, 9, 1), # Labor Day
+        pendulum.datetime(2025, 11, 11), # Veterans Day
+        pendulum.datetime(2025, 11, 27), # Thanksgiving Day
+        pendulum.datetime(2025, 12, 25), # Christmas Day
+    ],
+    description="Client Holidays",
+    restrict_to_events=False,
+)
+
+with DAG(
+    dag_id="my_timetable_dag",
+    start_date=datetime(2025, 1, 1),
+    schedule=my_events,    # <--- use custom Timetable as schedule
+):
+    # do stuff
+```
+
+Airflow will then run the DAG only at the datetimes we list in our `EventsTimetable` object. 
+
+This approach works because we have a finite number of dates. For more complex schedules, we can create a custom timetable and register it to our Airflow instance as a plugin. 
+
+Here are some scenarios when such heavy lifting may be useful: 
+
+- Run DAG weekly, alternating between 4:30 PM on one run and 9:00 AM on the next run
+- Data intervals with gaps between DAG runs. (Standard schedules have continuous data intervals.)
+- Run DAG daily at sunset. This may be useful for weather-related jobs and require access to external APIs to identify expected sunset times.
+
+Check out the [docs](https://airflow.apache.org/docs/apache-airflow/stable/howto/timetable.html) to see how to implement these custom timetable classes. 
 
 --- 
 
-Grab the [code](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/airflow_scheduling). Each of these scheduling techniques are represented. Check out the README for more details. 
+Now we have several ways to schedule our DAGs for Mr. Client's various needs! If you want concrete examples, check out this [Github repo folder](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/airflow_scheduling). The README can has more details on getting the example DAGs up and running. 
+
