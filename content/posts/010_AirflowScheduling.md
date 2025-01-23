@@ -28,7 +28,7 @@ with DAG(
     # do something amazing here
 ```
 
-Pop quiz: When do you think the very first run of this DAG will occur? 
+Pop quiz: When do you think the very first run of this DAG will be? 
 
 You may think the first run will be 1/1/25 at 12:00 AM. 
 
@@ -46,13 +46,13 @@ Remembering this concept can save you some headache. With that nuance out of the
 1. Timetable
 
 ## Cron
-[Cron expressions](https://en.wikipedia.org/wiki/Cron) can be used to schedule points in time you want the DAG to run. Here are some examples: 
+[Cron expressions](https://en.wikipedia.org/wiki/Cron) declare points in time you want the DAG to run. Here are some examples: 
 
 - `30 5 * * *`: Everyday at 5:30AM
 - `0 14 * * 3`: Every Wednesday at 2:00PM (14:00)
 - `5 2 1 8 *`: Every August 1 at 2:05AM (02:05)
 
-Cron expressions are made of 5 parts: minute, hour, day-of-month, month, and day-of-week. The asterisk can be used as a wild card to cover all values.
+Cron expressions are made of 5 parts: minute, hour, day-of-month, month, and day-of-week. The asterisk serves as a wild card to cover all values.
 
 ```text
 ┌── minute (0-59)
@@ -81,7 +81,7 @@ Given that some schedules are used so frequently, Airflow allows cron "presets" 
 
 If you need further customization, Airflow allows extended cron expressions: day-of-week hash and step values. 
 
-The hash symbol (`#`) can be used in the day-of-week position to indicate which instance in a given month to run the DAG. For example, the expression `0 13 * * 5#2` means "the 2nd Friday of the month (5#2) at 1:00PM (13:00)". This modification can be useful when you need a pipeline to run monthly but only on a given day of the week. 
+The hash symbol (`#`) in the day-of-week position indicates which instance in a given month to run the DAG. For example, the expression `0 13 * * 5#2` means "the 2nd Friday of the month (`5#2`) at 1:00PM (13:00)". This modification can be useful when you need a pipeline to run monthly but only on a given day of the week. 
 
 The division symbol (`/`) creates step values. For example, `*/10 * * * *` represents every 10 minutes. This is essentially a shortcut for the more verbose `0,10,20,30,40,50 * * * *`.
 
@@ -92,9 +92,9 @@ You can't.
 
 Cron is stateless, meaning it does not keep track of the last time a job ran. It's a glorified pattern matching system that regularly compares the expression against the current time to see if the pipeline should run. 
 
-You could try forcing a cron expression that represents every 4 days by hard-coding every 4th day (eg. 1st, 5th, 9th, 13th, ... of the month). But you'd have an issue at the end of the month; the DAG would run on the 29th of this month and the 1st of next month, which would break the every-4-days goal.
+You could try forcing a cron expression by hard-coding every 4th day (eg. 1st, 5th, 9th, 13th, ... of the month). But you'd have an issue at the end of the month; the DAG would run on the 29th of this month and the 1st of next month, which would break the "every 4 days" goal.
 
-This is where frequency-based scheduling comes into place. Python's [timedelta object](https://docs.python.org/3/library/datetime.html#timedelta-objects) can be supplied to the `schedule` parameter to schedule DAGs at a regular frequency. 
+This is where frequency-based scheduling comes into place. Python's [timedelta object](https://docs.python.org/3/library/datetime.html#timedelta-objects) can be supplied to the `schedule` parameter to trigger DAGs at a regular frequency. 
 
 ```python
 from datetime import datetime, timedelta
@@ -113,14 +113,14 @@ For example, `schedule = timedelta(days=4)` will execute the DAG every 4 days wh
 ## Dataset
 Mr. Client says, "I need this report to run after our vendor-supplied file is processed. But the file is processed at different times, perhaps even different days..."
 
-Now things are getting juicy. Sometimes, you can't schedule a DAG to run at fixed points of time. Sometimes, you need to wait until another process is complete before running a pipeline. These scenarios require event-driven scheduling rather than time-based scheduling. 
+Now things are getting juicy. Sometimes, you can't schedule a DAG to run at fixed points of time. Sometimes, you need to wait until another upstream process is complete. These scenarios require event-driven scheduling rather than time-based scheduling. 
 
 Airflow has push-based solutions like the [TriggerDagRunOperator](https://airflow.apache.org/docs/apache-airflow/stable/_api/airflow/operators/trigger_dagrun/index.html#airflow.operators.trigger_dagrun.TriggerDagRunOperator)
 and pull-based options like the [ExternalTaskSensor](https://airflow.apache.org/docs/apache-airflow/stable/howto/operator/external_task_sensor.html#externaltasksensor). But these can be a bit clunky to use. 
 
 A relatively new feature in Airflow is the [Dataset](https://airflow.apache.org/docs/apache-airflow/stable/authoring-and-scheduling/datasets.html). Simply put, an Airflow Dataset is a string that represents some data. A certain DAG can create or update a Dataset, which will trigger another DAG that uses that Dataset. 
 
-Airflow doesn't care what the Dataset actually represents. It could be an object in a S3 bucket, a local file, a table in a Postgres database, etc. And Airflow doesn't directly check the Dataset to see if it has been updated. Instead, the Dataset is an internal tracker for coordinating multiple DAGs that depend on each other. If Airflow knows that DAG 1 produces a Dataset and DAG 2 consumes that same Dataset, then Airflow will trigger DAG 2 after DAG 1 is complete. 
+Airflow doesn't care what the Dataset actually is. It could be an object in a S3 bucket, a local file, a table in a Postgres database, etc. And Airflow doesn't directly check the data to see if it has been updated. Instead, the Dataset is an internal tracker for coordinating multiple DAGs that depend on each other. If Airflow knows that DAG 1 produces a Dataset and DAG 2 consumes that same Dataset, then Airflow will trigger DAG 2 after DAG 1 is complete. 
 
 So how do we tell Airflow which DAG depends on another DAG's output? 
 
@@ -179,7 +179,7 @@ Cron expressions and timedelta objects won't serve us well here. For such comple
 
 [Airflow timetables](https://airflow.apache.org/docs/apache-airflow/stable/authoring-and-scheduling/timetable.html) determine the data interval and execution date of each DAG run. When we schedule with cron expressions or timedelta objects, Airflow automatically converts our input into its internal timetable representation. For this unique sitaution, we need to create our own timetable.
 
-We can use the built-in `EventsTimetable` class to record the dates the DAG should run: 
+We can use the built-in `EventsTimetable` class to record the dates the DAG should run, which is then passed to the `schedule` parameter: 
 
 ```python
 from datetime import datetime
@@ -218,10 +218,10 @@ Airflow will then run the DAG only at the datetimes we list in our `EventsTimeta
 
 This approach works because we have a finite number of dates. For more complex schedules, we can create a custom timetable and register it to our Airflow instance as a plugin. 
 
-Here are some scenarios when such heavy lifting may be useful: 
+Here are some scenarios when such heavy lifting may be necessary: 
 
-- Run DAG weekly, alternating between 4:30 PM on one run and 9:00 AM on the next run
-- Data intervals with gaps between DAG runs. (Standard schedules have continuous data intervals.)
+- Run DAG weekly, alternating between 4:30 PM on one run and 9:00 AM on the next run.
+- Run DAG with gaps in data intervals between DAG runs. (Standard schedules have continuous data intervals.)
 - Run DAG daily at sunset. This may be useful for weather-related jobs and require access to external APIs to identify expected sunset times.
 
 Check out the [docs](https://airflow.apache.org/docs/apache-airflow/stable/howto/timetable.html) to see how to implement these custom timetable classes. 
@@ -230,3 +230,6 @@ Check out the [docs](https://airflow.apache.org/docs/apache-airflow/stable/howto
 
 Now we have several ways to schedule our DAGs for Mr. Client's various needs! If you want concrete examples, check out this [Github repo folder](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/airflow_scheduling). The README can has more details on getting the example DAGs up and running. 
 
+<img alt="Dag list" src="/static/images/post010/DAGList.jpeg" class="w-full my-4 md:w-auto md:max-w-2xl mx-auto">
+
+[Call me](https://kpdata.dev) if you need help scheduling your mundane tasks. You deserve to move on to more creative ventures. 
