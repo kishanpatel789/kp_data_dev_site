@@ -67,6 +67,8 @@ These expressions may be hard to understand at first. Tools like [crontab.guru](
 
 Given that some schedules are used so frequently, Airflow allows cron "presets" as an alternative. The following human-friendly preset values can be entered as the schedule in place of their cron equivalent: 
 
+<div markdown=1 class="overflow-x-auto">
+
 | Preset        | Meaning                                                    | Cron          |
 | ------------- | ---------------------------------------------------------- | ------------- |
 | `@once`       | Schedule once and only once                                |               |
@@ -78,6 +80,7 @@ Given that some schedules are used so frequently, Airflow allows cron "presets" 
 | `@quarterly`  | Run once a quarter at midnight on the first day            | `0 0 1 */3 *` |
 | `@yearly`     | Run once a year at midnight of January 1                   | `0 0 1 1 *`   |
 
+</div>
 
 If you need further customization, Airflow allows extended cron expressions: day-of-week hash and step values. 
 

@@ -46,12 +46,12 @@ article li a {
 }
 
 article table {
-  @apply table-auto mx-auto border border-collapse my-2;
+  @apply table-auto min-w-full mx-auto border border-collapse my-2 max-w-7xl md:min-w-96;
 }
 
 article table th,
 article table td {
-  @apply border px-4 py-1;
+  @apply border px-4 py-1 whitespace-nowrap;
 }
 
 .highlight pre {
