@@ -3,7 +3,8 @@ Date: 2025-02-01
 Slug: airflow-scheduling
 Tags: airflow, data-engineering
 Summary: Enjoy life and let Airflow handle the boring stuff. We're talking about how you can schedule those tasks to run for you. 
-Status: draft
+Status: published
+MetaImage: /static/images/post010/Watch.jpeg
 
 Life is short. Way to short to do mundane tasks. 
 
