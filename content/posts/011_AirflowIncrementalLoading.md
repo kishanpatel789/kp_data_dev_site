@@ -5,18 +5,39 @@ Tags: airflow, data-engineering
 Summary: Big data can be difficult data. Let's checkout how to design our Airflow pipelines to process data more efficiently. 
 Status: draft
 
+## Intro
+I feel amazing. 
 
-What exactly is incremental loading? Unlike moving a huge pile of data in one step, you break it down into each manageable chunks and process each chunk independenly. 
+I just ran a pipeline that processed over 14 petabytes of data. It took about 23 hours and a fair amount of stress. But it is done. 
 
-This is more efficient that processing the entire dataset. It saves more compute resources (which also leads to a lower cloud bill). And it may even shave off some calories. 
+*ping*
 
-Airflow features a concept of a data interval. The idea is that each time you run a DAG, the run should process data associated with a certain interval of time. Airflow provides certain [template variables](https://airflow.apache.org/docs/apache-airflow/stable/templates-ref.html#variables) to help build such time-focused DAGs. The most important variables are the `data_interval_start` and `data_interval_end`. 
+Mr. Client says, "Hey, remember that huge data source you ingested into our warehouse. Turns out the data for a one date was corrupted at the source. We need to re-run the ingestion."
+
+Oh fiddlesticks. 
+
+Do I really want to re-run ALL historic data if only a single day's data needs to be refreshed? 
+
+Of course not. But I'm a data engineer. I'll just use incremental loading. 
+
+
+## What is incremental loading
+Incremental loading is the lazy-man's way to get the minimum amount of work done and no more. Unlike moving a huge pile of data in one step, you break it down into each manageable chunks and process each chunk independenly. 
+
+In the context of capturing changes in upstream data, incremental loading allows you to process only the data that changed, and nothing else. 
+
+This is more efficient that processing the entire dataset. It saves more compute resources (which also leads to a lower cloud bill). And it may even shave off a few calories. 
+
+## Data interval
+Airflow features a concept of a data interval. The idea is that each time you run a DAG, the run should process data associated with a certain interval of time. Airflow provides [template variables](https://airflow.apache.org/docs/apache-airflow/stable/templates-ref.html#variables) to help build such time-focused DAGs. The most important variables are the `data_interval_start` and `data_interval_end`. 
 
 [ INSERT LINE DIAGRAM OF TIME AND DATA INTERVALS ]
 
-Enough theory, let's make this real. Suppose we have an app that sells donuts online. We're going to build a pipeline that pulls donut orders from the app's API. Then we'll aggregate the data to see how many donuts we're selling each hour. 
+For example, in our first data interval, 
 
-Let's check out an example dag that processes donut orders. You heard me. The people want donuts. And there's an online app that sells them. 
+## Example dag
+Enough theory, let's make this real. We have an app that sells donuts online. We're building a pipeline that processes donut orders. We'll pull donut orders from the app's API. Then we'll aggregate the data to see how many donuts we're selling each hour. 
+
 
 [INSERT FLOW CHART OF DAG]
 
