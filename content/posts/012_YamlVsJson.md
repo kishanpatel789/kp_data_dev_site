@@ -3,21 +3,22 @@ Date: 2025-04-01
 Slug: yaml-vs-config-config-files
 Tags: system-design
 Summary: All apps have config files. But should you use YAML or JSON? (Please don't say XML)
-Status: draft
+Status: published
+MetaImage: /static/images/post012/ConfigScales.jpeg
 
 Confession: I'm cheating on my first love. 
 
 [JSON](https://www.json.org/json-en.html) is great. She's always there for me. I tell her my deepest secrets, and she keeps them safe. She's dependable and helps me talk with others. 
 
-But my recent fling with YAML has me wondering... Is there someone better? Someone out there who just gets me better than JSON does? 
+But my recent fling with YAML has me wondering... Is there someone better out there? Someone who just gets me better than JSON does? 
 
 Lately, I've fallen in love with [YAML](https://yaml.org/). Yes, she makes my config files more readable. But she makes me happier in so many ways. 
 
 ## What are you talking about, weirdo
 All apps have configuration. This is typically a file that contains the app settings, letting you make tweaks without digging into the code base. 
 
-<div class="flex flex-col md:flex-row md:space-x-2 md:gap-3 py-2 items-stretch">
-<div class="w-full md:w-1/2">
+<div class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
+<div class="w-full md:w-[48%]">
 
 Often, config files are written in JSON and look like this: 
 
@@ -52,7 +53,7 @@ Often, config files are written in JSON and look like this:
 
 </div>
 <div class="hidden md:block w-px bg-gray-300"></div>
-<div class="w-full md:w-1/2">
+<div class="w-full md:w-[48%]">
 
 But lately, I'm flirting with config files that look like this: 
 
@@ -83,9 +84,9 @@ logging:
 </div>
 
 
-Both config files have the same content. The app code can read either file to see the server it's running on, how to access the backend database, and where to send the logs. 
+Both config files have the same content. The app can read either file to see the server it's running on, how to access the backend database, and where to send the logs. 
 
-But these two beauties look different. Today we'll see the differences and why YAML is my new "main squeeze." 
+But these two beauties *look* different. Today we'll see the differences and why YAML is my new "main squeeze." 
 
 ## Cleaner Format
 Readability is important. Code is written for machines, but we feeble humans need to read that code, too. 
@@ -103,7 +104,7 @@ While JSON uses commas and braces to define structure, YAML's structure is built
 Quick side note: Both JSON and YAML are built on the concept of key-value pairs. 
 
 - **Keys** usually name things you want to track. Keys appear before the colon (`:`). (See green-bold items in examples above)
-- Each key has a **value** which appears to the right of the colon (`:`). A value can be a string, number, boolean (true/false), list, or even another object (another collection of key-value pairs). 
+- Each key has a **value** which appears after the colon (`:`). A value can be a string, number, boolean (true/false), list, or even another collection of key-value pairs. 
 
 Okay, back to my raving: One of my favorite features of YAML is how she handles long strings. With JSON, you're stuck scrolling...
 
@@ -139,14 +140,14 @@ This gives you the best of both worlds:
 1. In your YAML file, you split the string among multiple lines to make the text more readable (no horizontal scrolling). 
 2. When your app reads the file, it replaces the line breaks with whitespace, recreating the long, single-line string for use in the app logic. 
 
-Here's a snippet of how python would interpret the file:
+Here's how python would interpret the file:
 
 ```python
 import yaml
 with open(f"./config_longstring.yaml", "r") as f:
   config_yaml = yaml.safe_load(f)
 
-# config file interpreted as python dictionary `config_yaml`: 
+# config file converted to python dictionary `config_yaml`: 
 # line breaks replaced with whitespace
 {
   'spells': {
@@ -165,7 +166,7 @@ BUT if you want to keep line breaks, you can use the pipe operator (`|`):
 spells:
   patronus_charm:
     incantation: "Expecto Patronum"
-    description: |                 # preserve line breaks with with `|`
+    description: |                 # preserve line breaks with `|`
       The Patronus Charm is an advanced defensive spell that conjures a
       positive energy force, often taking the form of an animal that
       represents the caster's spirit. It is primarily used to repel
@@ -177,7 +178,7 @@ spells:
 The YAML parser will read the string block literally and respect line breaks. Note how line breaks are identified by the new line character (`\n`) when the file loads again:
 
 ```python
-# config file interpreted as python dictionary: 
+# config file converted to python dictionary: 
 # line breaks preserved (\n)
 {
   'spells': {
@@ -217,8 +218,8 @@ Unfortunately, the JSON specification doesn't allow comments. In YAML, you can u
 ## Re-Use Code
 Do you like repeating yourself? 
 
-<div class="flex flex-col md:flex-row md:space-x-2 md:gap-3 py-2 items-stretch">
-<div class="w-full md:w-1/2">
+<div class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2">
+<div class="w-full md:w-[48%]">
 
 If so, keep using JSON: 
 
@@ -269,7 +270,7 @@ If so, keep using JSON:
 
 </div>
 <div class="hidden md:block w-px bg-gray-300"></div>
-<div class="w-full md:w-1/2">
+<div class="w-full md:w-[48%]">
 
 If not, use YAML: 
 
@@ -306,11 +307,11 @@ databases:
 </div>
 </div>
 
-YAML allows you to reuse a node, or part of the YAML file. You first "anchor" the node and give it an alias with the `&` character. Later you reference that alias with the `*` character. The example above shows how to reuse log settings across services, enabling consistency and the [DRY principle](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
+YAML lets you reuse a node, or part of the config file. You first "anchor" the node and give it an alias with the `&` character. Later you reference that alias with the `*` character. The example above shows how to reuse log settings across services, enabling consistency and the [DRY principle](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself).
 
 You can even merge an aliased node into another node that has extra key-value pairs. Check out our database config in JSON above. The primary and replica databases have many identical settings; only `name` and `read_only` differ. In the YAML version, common settings are in the `default_database` node, aliased as (`&default_db`). `default_db` is merged into the primary and replica settings with the `<<` operator; right after that, the settings unique to each environment are defined (`name` and `read_only`). 
 
-YAML's anchors reduce future bugs. Let's face it: When modifying our code, we've all introduced bugs because we updated the password for the primary database but forgot to update the password for the replica. With the pattern above, we can safely update our config in one place and sleep better at night. 
+YAML's anchors reduce future bugs. Let's face it: We've all introduced bugs when we updated the password for the primary database but forgotten to update the password for the replica. With the YAML pattern above, we can safely update our config in one place and sleep better at night. 
 
 ---
 
