@@ -12,9 +12,9 @@ Confession: I'm cheating on my first love.
 
 But my recent fling with YAML has me wondering... Is there someone better out there? Someone who just gets me better than JSON does? 
 
-Lately, I've fallen in love with [YAML](https://yaml.org/). Yes, she makes my config files more readable. But she makes me happier in so many ways. 
+Lately, I've fallen in love with [YAML](https://yaml.org/). Yes, she makes my config files more readable. But she does so much more. 
 
-## What are you talking about, weirdo
+## What are you talking about, weirdo?
 All apps have configuration. This is typically a file that contains the app settings, letting you make tweaks without digging into the code base. 
 
 <div class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
