@@ -12,7 +12,7 @@ Confession: I'm cheating on my first love.
 
 But my recent fling with YAML has me wondering... Is there someone better out there? Someone who just gets me better than JSON does? 
 
-Lately, I've fallen in love with [YAML](https://yaml.org/). Yes, she makes my config files more readable. But she does so much more. 
+Lately, I've fallen in love with [YAML](https://yaml.org/). Yes, she makes my config files more readable. But she does so much more than that. 
 
 ## What are you talking about, weirdo?
 All apps have configuration. This is typically a file that contains the app settings, letting you make tweaks without digging into the code base. 
@@ -311,7 +311,7 @@ YAML lets you reuse a node, or part of the config file. You first "anchor" the n
 
 You can even merge an aliased node into another node that has extra key-value pairs. Check out our database config in JSON above. The primary and replica databases have many identical settings; only `name` and `read_only` differ. In the YAML version, common settings are in the `default_database` node, aliased as (`&default_db`). `default_db` is merged into the primary and replica settings with the `<<` operator; right after that, the settings unique to each environment are defined (`name` and `read_only`). 
 
-YAML's anchors reduce future bugs. Let's face it: We've all introduced bugs when we updated the password for the primary database but forgotten to update the password for the replica. With the YAML pattern above, we can safely update our config in one place and sleep better at night. 
+YAML's anchors reduce future bugs. Let's face it: We've all introduced bugs when we updated the password for the primary database but forgot to update the password for the replica. With the YAML pattern above, we can safely update our config in one place and sleep better at night. 
 
 ---
 
