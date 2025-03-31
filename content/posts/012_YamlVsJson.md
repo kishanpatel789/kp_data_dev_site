@@ -328,4 +328,4 @@ JSON is a long-time industry standard and used to transmit data between machines
 
 If you're a nerd like me, read the YAML spec (i.e. the boring manual) at [yaml.org](https://yaml.org/spec/1.2.2/).
 
-And if you want training on software design, [give me call](https://kpdata.dev/). Like YAML, you'll find me... approachable.
+And if you want training on software design, [call me](https://kpdata.dev/). Like YAML, you'll find me... approachable.
