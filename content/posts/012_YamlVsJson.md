@@ -1,6 +1,6 @@
 Title: YAML vs JSON Config Files
 Date: 2025-04-01
-Slug: yaml-vs-config-config-files
+Slug: yaml-vs-json-config-files
 Tags: system-design
 Summary: All apps have config files. But should you use YAML or JSON? (Please don't say XML)
 Status: published
