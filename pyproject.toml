@@ -1,0 +1,8 @@
+[project]
+name = "kp-data-dev-site"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "pelican-sitemap>=1.2.1",
+    "pelican[markdown]>=4.11.0",
+]
