@@ -24,18 +24,18 @@ def log_message(message, level):
     print(f"[{ts_formatted}] [{level}] {message}")
 ```
 
-You pass in a `message` and `level`, and a formatted log message is printed. The `message` and `level` are the function's parameters.
-
-Parameters define the bits of info a function expects to receive. Here we pass the arguments "Hello World" and "INFO": 
+Give a `message` and `level`, and a formatted log entry is printed:
 
 ```python
 >>> log_message("Hello World", "INFO")
 [2025-06-25 16:30:24] [INFO] Hello World
 ```
 
-Quick side note: When we <u>define</u> a function, the inputs are called "parameters". But when we <u>call</u> the function, the values we actually input are called "arguments". 
+The `message` and `level` are the function's parameters, or the bits of info the function expects to receive.
 
-The user needs to pass an argument for each parameter to call the function... except when there's already a default argument.
+Quick side note: When we <u>define</u> a function, the inputs are called "parameters". But when we <u>call</u> the function, the values we actually input are "arguments". 
+
+The user must pass an argument for each parameter to call the function... except when there's already a default argument.
 
 ## Level 2: Default Arguments
 Parameters can have default values in the function header. Here's our modifed `log_message`, where `level` has a default argument of "INFO": 
@@ -46,7 +46,7 @@ def log_message(message, level="INFO"):
     print(f"[{ts_formatted}] [{level}] {message}")
 ```
 
-This makes the function easier to use. The user still has the option to give their own argument, but if they don't give one, the default value you defined is used. Here's what happens when the user enters only 1 of the 2 parameters:
+The user has the option to give their own `level`, but if they don't give one, the default value is used. Now the function's a bit easier to use; the user can enter only 1 of the 2 parameters:
 
 ```python
 >>> log_message("Hello World")
@@ -81,7 +81,7 @@ It seems tame. But look what happens:
 ['error:missing_field', 'error:bad_format']
 ```
 
-Hmm... How'd the 2nd batch return errors found the 1st batch? Both function calls are sharing the same `warnings` list, which was not intended. That empty list was created when the function was defined, so every function call uses the exact same list object. 
+Hmm... How'd the 2nd call return errors found the 1st batch? Both function calls are sharing the same `warnings` list, which was not intended. That empty list was created when the function was defined, so every function call uses the exact same list object. 
 
 Here's a safer alternative that does what we want:
 
@@ -95,7 +95,7 @@ def process_events(events, warnings=None):
     return warnings
 ```
 
-Instead of an empty list, we pass `None` as the default argument for `warnings`. In the function logic, if the user doesn't pass a `warnings` argument, we define `warnings` as an empty list at call time. This isolates the default empty list to a single function call (i.e. no shared state between calls).
+Instead of an empty list, `None` is the default argument of `warnings`. In the function logic, if the user doesn't pass a `warnings` argument, we define `warnings` as an empty list at call time. This isolates the default empty list to a single function call (i.e. no shared state between calls).
 
 ## Positional or Keyword Parameters
 So far, our example parameters have received arguments by either position or keyword. The following function calls are all valid: 
@@ -105,28 +105,28 @@ def log_message(message, level):
     ts_formatted = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(f"[{ts_formatted}] [{level}] {message}")
 
-log_message("Hello World", "INFO")                # positional arguments - just give value, not parameter name
-log_message(message="Hello World", level="INFO")  # keyword arguments - type "parameter=value"
+log_message("Hello World", "INFO")                # positional arguments - just type input value, not parameter name
+log_message(message="Hello World", level="INFO")  # keyword arguments - type "name=value"
 log_message(level="INFO", message="Hello World")  # keyword arguments (but different order)
 log_message("Hello World", level="INFO")          # mixture of positional and keyword arguments
 ```
 
-When using positional arguments, order matters. The order of the arguments must match the order of the parameters in the function header. 
+When using positional arguments, order matters. The argument order must match parameter order in the function header. 
 
-However, when using keyword arguments, the order doesn't matter. Python will pass the argument to the correct parameter. The only restriction is that keyword arguments must appear after positional arguments.
+However, when using keyword arguments, the order does not matter. Python will pass the argument to the correct parameter. The only restriction is that keyword arguments must appear after positional arguments.
 
-But sometimes, you want to apply more restrictions on how your function is used. 
+But sometimes, you want more restrictions on how your function is used. 
 
 ## Level 10: Positional-ONLY and Keyword-ONLY Parameters
-Let's talk about that `/` and `*` in the function header. These markers force a parameter to be received by position only or by keyword only. 
+Let's talk about that `/` and `*` in the function header. These markers force a parameter to be position-only or keyword-only. 
 
-Here's the punch line: 
+The markers break the function header into three "regions" of parameters: 
 
-[ INSERT DIAGRAM OF FUNCTION HEADER WITH 3 TYPES OF PARAMETERS ]
+<img alt="Parameter map" src="/static/images/post014/ParameterMap.jpeg" class="w-full my-2 md:w-auto md:max-w-2xl mx-auto">
 
-A parameter before the forward slash can receive an argument only by position, not by keyword. Why would that be useful, you ask? 
+A parameter before the forward slash must receive an argument by position, not by keyword. Why would that be useful, you ask? 
 
-Well, maybe the order of arguments is really meaningful. Consider the function `make_point(x, y)` that creates a point in the Cartesian coordinate system. (Did you feel that high school algebra nostalgia?) We know that the x-coordinate is listed before the y-coordinate on paper, so it would be silly to let the user call the function with something like `point(y=-4, x=5)`. To force the x argument to appear before the y argument, we can use the "/" marker: 
+Well, maybe the order of arguments is meaningful. Consider the function `make_point(x, y)` which creates a point in the Cartesian coordinate system. (Did you feel that high school algebra nostalgia?) We know the x-coordinate appears before the y-coordinate on paper, so it would be silly to let the user switch argument order with something like `point(y=-4, x=5)`. To force the x argument to appear before the y argument, we can use the `/` marker: 
 
 ```python
 def make_point(x, y, /):
@@ -146,20 +146,20 @@ TypeError: make_point() got some positional-only arguments passed as keyword arg
 
 The function will only accept positional arguments, like `make_point(5, -4)`. This is more of a stylistic choice when designing your function. You force your users to pass arguments in a way that avoids confusion. As an added bonus, you can change the the names of the function parameters without breaking any user code. 
 
-Parameters after the `*` marker can receive arguments only by keyword, not by position. This is useful when you want to make users' code more readable, especially when the function has many parameters. Check out this email-sender function: 
+Parameters after the `*` marker must receive arguments by keyword, not by position. This makes function calls more readable, especially when the function has many parameters. Check out this email-sender function: 
 
 ```python
 def send_email(to, subject, cc, bcc, reply_to):
     ...
 ```
 
-Now just imagine how a user may use this function: 
+Imagine how a user may use this function: 
 
 ```python
 >>> send_email('hermione@hogwarts.edu', 'I love you', 'harry@hogwarts.edu', 'molly@alumni.hogwarts.edu', 'ron@hogwarts.edu')
 ```
 
-Uh... who's CC'd on this email and who's BCC'd? It's hard to tell what each of the parameters mean. Instead, you can force users to use keyword arguments by including the `*` marker. 
+Uh... who's CC'd on this email and who's BCC'd? It's hard to tell what each argument means. Instead, you can require keyword arguments with the `*` marker. 
 
 ```python
 def send_email(to, subject, *, cc, bcc, reply_to):
@@ -186,33 +186,84 @@ But the following function call will pass:
 ...            reply_to='ron@hogwarts.edu')
 ```
 
-Now it's clear what each argument of the function is for. As a bonus, you can add new parameters in the function header without breaking existing code. Maybe one day, the function will have an "encrypt" parameter. If you force the parameter to receive keyword arguments only, your users' existing code won't break: 
+This version clearly shows what the last few arguments map to. Another benefit is the ability to safely add parameters while avoiding argument-ordering bugs. Maybe one day, the function will have an "encrypt" parameter. If you force the parameter to receive keyword arguments only, your can safely rearrange the order of keyword-only parameters without breaking existing code: 
 
-```
+```python
 def send_email(to, subject, *, encrypt, cc, bcc, reply_to):
+    # "encrypt" can squeeze in before "cc" since these parameters are keyword-only
     ...
 ```
 
+When designing the parameter type, remember the following:
 
-1. Use position-only parameters when the order of arguments is important or the parameter names may change. 
-2. Use keyword-only parameters to improve readability when the function is used and to add new parameters without breaking existing code. 
+1. Use position-only parameters when the order of arguments is important or the parameter names may change in the future.
+2. Use keyword-only parameters to improve readability when the function is used and to add new parameters without breaking code. 
 3. Use positional-or-keyword parameters when it doesn't make a difference. 
 
-## Level 25: Unpacking Parameters
-Sometimes, you want the function to accept a variable number of inputs. Or you don't know how many inputs the function will receive in the wild. In such cases, you use the `*args` parameter to group the inputs into a tuple. The function can then unpack the values in the function body for processing. 
+## Level 25: Variable Parameters
+Sometimes, you just don't know. You don't how many arguments a function will receive in the wild. Luckily, you can use the `*args` parameter to group extra positional arguments into a tuple:
 
-Likewise, sometimes you want the function to accept a varible number of inputs with names, or keywords. These can be received into the function using `**kwargs` in the signature. Any keyword argument passed into the function that are not explicitly declared in the signature are placed into a dictionary and given the name "kwargs". The function can then work on that dictionary within the logic. 
+```python
+>>> def func(x, y, *args):
+...     print(f"{x=}, {y=}, {args=}")
+... 
+>>> func(1, 2, 3, 4, 5)
+x=1, y=2, args=(3, 4, 5)
+```
 
-The names "args" and "kwargs" are not required. You can use any variable name, like `*stuff` and `**more_stuff`, but "args" and "kwargs" are the community accepted standard. 
+Notice our function has positional parameters `x` and `y`. But when we called the function, we passed 5 arguments. Python took the first two positional arguments and gave them to `x` and `y`; the rest of the positional arguments were shoved into a tuple called `args`. 
 
+Likewise, sometimes your function needs to receive a variable number of keyword arguments. Use the `**kwargs` parameter to gather extra keyword arguments into a dictionary: 
 
-If you've made it this far, here's you prize: A cheatsheet of the various parameter types.
+```python
+>>> def func(x, y, **kwargs):
+...     print(f"{x=}, {y=}, {kwargs=}")
+... 
+>>> func(1, 2, a=3, b=4, c=5)
+x=1, y=2, kwargs={'a': 3, 'b': 4, 'c': 5}
+```
+
+Again, `x` and `y` are declared positional parameters. But this time, we're passing some keyword arguments not defined in the function header. Python will capture these undeclared keyword arguments and store them in a dictionary called `kwargs`.
+
+Note: The parameter names "args" and "kwargs" are not required. You can use any variable name, like `*stuff` and `**more_stuff`, but "args" and "kwargs" are the community accepted standard. It's the unpacking operator (`*` and `**`) before the parameter name that performs the magic. 
+
+Here's a more practical example of how variable arguments can enhance our `log_message` function. `*messages` and `**metadata` join the team: 
+
+```python
+def log_message(*messages, level="INFO", **metadata):
+    ts_formatted = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    meta_str = " ".join(f"{k}={v}" for k, v in metadata.items())
+    for message in messages:
+        print(f"[{ts_formatted}] [{level}] {message} {meta_str}")
+```
+
+Now `log_message` can receive multiple messages that need to be logged. Any extra information is passed as keyword arguments and stored in `metadata`. 
+
+```python
+>>> log_message(
+...     "Disk usage at 85%",
+...     "Auto-scaling triggered",
+...     level="WARNING",
+...     instance="vm-123",
+...     region="us-east-1",
+... )
+[2025-06-30 15:52:01] [WARNING] Disk usage at 85% instance=vm-123 region=us-east-1
+[2025-06-30 15:52:01] [WARNING] Auto-scaling triggered instance=vm-123 region=us-east-1
+```
+
+---
+
+Whew! If you've made it this far, here's your prize: A cheatsheet of the various parameter types.
 
 | Parameter Type            | Example Definition         | Must Be Called As  |
 | ------------------------- | -------------------------- | ------------------ |
-| **Positional-only**       | `def f(a, /)`              | `f(1)`             |
-| **Positional-or-keyword** | `def f(a)` or `def f(a=1)` | `f(1)` or `f(a=1)` |
-| **Keyword-only**          | `def f(*, a)`              | `f(a=1)`           |
-| **Var-positional**        | `def f(*args)`             | `f(1, 2, 3)`       |
-| **Var-keyword**           | `def f(**kwargs)`          | `f(a=1, b=2)`      |
+| **Positional-only**       | `def f(x, /)`              | `f(1)`             |
+| **Positional-or-keyword** | `def f(x)` or `def f(x=1)` | `f(1)` or `f(x=1)` |
+| **Keyword-only**          | `def f(*, x)`              | `f(x=1)`           |
+| **Variable Positional**   | `def f(*args)`             | `f(1, 2, 3)`       |
+| **Variable Keyword**      | `def f(**kwargs)`          | `f(x=1, y=2)`      |
+
+In most cases, letting your parameters be positional-or-keyword is fine. However, enhancing functions with other parameter types can make larger modules more weatherproof for what life (i.e. users) may throw at it. 
+
+What other ways do you use function parameters? Give me a [shout](https://kpdata.dev/) if you want help taking your functions to the next level. 
 
