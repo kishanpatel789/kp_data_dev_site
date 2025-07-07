@@ -128,7 +128,7 @@ The markers break the function header into three "regions" of parameters:
 
 A parameter before the `/` marker must receive an argument by position, not by keyword. Why would that be useful, you ask? 
 
-Well, maybe the order of arguments is meaningful. Consider the function `make_point(x, y)` which creates a point in the Cartesian coordinate system. (Did you feel that high school algebra nostalgia?) We know "x" appears before "y" on paper, so it's silly to let the user change the order with something like `point(y=-4, x=5)`. To force consistent argument ordering, we can use the `/` marker: 
+Well, maybe the order of arguments is meaningful. Consider the function `make_point(x, y)` which creates a point in the Cartesian coordinate system. (Did you feel that high school algebra nostalgia?) We know "x" appears before "y" on paper, so it's silly to let the user change the order with something like `point(y=-4, x=5)`. To force consistent argument ordering, we use the `/` marker: 
 
 ```python
 def make_point(x, y, /):
@@ -146,9 +146,9 @@ Traceback (most recent call last):
 TypeError: make_point() got some positional-only arguments passed as keyword arguments: 'x, y'
 ```
 
-The function will only accept positional arguments, like `make_point(5, -4)`. This is more of a stylistic choice when designing your function. You force your users to pass arguments in a way that avoids confusion: the 1st argument is always "x"; the 2nd argument is always "y". As a bonus, you can change the parameter names without breaking any user code. 
+The function will only accept positional arguments, like `make_point(5, -4)`. This is more of a stylistic choice when designing your function. You force users to pass arguments in a way that avoids confusion: the 1st argument is always "x"; the 2nd argument is always "y". As a bonus, you can change the parameter names without breaking any user code. 
 
-Parameters after the `*` marker must receive arguments by keyword, not by position. This makes function calls more readable, especially when the function has many parameters. Check out this email-sender function: 
+Next, parameters after the `*` marker must receive arguments by keyword, not by position. This makes function calls more readable, especially when the function has many parameters. Check out this email-sender function: 
 
 ```python
 def send_email(to, subject, cc, bcc, reply_to):
@@ -206,7 +206,7 @@ When picking a parameter type, remember the following:
 3. Use positional-or-keyword parameters when it doesn't make a difference. 
 
 ## Level 25: Variable Parameters
-Sometimes, you just don't know. You don't how many arguments a function will receive in the wild. Luckily, you can use the `*args` parameter to group extra positional arguments into a tuple:
+Sometimes, you just don't know. You don't know how many arguments a function will receive in the wild. Luckily, you can use the `*args` parameter to group extra positional arguments into a tuple:
 
 ```python
 >>> def func(x, y, *args):
@@ -228,7 +228,7 @@ Likewise, sometimes your function will receive a variable number of keyword argu
 x=1, y=2, kwargs={'a': 3, 'b': 4, 'c': 5}
 ```
 
-Again, `x` and `y` are declared positional parameters. But this time, we're passing some keyword arguments not defined in the function header. Python will capture these undeclared keyword arguments and store them in a dictionary called `kwargs`.
+This time, we're passing some keyword arguments not defined in the function header. Python will capture these undeclared keyword arguments and store them in a dictionary called `kwargs`.
 
 Note: The parameter names "args" and "kwargs" are not required. You can use any variable name, like `*stuff` and `**more_stuff`, but "args" and "kwargs" are the community accepted standard. It's the unpacking operator (`*` and `**`) before the parameter name that performs the magic. 
 
@@ -242,7 +242,7 @@ def log_message(*messages, level="INFO", **metadata):
         print(f"[{ts_formatted}] [{level}] {message} {meta_str}")
 ```
 
-Now we can send multiple messages to `log_message`. Any extra information is passed as keyword arguments and stored in `metadata`. 
+Now we send multiple events to `log_message`. Any extra info is passed as keyword arguments and stored in `metadata` to enhance the message:
 
 ```python
 >>> log_message(
@@ -274,5 +274,5 @@ Whew! You made it! Here's your treat: A cheatsheet of the parameter types.
 
 Just like choosing your starter Pokémon, how you define your parameters sets the tone for the whole adventure. Letting your parameters be positional-or-keyword is usually fine. However, enhancing functions with other parameter types can make larger modules more prepared for what life (i.e. users) may throw at it. 
 
-What other ways do you use function parameters? Give me a [shout](https://kpdata.dev/) if you want help taking your functions to the next level. 
+What other ways do you use function parameters? Give me a [shout](https://kpdata.dev/) if you want to take your functions to the next level. 
 
