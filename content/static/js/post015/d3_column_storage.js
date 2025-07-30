@@ -1,20 +1,20 @@
-const svg = d3.select("#viz");
+const svg = d3.select("#viz-column");
 const width = +svg.attr("width");
 const height = +svg.attr("height");
 
 const tableRows = 4;
-const tableCols = 4;
+const tableCols = 3;
 const cellSize = 50;
 const spacing = 10;
 
 const tableStartX = 100;
 const tableStartY = 100;
 
-const storageStartX = 500;
+const storageStartX = 400;
 const storageStartY = 100;
 const storageWrap = 7;  // how many cells per row in wrapped layout
 
-const colors = d3.schemeCategory10;
+const colors = d3.schemeTableau10;
 
 const data = [];
 for (let r = 0; r < tableRows; r++) {
@@ -32,15 +32,15 @@ for (let r = 0; r < tableRows; r++) {
 // Add section headers
 svg.append("text")
   .attr("class", "section-title")
-  .attr("x", tableStartX + (tableCols * (cellSize + spacing)) / 2 - spacing)
-  .attr("y", tableStartY - 40)
+  .attr("x", tableStartX + (tableCols * (cellSize + spacing)) / 2 - 25 )
+  .attr("y", tableStartY - 50)
   .text("Table");
 
 svg.append("text")
   .attr("class", "section-title")
-  .attr("x", storageStartX + cellSize * 4)
-  .attr("y", storageStartY - 40)
-  .text("Storage");
+  .attr("x", storageStartX + cellSize * 3)
+  .attr("y", storageStartY - 50)
+  .text("Column Storage");
 
 // Add ghost table grid (always visible)
 for (let r = 0; r < tableRows; r++) {
@@ -89,12 +89,12 @@ svg.on("click", () => {
       .attr("x", d => {
         const index = d.col * tableRows + d.row;
         const xOffset = index % storageWrap;
-        return storageStartX + xOffset * (cellSize + 5);
+        return storageStartX + xOffset * (cellSize + spacing);
       })
       .attr("y", d => {
         const index = d.col * tableRows + d.row;
         const yOffset = Math.floor(index / storageWrap);
-        return storageStartY + yOffset * (cellSize + 5);
+        return storageStartY + yOffset * (cellSize + spacing * 1.5);
       });
 
     labels.transition()
@@ -103,12 +103,12 @@ svg.on("click", () => {
       .attr("x", d => {
         const index = d.col * tableRows + d.row;
         const xOffset = index % storageWrap;
-        return storageStartX + xOffset * (cellSize + 5) + cellSize / 2;
+        return storageStartX + xOffset * (cellSize + spacing) + cellSize / 2;
       })
       .attr("y", d => {
         const index = d.col * tableRows + d.row;
         const yOffset = Math.floor(index / storageWrap);
-        return storageStartY + yOffset * (cellSize + 5) + cellSize / 2 + 5;
+        return storageStartY + yOffset * (cellSize + spacing * 1.5) + cellSize / 2 + 5;
       });
   } else {
     // Animate back to table view
