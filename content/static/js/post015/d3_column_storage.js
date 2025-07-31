@@ -32,7 +32,7 @@ for (let r = 0; r < tableRows; r++) {
 // Add section headers
 svg.append("text")
   .attr("class", "section-title")
-  .attr("x", tableStartX + (tableCols * (cellSize + spacing)) / 2 - 25 )
+  .attr("x", tableStartX + (tableCols * (cellSize + spacing)) / 2)
   .attr("y", tableStartY - 50)
   .text("Table");
 
@@ -52,6 +52,16 @@ for (let r = 0; r < tableRows; r++) {
       .attr("width", cellSize)
       .attr("height", cellSize);
   }
+}
+
+// Add ghost storage disk (always visible)
+for (let r=0; r < 2; r++) {
+  svg.append("rect")
+    .attr("class", "ghost")
+    .attr("x", storageStartX)
+    .attr("y", storageStartY + r * (cellSize + spacing * 1.5))
+    .attr("width", storageWrap * (cellSize + spacing))
+    .attr("height", cellSize);
 }
 
 // Main cells
