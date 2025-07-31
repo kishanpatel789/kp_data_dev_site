@@ -4,6 +4,7 @@ Slug: what-is-a-parquet-file
 Tags: data-engineering,python
 Summary: Parquet is your bae. But do you understand how she works?
 Status: draft
+Extra_Stylesheet: /static/css/post015/styles.css
 
 SAMPLE PARAGRAPH HERE. SAMPLE PARAGRAPH HERE. SAMPLE PARAGRAPH HERE.SAMPLE PARAGRAPH HERE.SAMPLE PARAGRAPH HERE.SAMPLE PARAGRAPH HERE.SAMPLE PARAGRAPH HERE.SAMPLE PARAGRAPH HERE.SAMPLE PARAGRAPH HERE.
 

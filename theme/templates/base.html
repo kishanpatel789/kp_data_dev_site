@@ -36,7 +36,7 @@
     <meta property="twitter:domain" content="kpdata.dev">
     
     {% block link_canonical %}<link rel="canonical" href="{{ SITEURL }}" />{% endblock %}
-    <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/main.css" />
+    {% block stylesheets %}<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/main.css" />{% endblock %}
     <link rel="icon" type="image/svg+xml" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/Favicon.svg" />
   {% endblock head %}
 </head>

@@ -31,6 +31,13 @@
   {% endif %}
 {% endblock %}
 
+{% block stylesheets %}
+  {{ super() }}
+  <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/pygments.css" />
+  {% if article.metadata.extra_stylesheet %}
+    <link rel="stylesheet" href="{{ SITEURL + article.metadata.extra_stylesheet|trim }}" />
+  {% endif %}
+{% endblock %}
 
 {% block head %}
   {{ super() }}
@@ -39,7 +46,6 @@
     <meta name="tags" content="{{tag}}" />
   {% endfor %}
 
-  <link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/pygments.css" />
 {% endblock %}
 
 {% block content %}
