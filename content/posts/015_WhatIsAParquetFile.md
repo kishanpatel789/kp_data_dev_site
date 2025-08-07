@@ -116,12 +116,38 @@ column_chunk = [0, 1, 0, 0, 2, 1, 2, 0]   # <-- here we store IDs in the column 
 
 This transforms a column of long strings into a column of integers, which significantly saves space. Instead of storing the full name over and over again, we store it once in the dictionary and then reference it with a much shorter integer every time the name appears.
 
-To demonstrate with a larger dataset, suppose we have these three names appearing in a single column with a million rows.
+To demonstrate with a larger dataset, suppose we have these three names appearing in a single column with a 100,000,000 rows. Let's save this into two files: one with plain encoding and another with dictionary encoding. We'll use the PyArrow package again:
 
-TODO: show experiment with column of millions of strings - compare plain and dictionary encoding
+```python
+import pyarrow.parquet as pq
+import random
 
+# make table with 100,000,000 names
+people_options = ["Harry", "Hermione", "Ron"]
+people = [random.choice(people_options) for _ in range(100_000_000)]
+people_table = pa.table({"people": people})
 
-The dictionary-encoded version has a _ % savings over plain encoding!
+# save with plain encoding
+pq.write_table(
+    people_table,
+    "data/people_plain.parquet",
+    use_dictionary=False,
+    column_encoding={
+        "people": "PLAIN",     # force plain encoding
+    },
+)
+
+# save with dictionary encoding
+pq.write_table(people_table, "data/people_dict.parquet", use_dictionary=True)
+```
+
+```bash
+$ du -h data/people*
+25M     data/people_dict.parquet
+164M    data/people_plain.parquet
+```
+
+The file with dictionary encoding is 85% smaller than the file with plain encoding! (25 MB vs 164 MB)
 
 ### Run Length Encoding
 Back to our toy example: Let's suppose we have a few more records in our single-column table. Magically, this column is sorted:
@@ -146,9 +172,24 @@ With RLE, a long sequence of repeated values is stored as the value itself and t
 column_chunk = [(0, 4), (1, 6), (2, 8)]  # template: (value, number of times it appears)
 ```
 
-For a larger dataset with millions of rows, here are the savings: 
+For that larger table with 100,000,000 rows, let's order the records and save as a 3rd file:
 
-TODO: make sorted list longer to show rle savings
+```python
+# save with run length encoding
+sorted_people_table = pa.table({"people": sorted(people)})
+pq.write_table(sorted_people_table, "data/people_sorted.parquet")
+```
+
+Drumroll please...
+
+```bash
+$ du -h data/people*
+25M     data/people_dict.parquet
+164M    data/people_plain.parquet
+20K     data/people_sorted.parquet
+```
+
+20 kilobytes. The sorted column takes up 20 kilobytes, which is 0.01% the space of the plain-encoded file and 0.08% of the dictionary-encoded file.
 
 What's the take away here? Wherever possible, try to sort your data before you save it as a Parquet file. This reduces storage and can speed up queries against the file.
 
