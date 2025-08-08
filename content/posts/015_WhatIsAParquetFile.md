@@ -141,6 +141,8 @@ pq.write_table(
 pq.write_table(people_table, "data/people_dict.parquet", use_dictionary=True)
 ```
 
+And now let's compare the file sizes:
+
 ```bash
 $ du -h data/people*
 25M     data/people_dict.parquet
@@ -194,9 +196,9 @@ $ du -h data/people*
 What's the take away here? Wherever possible, try to sort your data before you save it as a Parquet file. This reduces storage and can speed up queries against the file.
 
 ### Delta Encoding
-One more: **delta encoding** works best for ordered numeric columns. Instead of storing large numbers, you store the first large number and then the difference between that large number and the next number. An example are timestamps, which record time as the number of seconds since January 1, 1970 00:00 UTC. For example, the timestamp 1754399851 represents the time August 5, 2025 at 8:17:31 AM.
+One more: **delta encoding** works best for ordered numeric columns. Instead of storing large numbers, you store the first large number and then the difference (or the delta) between each pair of numbers. A good use case is the timestamp data type. Timestamps represent time as the number of seconds since January 1, 1970 00:00 UTC. For example, the timestamp 1754399851 represents the time August 5, 2025 at 8:17:31 AM.
 
-In the example below, we have 10 timestamps in ascending order. Check out the difference between plain encoding and delta encoding. In plain encoding, you have to store large integer values, which take up much more space than a single digit integer. With delta encoding, the small difference between each value and the one that comes before it can be stored in fewer bits, saving storage.
+In the example below, we have 10 timestamps in ascending order. Look at the two encoding columns. In plain encoding, you have to store large integer values, which take up much more space than a single digit integer. With delta encoding, the small difference between each value and the one that comes before it can be stored in fewer bits, saving storage.
 
 | Timestamp Values | Plain Encoding | Delta Encoding |
 | --:              | --:            | --:            |
@@ -212,9 +214,51 @@ In the example below, we have 10 timestamps in ascending order. Check out the di
 | 1754399870       | 1754399870     | 2              |
 
 
-Suppose you have a timestamp column with millions of values. Let's compare how plain encoding and delta encoding compare. 
+Suppose you have a table with a million timestamps. Let's put plain encoding against delta encoding: 
 
-TODO: show timestamp savings with delta encoding
+```python
+from datetime import datetime
+
+# create table with 1 million timestamps
+timestamps = [datetime.now() for _ in range(1_000_000)]
+ts_table = pa.table({"timestamps": timestamps})
+
+# save with plain encoding
+pq.write_table(
+    ts_table,
+    "data/timestamps_plain.parquet",
+    compression=None,
+    use_dictionary=False,
+    column_encoding={
+        "timestamps": "PLAIN",   # force plain encoding
+    },
+)
+
+# save with delta encoding
+pq.write_table(
+    ts_table,
+    "data/timestamps_delta.parquet",
+    compression=None,
+    use_dictionary=False,
+    column_encoding={
+        "timestamps": "DELTA_BINARY_PACKED",  # force delta encoding
+    },
+)
+```
+
+Now let's compare the file sizes: 
+
+```bash
+$ du -h data/timestamps*
+256K    data/timestamps_delta.parquet
+7.7M    data/timestamps_plain.parquet
+```
+
+Storing all those timestamps as long integers takes 7.7 MB. But using delta encoding reduces the size to 256 KB, or 3.2% of the original size!
+
+Okay, we're done with our journey through Parquet storage patterns.
+
+To be fair, PyArrow and Parquet have more advanced storage optimizations techniques. But I hope you see from these simple examples how powerful encoding techniques can be. 
 
 Most of the time, you don't need to worry about encoding style. Processing tools like Spark, PyArrow, and BigQuery will intelligently choose the best encoding and compression algorithm for the particular dataset. But sometimes you know better. And when that's true, you can force a particular storage pattern that meets your use case.
 
