@@ -4,10 +4,10 @@ const cellSize = 50;
 const spacing = 10;
 
 const tableStartX = 100;
-const tableStartY = 70;
+const tableStartY = 50;
 
 const storageStartX = 400;
-const storageStartY = 70;
+const storageStartY = 50;
 const storageWrap = 7;  // how many cells per row in wrapped layout
 
 const tableWidth = tableCols * cellSize + (tableCols - 1) * spacing
@@ -101,20 +101,28 @@ function createCells(svg) {
 
 function createRowViz() {
   const svg = d3.select("#viz-row");
-  writeSectionHeaders(svg, "Row Storage");
+  writeSectionHeaders(svg, "Row Storage (on disk)");
   drawGhosts(svg);
   createCells(svg);
 }
 
 function createColumnViz() {
   const svg = d3.select("#viz-column");
-  writeSectionHeaders(svg, "Column Storage");
+  writeSectionHeaders(svg, "Column Storage (on disk)");
+  drawGhosts(svg);
+  createCells(svg);
+}
+
+function createHybridViz() {
+  const svg = d3.select("#viz-hybrid");
+  writeSectionHeaders(svg, "Hybrid Storage");
   drawGhosts(svg);
   createCells(svg);
 }
 
 createRowViz()
 createColumnViz()
+createHybridViz()
 
 function toggleAllViz() {
 
@@ -123,51 +131,54 @@ function toggleAllViz() {
   transitionViz("column", inStorageView)
 }
 
+function getIndex(d, type) {
+  if (type === "row") return d.row * tableCols + d.col;
+  if (type === "column") return d.col * tableRows + d.row;
+}
+
 function transitionViz(type, toStorage) {
   const svg = d3.select(`#viz-${type}`)
   const cells = svg.selectAll(".cell")
   const labels = svg.selectAll(".label")
+  const duration = 1000
 
+  svg.selectAll(".cell")
+    .transition()
+    .duration(duration)
+    .delay(d => getIndex(d, type) * 50)
+    .attr("x", d => {
+      if (!toStorage) {
+        return tableStartX + d.col * (cellSize + spacing);
+      } else {
+        return storageStartX + (getIndex(d, type) % storageWrap) * (cellSize + spacing)
+      }
+    })
+    .attr("y", d => {
+      if (!toStorage) {
+        return tableStartY + d.row * (cellSize + spacing);
+      } else {
+        return storageStartY + Math.floor(getIndex(d, type) / storageWrap) * (cellSize + spacing * 1.5);
+      }
+    })
 
-  if (toStorage) {
-    // Animate to columnar storage (column-major order)
-    cells.transition()
-      .duration(1000)
-      .attr("x", d => {
-        const index = d.col * tableRows + d.row;
-        const xOffset = index % storageWrap;
-        return storageStartX + xOffset * (cellSize + spacing);
-      })
-      .attr("y", d => {
-        const index = d.col * tableRows + d.row;
-        const yOffset = Math.floor(index / storageWrap);
-        return storageStartY + yOffset * (cellSize + spacing * 1.5);
-      });
-
-    labels.transition()
-      .duration(1000)
-      .attr("x", d => {
-        const index = d.col * tableRows + d.row;
-        const xOffset = index % storageWrap;
-        return storageStartX + xOffset * (cellSize + spacing) + cellSize / 2;
-      })
-      .attr("y", d => {
-        const index = d.col * tableRows + d.row;
-        const yOffset = Math.floor(index / storageWrap);
-        return storageStartY + yOffset * (cellSize + spacing * 1.5) + cellSize / 2 + 5;
-      });
-  } else {
-    // Animate back to table view
-    cells.transition()
-      .duration(1000)
-      .attr("x", d => tableStartX + d.col * (cellSize + spacing))
-      .attr("y", d => tableStartY + d.row * (cellSize + spacing));
-
-    labels.transition()
-      .duration(1000)
-      .attr("x", d => tableStartX + d.col * (cellSize + spacing) + cellSize / 2)
-      .attr("y", d => tableStartY + d.row * (cellSize + spacing) + cellSize / 2 + 5);
-  }
+  svg.selectAll(".label")
+    .transition()
+    .duration(duration)
+    .delay(d => getIndex(d, type) * 50)
+    .attr("x", d => {
+      if (!toStorage) {
+        return tableStartX + d.col * (cellSize + spacing) + cellSize / 2;
+      } else {
+        return storageStartX + (getIndex(d, type) % storageWrap) * (cellSize + spacing) + cellSize / 2;
+      }
+    })
+    .attr("y", d => {
+      if (!toStorage) {
+        return tableStartY + d.row * (cellSize + spacing) + cellSize / 2 + 5;
+      } else {
+        return storageStartY + Math.floor(getIndex(d, type) / storageWrap) * (cellSize + spacing * 1.5) + cellSize / 2 + 5;
+      }
+    })
 }
 
-document.getElementById(`play-row`).addEventListener("click", toggleAllViz);
+document.getElementById("play-0").addEventListener("click", toggleAllViz);

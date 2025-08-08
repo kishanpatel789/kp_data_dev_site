@@ -53,17 +53,17 @@ Can you smell the savings? A 75 MB Parquet file is stored as a bloated 470 MB CS
 Think of a data table; rows represent records, and columns define attributes. This is 2-dimensional data. When you save a file, you need to convert the data into a one-dimensional stream of information. In a CSV file, data are stored by rows. That is, when you save the CSV to the disk, rows are stored one after the other. (Click "Play" &#128071;)
 
 <div class="mx-auto">
-<button id="play-row" class="block mx-auto font-semibold text-white bg-kpddsec px-4 py-2 rounded hover:bg-kpddmain">Play</button>
+<button id="play-0" class="block mx-auto font-semibold text-white bg-kpddsec px-4 py-2 rounded hover:bg-kpddmain">Play</button>
 </div>
 
-<div class="w-full aspect-[9/4]">
-<svg id="viz-row" class="w-full h-full" viewBox="0 0 900 400" preserveAspectRatio="xMidYMid meet"></svg>
+<div class="w-full aspect-[9/3]">
+<svg id="viz-row" class="w-full h-full" viewBox="0 0 900 300" preserveAspectRatio="xMidYMid meet"></svg>
 </div>
 
 But with columnar storage options, data is arranged differently. Data is stored a column at a time. 
 
-<div class="w-full aspect-[9/4]">
-<svg id="viz-column" class="w-full h-full" viewBox="0 0 900 400" preserveAspectRatio="xMidYMid meet"></svg>
+<div class="w-full aspect-[9/3]">
+<svg id="viz-column" class="w-full h-full" viewBox="0 0 900 300" preserveAspectRatio="xMidYMid meet"></svg>
 </div>
 
 Said differently, with row-based storage, the "cells" of a row are stored next to each other. With column-based storage, the "cells" of a column are stored next to each other. 
@@ -78,8 +78,12 @@ Ready for some heartbreak? Parquet files are NOT stored in columnar storage. At 
  
 Side note: Metadata is "data about the data". It can include statistics like the max and min values, the schema of the dataset, and the winning lottery numbers (kidding about that last one). 
 
-<div class="w-full aspect-[9/4]">
-<svg id="viz-hybrid" class="w-full h-full" viewBox="0 0 900 400" preserveAspectRatio="xMidYMid meet"></svg>
+<div class="mx-auto">
+<button id="play-1" class="block mx-auto font-semibold text-white bg-kpddsec px-4 py-2 rounded hover:bg-kpddmain">Play</button>
+</div>
+
+<div class="w-full aspect-[9/3]">
+<svg id="viz-hybrid" class="w-full h-full" viewBox="0 0 900 300" preserveAspectRatio="xMidYMid meet"></svg>
 </div>
 
 There's a bit more to the format. Near the end of the file, there's a footer filled with metadata. The footer lists the number of rows, schema (type of each column), and more metadata about each row group.
@@ -200,19 +204,22 @@ One more: **delta encoding** works best for ordered numeric columns. Instead of 
 
 In the example below, we have 10 timestamps in ascending order. Look at the two encoding columns. In plain encoding, you have to store large integer values, which take up much more space than a single digit integer. With delta encoding, the small difference between each value and the one that comes before it can be stored in fewer bits, saving storage.
 
-| Timestamp Values | Plain Encoding | Delta Encoding |
-| --:              | --:            | --:            |
-| 1754399851       | 1754399851     | 1754399851     |
-| 1754399855       | 1754399855     | 4              | 
-| 1754399857       | 1754399857     | 2              |
-| 1754399859       | 1754399859     | 2              |
-| 1754399860       | 1754399860     | 1              |
-| 1754399862       | 1754399862     | 2              |
-| 1754399863       | 1754399863     | 1              |
-| 1754399865       | 1754399865     | 2              |
-| 1754399868       | 1754399868     | 3              |
-| 1754399870       | 1754399870     | 2              |
+<div markdown=1 class="overflow-x-auto">
 
+| Timestamps | Plain Encoding | Delta Encoding |
+| --:        | --:            | --:            |
+| 1754399851 | 1754399851     | 1754399851     |
+| 1754399855 | 1754399855     | 4              | 
+| 1754399857 | 1754399857     | 2              |
+| 1754399859 | 1754399859     | 2              |
+| 1754399860 | 1754399860     | 1              |
+| 1754399862 | 1754399862     | 2              |
+| 1754399863 | 1754399863     | 1              |
+| 1754399865 | 1754399865     | 2              |
+| 1754399868 | 1754399868     | 3              |
+| 1754399870 | 1754399870     | 2              |
+
+</div>
 
 Suppose you have a table with a million timestamps. Let's put plain encoding against delta encoding: 
 
