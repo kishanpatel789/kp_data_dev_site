@@ -2,6 +2,7 @@ const tableRows = 4;
 const tableCols = 3;
 const cellSize = 50;
 const spacing = 10;
+const rowGroupSize = 2
 
 const tableStartX = 100;
 const tableStartY = 50;
@@ -10,8 +11,10 @@ const storageStartX = 400;
 const storageStartY = 50;
 const storageWrap = 7;  // how many cells per row in wrapped layout
 
-const tableWidth = tableCols * cellSize + (tableCols - 1) * spacing
-const storageWidth = storageWrap * (cellSize + spacing)
+const tableWidth = tableCols * cellSize + (tableCols - 1) * spacing;
+const storageWidth = storageWrap * (cellSize + spacing);
+const cellsPerRG = rowGroupSize * tableCols;
+const numRG = Math.ceil(tableRows / rowGroupSize);
 
 const colors = d3.schemeTableau10;
 
@@ -35,6 +38,17 @@ function writeSectionHeaders(svg, storage_title) {
     .text(storage_title);
 }
 
+function writeRowGroupHeaders(svg) {
+  for (let rg = 0; rg < numRG; rg++) {
+    svg.append("text")
+      .attr("class", "section-subtitle")
+      .attr("x", storageStartX - 50)
+      .attr("y", storageStartY + rg * (cellSize + spacing * 1.5) + 30)
+      .text(`Row Group ${rg}`);
+  }
+
+}
+
 
 function drawGhosts(svg) {
   // Add ghost table grid (always visible)
@@ -46,6 +60,13 @@ function drawGhosts(svg) {
         .attr("y", tableStartY + r * (cellSize + spacing))
         .attr("width", cellSize)
         .attr("height", cellSize);
+
+      svg.append("text")
+        .attr("class", "ghost")
+        .attr("x", tableStartX + c * (cellSize + spacing) + cellSize / 2)
+        .attr("y", tableStartY + r * (cellSize + spacing) + cellSize / 2 + 5)
+        .text(`R${r}C${c}`)
+        .attr("text-anchor", "middle");
     }
   }
 
@@ -118,6 +139,7 @@ function createHybridViz() {
   writeSectionHeaders(svg, "Hybrid Storage");
   drawGhosts(svg);
   createCells(svg);
+  writeRowGroupHeaders(svg);
 }
 
 createRowViz()
@@ -125,15 +147,24 @@ createColumnViz()
 createHybridViz()
 
 function toggleAllViz() {
-
   inStorageView = !inStorageView;
   transitionViz("row", inStorageView)
   transitionViz("column", inStorageView)
+  transitionViz("hybrid", inStorageView)
 }
 
 function getIndex(d, type) {
   if (type === "row") return d.row * tableCols + d.col;
   if (type === "column") return d.col * tableRows + d.row;
+  if (type === "hybrid") return d.row % rowGroupSize + d.col * rowGroupSize + Math.floor(d.row / rowGroupSize) * rowGroupSize * tableCols;
+}
+
+function getStorageWrap(type) {
+  if (type === "hybrid") {
+    return cellsPerRG;
+  } else {
+    return storageWrap;
+  }
 }
 
 function transitionViz(type, toStorage) {
@@ -150,14 +181,14 @@ function transitionViz(type, toStorage) {
       if (!toStorage) {
         return tableStartX + d.col * (cellSize + spacing);
       } else {
-        return storageStartX + (getIndex(d, type) % storageWrap) * (cellSize + spacing)
+        return storageStartX + (getIndex(d, type) % getStorageWrap(type)) * (cellSize + spacing)
       }
     })
     .attr("y", d => {
       if (!toStorage) {
         return tableStartY + d.row * (cellSize + spacing);
       } else {
-        return storageStartY + Math.floor(getIndex(d, type) / storageWrap) * (cellSize + spacing * 1.5);
+        return storageStartY + Math.floor(getIndex(d, type) / getStorageWrap(type)) * (cellSize + spacing * 1.5);
       }
     })
 
@@ -169,16 +200,17 @@ function transitionViz(type, toStorage) {
       if (!toStorage) {
         return tableStartX + d.col * (cellSize + spacing) + cellSize / 2;
       } else {
-        return storageStartX + (getIndex(d, type) % storageWrap) * (cellSize + spacing) + cellSize / 2;
+        return storageStartX + (getIndex(d, type) % getStorageWrap(type)) * (cellSize + spacing) + cellSize / 2;
       }
     })
     .attr("y", d => {
       if (!toStorage) {
         return tableStartY + d.row * (cellSize + spacing) + cellSize / 2 + 5;
       } else {
-        return storageStartY + Math.floor(getIndex(d, type) / storageWrap) * (cellSize + spacing * 1.5) + cellSize / 2 + 5;
+        return storageStartY + Math.floor(getIndex(d, type) / getStorageWrap(type)) * (cellSize + spacing * 1.5) + cellSize / 2 + 5;
       }
     })
 }
 
 document.getElementById("play-0").addEventListener("click", toggleAllViz);
+document.getElementById("play-1").addEventListener("click", toggleAllViz);
