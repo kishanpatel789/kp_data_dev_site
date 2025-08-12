@@ -20,13 +20,11 @@ config.storageWidth = config.storageWrap * (config.cellSize + config.spacing);
 config.cellsPerRG = config.rowGroupSize * config.tableCols;
 config.numRG = Math.ceil(config.tableRows / config.rowGroupSize);
 
-
 let inStorageView = false;
 
 function writeSectionHeaders(svg, storage_title) {
   const headerOffset = 20
 
-  // Add section headers
   svg.append("text")
     .attr("class", "section-title")
     .attr("x", config.tableStartX + config.tableWidth / 2)
@@ -99,7 +97,6 @@ function createCells(svg) {
     }
   }
 
-  // Main cells
   const cells = svg.selectAll(".cell")
     .data(data)
     .enter()
@@ -142,17 +139,6 @@ function createHybridViz() {
   drawGhosts(svg);
   createCells(svg);
   writeRowGroupHeaders(svg);
-}
-
-createRowViz()
-createColumnViz()
-createHybridViz()
-
-function toggleAllViz() {
-  inStorageView = !inStorageView;
-  transitionViz("row", inStorageView)
-  transitionViz("column", inStorageView)
-  transitionViz("hybrid", inStorageView)
 }
 
 function getIndex(d, type) {
@@ -213,6 +199,17 @@ function transitionViz(type, toStorage) {
       }
     })
 }
+
+function toggleAllViz() {
+  inStorageView = !inStorageView;
+  transitionViz("row", inStorageView)
+  transitionViz("column", inStorageView)
+  transitionViz("hybrid", inStorageView)
+}
+
+createRowViz()
+createColumnViz()
+createHybridViz()
 
 document.getElementById("play-0").addEventListener("click", toggleAllViz);
 document.getElementById("play-1").addEventListener("click", toggleAllViz);
