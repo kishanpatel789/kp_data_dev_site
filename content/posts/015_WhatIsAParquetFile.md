@@ -3,7 +3,8 @@ Date: 2025-08-12
 Slug: what-is-a-parquet-file
 Tags: data-engineering,python
 Summary: Parquet is all over the modern data stack. But do you understand how it works?
-Status: draft
+Status: published
+MetaImage: /static/images/post015/ParquetThumbnail.jpeg
 Extra_Stylesheet: /static/css/post015/styles.css
 
 
@@ -296,4 +297,4 @@ Is your cloud storage bill too high due to the mass of Parquet files? Do you nee
 
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
-<script src="/static/js/post015/d3_column_storage.js"></script>
+<script src="/static/js/post015/d3_parquet_storage.js"></script>
