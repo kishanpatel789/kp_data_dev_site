@@ -10,7 +10,7 @@ Extra_Stylesheet: /static/css/post015/styles.css
 
 Data's like trash. 
 
-We make too much of it. Then we squeeze more of it into smaller spaces. 
+We make a lot of it. Then we squeeze more of it into smaller spaces. 
 
 Trash engineers optimize landfills. Data engineers optimize data storage... while making the data still accessible. 
 
@@ -74,7 +74,7 @@ But with columnar storage, data is arranged differently. Data is stored a column
 
 Said differently, with row-based storage, the "cells" of a row are placed next to each other. With column-based storage, the "cells" of a column are placed next to each other. 
 
-So what? Well say you need to compute the total sales across a table stored in CSV. You'd need to load each row into memory and find the column representing the sales of each record; then you can total the sales. But in Parquet, since all sales data are located next to each other (in a single column), you can jump to that portion of the file and ignore the other columns in the file. With less data to scan and process, the aggregation is faster for column-based storage compared to CSV's row-based storage. 
+So what? Well say you need to compute the total sales across a table stored in CSV. You'd need to load each row into memory and find the column for sales; then you can total the sales. Even though you only need the sales column, all columns are loaded before the computation. But in Parquet, since all sales data are located next to each other (in a single column), you can jump to that portion of the file and ignore the other columns in the file. With less data to scan and process, the aggregation is faster for column-based storage compared to CSV's row-based storage. 
 
 Ready for some heartbreak? Parquet files are NOT stored in columnar storage. At least not pure columnar storage. Parquet uses a hybrid approach of row-based and column-based storage. Here's the hierarchy of objects in the Parquet format:
 
@@ -100,7 +100,7 @@ Near the end of the file, there's a footer filled with metadata. The footer list
 
 Side note: Metadata is "data about the data". It can include statistics like the max and min values, the number of rows, and the winning lottery numbers (kidding about that last one). 
 
-I have to gush over Parquet's built-in schemas. &#128525; When loading CSV files, everything is a text, and you later assign a data type to each column (integer, string, datetime, etc.). But with Parquet files, the type of each column is included in the file itself. You don't need a separate file (or some random guy in the application data department) to tell you what the schema is.
+I have to gush over Parquet's built-in schemas. &#128525; When loading CSV files, everything is text, and you later assign a data type to each column (integer, string, datetime, etc.). But with Parquet files, the type of each column is included in the file itself. You don't need a separate file (or some random guy in the application data department) to tell you what the schema is.
 
 ## Storage Optimizations
 Cool, now we see how data is stored in Parquet. But that doesn't explain how a Parquet file takes up less space than a CSV file. So far, we just rearranged the data from row-based to hybrid-based. 
@@ -112,10 +112,10 @@ But the real magic is how data is encoded to save disk space. "Encoding" means h
 ### 1. Plain Encoding
 Suppose we have a column of names: `["Harry", "Hermione", "Harry", "Harry", "Ron", "Hermione", "Ron", "Harry"]` (Pretend this is a vertical column in a table.)
 
-One way of saving this data is with **plain encoding**. That means the data is stored on disk the same way a human reads it in a table. Every instance of "Harry" takes up 5 bytes (one byte for each ASCII character). "Hermione" takes up 8 bytes, and each "Ron" occupies 3 bytes. But this is somewhat wasteful. The names repeat in the column, and each instance of "Hermione" takes another 8 bytes. 
+One way of saving this data is with **plain encoding**. That means the data is stored on disk the same way a human reads it in a table. Every instance of "Harry" takes up 5 bytes (one byte for each ASCII character). "Hermione" takes up 8 bytes, and each "Ron" occupies 3 bytes. But this is somewhat wasteful. The names repeat, and each instance of "Hermione" takes another 8 bytes. 
 
 ### 2. Dictionary Encoding
-An improvement over plain encoding is **dictionary encoding**. We give each name in the column an ID number and record that once in a dictionary. Then, when encoding the column, we use the ID number instead of the name.
+An improvement over plain encoding is **dictionary encoding**. We give each name an ID number and record that once in a dictionary. Then, when encoding the column, we use the ID number instead of the name.
 
 ```python
 # option 1: plain encoding
@@ -130,9 +130,9 @@ dictionary = {
 column_chunk = [0, 1, 0, 0, 2, 1, 2, 0]   # <-- here we store IDs in the column chunk instead of names
 ```
 
-This replaces a column of strings into a column of integers, which significantly saves space. Instead of storing the full name over and over again, we store it once in the dictionary and then reference it with a much shorter integer every time the name appears.
+This replaces a column of strings with a column of integers, which significantly saves space. Instead of storing the full name over and over, we store it once in the dictionary and then reference it with a much shorter integer every time the name appears.
 
-Let's demonstrate the savings with a larger dataset. We have these three names appearing in a single column with a 100,000,000 rows. We'll use PyArrow to save the table into two files: one with plain encoding and another with dictionary encoding:
+Let's demonstrate the savings with a larger dataset. We have these three names appearing in a single column with 100,000,000 rows. We'll use PyArrow to save the table into two files: one with plain encoding and another with dictionary encoding:
 
 ```python
 import pyarrow.parquet as pq
@@ -185,9 +185,9 @@ With dictionary encoding, the long column can be stored like this:
 column_chunk = [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2]
 ```
 
-But do you see the repetition of IDs? What if we store each ID once and then record the number of times the ID repeats right after that? That's **run length encoding** (RLE). 
+But do you see the repetition of IDs? What if we store each ID once and then record the number of times the ID repeats? That's **run length encoding** (RLE). 
 
-With RLE, a long sequence of repeated values is stored with just two numbers: the value and how many times it appears. Instead of writing `0` 4 separate times, `1` 6 separate times, etc, we use the more concise RLE representation:
+With RLE, a long sequence of repeated values is stored with just two numbers: the value and how many times it appears. Instead of writing `0` four separate times, `1` six separate times, etc, we use the more concise RLE representation:
 
 ```python
 # option 3: run length encoding
@@ -213,7 +213,7 @@ $ du -h data/people*
 
 20 kilobytes. &#129327; The sorted column takes up 20 kilobytes, 0.01% the space of the plain-encoded file and 0.08% of the dictionary-encoded file.
 
-What's the take away here? Wherever possible, for the love of [Codd](https://en.wikipedia.org/wiki/Edgar_F._Codd), sort your data before you save it.
+What's the take away here? Please, for the love of [Codd](https://en.wikipedia.org/wiki/Edgar_F._Codd), sort your data before you save it.
 
 ### 4. Delta Encoding
 One more: **delta encoding** works best for ordered, numeric columns. Instead of storing tons of large numbers, you store the first large number; all other numbers are stored as the difference (or delta) between that number and the previous one. 
@@ -276,11 +276,11 @@ $ du -h data/timestamps*
 
 Storing all those timestamps as long integers takes 7.7 MB. But using delta encoding reduces the size to 256 KB, or 3.2% of the original size!
 
-Okay, we're done with our journey through Parquet storage patterns.
+Okay, we finished our journey through Parquet storage patterns.
 
 To be fair, PyArrow and Parquet have more advanced optimizations than what we saw here. But I hope these examples show you how powerful encoding techniques can be. 
 
-Most of the time, you don't need to worry about encoding style. Processing tools like Spark, PyArrow, and BigQuery will intelligently choose the best encoding and compression algorithm for the particular dataset. But sometimes you know better. And when that's true, you can force a particular storage pattern that meets your use case.
+Most of the time, you don't need to worry about encoding style. Processing tools like Spark, PyArrow, and BigQuery will intelligently choose the best encoding and compression algorithm for the particular dataset. But sometimes you know better. And when that's true, you can force a particular storage pattern that meets your needs.
 
 Here's the cheatsheet on when to use each column encoding: 
 
@@ -291,9 +291,9 @@ Here's the cheatsheet on when to use each column encoding:
 
 --- 
 
-The Parquet format is designed to efficiently store large datasets and is the defacto standard today. There are additional features that enable high performance when analyzing data in Parquet files... but that's a post for another day. If you're a nerd like me who likes to have a good time, go [read the docs](https://parquet.apache.org/docs/overview/).
+The Parquet format efficiently stores large datasets and is the defacto standard today. There are additional features that enable high performance when analyzing data in Parquet files... but that's a post for another day. If you're a nerd like me who likes to have a good time, go [read the docs](https://parquet.apache.org/docs/overview/).
 
-Is your cloud storage bill too high due to the mass of Parquet files? Do you need help optimizing your data lake? [Call me](https://kpdata.dev/). My trash truck is ready to clear your digital neighborhood.
+Is your cloud storage bill too high due to the pile of Parquet files? Do you need help optimizing your data lake? [Call me](https://kpdata.dev/). My trash truck is ready to clear your digital neighborhood.
 
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
