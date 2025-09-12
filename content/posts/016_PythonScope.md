@@ -1,13 +1,14 @@
 Title: Python Scope
-Date: 2025-09-11
+Date: 2025-09-12
 Slug: python-scope
-Tags: #python
-Summary: Finding a variable can be like a game of finding Waldo. It's important you get the right one.
-Status: draft
+Tags: python
+Summary: Life's good until you hit that NameError or UnboundLocalError. Avoid unnecessary pain by mastering Python scope.
+Status: published
+MetaImage: /static/images/post016/LEGBThumbnail.jpg
 
 Some things make you say "WTF?" 
 
-Like when you run a script and get a scary message: 
+Like when you run a script and get this: 
 
 ```pytb
 Traceback (most recent call last):
@@ -17,7 +18,7 @@ Traceback (most recent call last):
 NameError: name 'x' is not defined
 ```
 
-Or something like...
+Or something cryptic like...
 
 ```pytb
 Traceback (most recent call last):
@@ -30,17 +31,18 @@ Traceback (most recent call last):
 UnboundLocalError: cannot access local variable 'count' where it is not associated with a value
 ```
 
+These errors come out of nowhere. They ruin a smooth coding session. But these errors can be avoided.
 
-Let's talk about Python scope.
+We need to talk about Python scope.
 
 I can see your eyes glazing over. But hear me out.
 
-Understand scope and you'll write cleaner and safer code. Your apps will avoid unexpected behavior. It may even make you a badass.
+Understand scope, and you'll write cleaner and safer code. Your apps will avoid unexpected behavior. It may even make you a badass.
 
-You want to be a badass, so keep reading.
+You want to be a badass. So keep reading.
 
 ## The Basics
-Every variable has a home, a place in the digital neighborhood where it "lives." This is scope. A variable's scope is the area of code where the variable is visible or accessible.
+Every variable has a home, a place where it "lives." This is scope. A variable's scope is the area of code where the variable is visible or accessible.
 
 Take this example:
 
@@ -66,7 +68,7 @@ NameError: name 'x' is not defined
 
 That's because `x` exists within its "house" of the function `f1`. You can't reach `x` from outside its house. Variables with local scope can only be accessed within the function (or lambda expression) that define them. After the function runs, the variable ceases to exist.
 
-Global scope, on the other hand, contains variables defined at the top level of your module. It includes variables defined outside of functions, or roaming the streets outside houses. Below, `x` is defined at the top level. And somehow... function `f2` knows how to find it.
+Global scope, on the other hand, contains variables defined at the top level of the module. Below, `x` is defined outside any function. And somehow... function `f2` knows how to find it.
 
 ```python-console
 >>> x = "hola"  # define 'x' outside the function
@@ -92,18 +94,20 @@ hello
 ```
 
 ## Scope Resolution
-This raises the question: How does Python determine which `x` to use? (when there's more than one option to choose from)
+This raises the question: How does Python determine which `x` to use? (when there's more than one option)
 
-A search pattern called the LEGB rule is used for scope resolution. When you refer to a name (of a variable, class, or function), Python searches the following scopes in order until a matching name is found. If the name can't be found in any of these locations, a NameError is raised.
+A search pattern called the "LEGB Rule" is used for scope resolution. When you refer to a name (of a variable, class, or function), Python searches the following scopes <u>in order</u> until a matching name is found. If the name can't be found in any of these locations, a NameError is raised.
 
 1. **L**ocal
 2. **E**nclosing
 3. **G**lobal
-4. **B**uilt-ins
+4. **B**uilt-in
 
-This raises an important concern about naming. Suppose you want to access a function defined in the built-in scope (e.g. `max`). If you accidentally define a function, class, or variable with the same name, you're effectively masking the high-level `max` function. This can cause bugs, so be careful to namespace your custom objects.
+The final scope Python searches for a name match is the built-in scope. Unsurprisingly, this scope contains built-in objects, like `list()`, `open()`, `Exception`, etc.
 
-Here, the `max` function works as expected... until we create our own `max` function that masks the built-in one. More specifically, when we call `max` again, Python finds a match in our global scope (the one we defined) and stops there. Meanwhile, the original `max` function object still exists in the built-in scope.
+Because of LEGB, we need to be careful when naming things. Suppose you want to access a function defined in the built-in scope (e.g. `max()`). If you accidentally define a function, class, or variable with the same name, you're effectively masking the high-level `max` function. This can cause surprising bugs.
+
+Here, the `max` function works as expected... until we create our own `max` function that masks the built-in one. More specifically, when we call `max` again, Python finds a match in our global scope (the one we defined) and stops there. 
 
 ```python-console
 >>> max(4, 7)  # run the built-in max function
@@ -119,7 +123,7 @@ Traceback (most recent call last):
 TypeError: max() takes 0 positional arguments but 2 were given
 ```
 
-But fear not, things can be restored. After deleting our `max` function in the global scope, the built-in `max` becomes available again:
+But fear not, things can be restored. The original `max` function object still exists in the built-in scope; it's just inaccessible due to the `max` in our global scope. After deleting our `max` function in the global scope, the built-in `max` becomes available again:
 
 ```python-console
 >>> del(max)  # delete our custom function
@@ -129,7 +133,7 @@ But fear not, things can be restored. After deleting our `max` function in the g
 
 Ah... all is right with the world.
 
-Okay, we've seen Local and Global scope. Let's check out Enclosing scope, which typically appears with nested functions.
+Okay, we've seen Local, Global, and Built-in scope. Let's check out Enclosing scope, which typically appears with nested functions.
 
 ## Enclosing Scope
 Below we have a dream within a dream... I mean a function within a function.
@@ -147,7 +151,7 @@ Printing from inner: hola
 Printing from outer: hola
 ```
 
-What's going on here? The main function is `f_outer`. Within that, we define another function `f_inner`. You'll notice that `f_inner` is printing variable `x`... without having `x` assigned in its local scope. `x` isn't defined in the global scope either. Instead, `f_inner` first finds `x` in its "enclosing scope," or the local scope of its enclosing function.
+What's going on here? The main function is `f_outer`. Within that, we define another function `f_inner`. You'll notice that `f_inner` is printing variable `x`... without having `x` assigned in its local scope. `x` isn't defined in the global scope either. Instead, `f_inner` finds `x` in its "enclosing scope," or the local scope of its enclosing function.
 
 This example is admittedly contrived. Let's see a more useful example.
 
@@ -164,7 +168,7 @@ Here's a function that gives you something to store your stuff:
 >>> collector = get_collector()
 ```
 
-The outer function `get_collector()` creates an empty list called `series` and returns the inner function `store()`. The `store()` function appends its input `x` into the variable `series` and then returns the number if items in `series`. Of course, `series` is not defined in the inner function `store()`, so following the LEGB rule, the `series` variable found in the enclosing scope (of outer function `get_collector`) is supposedly used.
+The outer function `get_collector()` creates an empty list called `series` and returns the inner function `store()`. The `store()` function appends its input `x` into the variable `series` and returns the number of items in `series`. Of course, `series` is not defined in the inner function `store()`, so following the LEGB rule, the `series` variable found in the enclosing scope (of outer function `get_collector`) is supposedly used.
 
 We can test this. Let's load up our collector:
 
@@ -177,11 +181,13 @@ We can test this. Let's load up our collector:
 3
 ```
 
-Each time we call `collector()`, we're really calling an instance of `store()`. The three calls above show that each call is affecting the same `series` object. 
+Each time we call `collector()`, we're really calling an instance of `store()`. The three calls above show that each call is affecting the same `series` object. After the final call, we're told there are 3 items in `series`.
 
-`store()` is something called a closure. A closure is a function that has access to the variables in its enclosing scope after the code defining the function has run. Such variables are called free. A free variable is not defined in local scope or global scope; it's defined in the enclosing scope.
+`store()` is something called a "closure." A closure is a function that is packaged with its enclosing scope. It can continue accessing the outer function's variables even after the outer function has run. 
 
-We can inspect the returned `store()` object to verify its use of variables. The attribute `__code__` represents the compiled function body; this is where we can see the variables used. The attribute `__closure__` stores the contents of free variables in a cell-like structure:
+Closures commonly use two kinds of variables: local and free. Local variables are defined in the inner function like normal. A free variable is not defined in local scope or global scope; it's defined in the enclosing scope.
+
+We can inspect the variables on the `collector` object. The attribute `__code__` represents the compiled function body; this is where we can see the variables used. And the attribute `__closure__` stores the contents of free variables in a cell-like structure:
 
 ```python-console
 >>> collector.__code__.co_varnames  # list local variables
@@ -192,7 +198,7 @@ We can inspect the returned `store()` object to verify its use of variables. The
 ['thing1', 'thing2', 'thing3']
 ```
 
-Closures let you retain state between function calls. This reduces the need for classes or global variables to maintain state. The same functionality can be achieved by the class below, but such class definitions be overkill. (Don't tell the [OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) bros I said that.)
+Closures are very helpful! They let you retain state between function calls. This reduces the need for classes or global variables to maintain state. The same functionality could be achieved by the class below, but such class definitions be overkill. (Don't tell the [OOP](https://en.wikipedia.org/wiki/Object-oriented_programming) bros I said that.)
 
 ```python
 class Collector():
@@ -204,20 +210,96 @@ class Collector():
         return len(self.series)
 ```
 
-## Built-ins
-The final scope Python searches for a name match is the built-ins scope. Unsurprisingly, this is where built-in objects are stored, like `list`, `next`, `Exception`, etc.
-
 
 ## Modifying Scope Rules
 
-[ INSERT SCOPE MOD WITH GLOBAL AND NONLOCAL KEYWORDS ]
+So far, we've talked about **reading** variables outside local scope. But what if we want to **change** variables outside local scope? Let's give it whirl: 
 
-- you can't modify objects in enclosing scope from inside a nested function unless you use `nonlocal` statement
-- you can't modify global objects inside functions unless you use `global` statement
+```python-console
+>>> counter = 0    # here's a global variable
+>>> def update_counter():
+...     counter = counter + 1    # try updating global variable
+...
+>>> update_counter()
+Traceback (most recent call last):
+  File "<input>", line 1, in <module>
+    update_counter()
+    ~~~~~~~~~~~~~~^^
+  File "<input>", line 2, in update_counter
+    counter = counter + 1
+              ^^^^^^^
+UnboundLocalError: cannot access local variable 'counter' where it is not associated with a value
+```
 
+Oops... I did it again. Here's what Python thought about the line `counter = counter + 1`. When you assign `counter` to a value (left side of `=`), Python compiles the function body with `counter` as a local variable. Later when you reference `counter` (right side of `=`), Python searches the local scope only and realizes it doesn't exist. That's what the UnboundLocalError message is saying.
 
-Don't modify global variables. It's a bad practice and makes debugging difficult. But hey, I'm not your Mom; you live your life and do what you want.
+But our intent was to update the global `counter`. It turns out you can't modify global objects while within a function. That's the default rule. And it's a good rule. Because you don't want your functions modifying global variables that other parts of your code depend on. That can make debugging a nightmare. 
+
+But if you like living dangerously, you can stray from the safe path: Use the `global` keyword within your function.
+
+```python-console
+>>> counter = 0
+>>> def update_counter():
+...     global counter   # tell Python we're talking about the global 'counter'
+...     counter = counter + 1
+...
+>>> update_counter()
+>>> counter  # check value
+1
+```
+
+Near the top of the function, list the variables that should be accessed from the global scope. When the function attempts to modify those variables, it will affect the globally scoped variable instead of making a new local variable.
+
+Again, modifying global variables from within a function is bad practice. But hey, I'm not your Mom; you live your life and do what you want.
+
+There's a similar story about changing variables in an enclosing scope from within an inner function:
+
+```python-console
+>>> def get_counter():
+...     count = 0
+...     def counter():
+...         count = count + 1  # try updating variable in enclosing scope
+...     return counter
+...
+>>> update_counter = get_counter()   # increment the count
+>>> update_counter()
+Traceback (most recent call last):
+  File "<input>", line 1, in <module>
+    update_counter()
+    ~~~~~~~~~~~~~~^^
+  File "<input>", line 4, in counter
+    count = count + 1  # try updating variable from enclosing scope
+            ^^^^^
+UnboundLocalError: cannot access local variable 'count' where it is not associated with a value
+```
+
+Like before, since we're assigning `count` in the inner function, Python recognizes `count` as a local variable. But when attempting to reference `count` for the first time (`count + 1`), the interpreter recognizes `count` doesn't exist in local scope. We get the same UnboundLocalError. 
+
+Use the `nonlocal` keyword to modify variables in the enclosing scope. By saying `nonlocal count`, you're telling Python that you want to update the outer function's `count`:
+
+```python-console
+>>> def get_counter():
+...     count = 0
+...     def counter():
+...         nonlocal count  # tell Python we want the enclosing 'count'
+...         count = count + 1
+...     return counter
+...
+>>> update_counter = get_counter()
+>>> update_counter()   # increment the count
+>>> update_counter.__closure__[0].cell_contents  # check value
+1
+```
+
+Here's a summary of the modification rules:
+
+- You can't modify objects in enclosing scope from within an inner function unless you use the `nonlocal` statement.
+- You can't modify global objects from within functions unless you use the `global` statement.
 
 ---
 
+There you go, you badass. Tattoo "LEGB" on your arm. You now see how names are found in Python. Our discussion focused on variable names, but the same scope rules apply to class and function names too.
 
+Improve the long-term maintainability of a project by keeping scope in mind. Proper scope usage reduces naming conflicts and improves code organization. Most importantly, it ensures the proper variable gets used.
+
+Are you being attacked by NameErrors and UnboundLocalErrors? [Reach out](https://kpdata.dev/) for help squashing those bugs.
