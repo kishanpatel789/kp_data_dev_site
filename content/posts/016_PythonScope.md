@@ -42,7 +42,9 @@ Understand scope, and you'll write cleaner and safer code. Your apps will avoid 
 You want to be a badass. So keep reading.
 
 ## The Basics
-Every variable has a home, a place where it "lives." This is scope. A variable's scope is the area of code where the variable is visible or accessible.
+Every variable has a home, a place where it "lives." This is scope. 
+
+A variable's scope is the area of code where the variable is visible or accessible.
 
 Take this example:
 
@@ -66,7 +68,7 @@ Traceback (most recent call last):
 NameError: name 'x' is not defined
 ```
 
-That's because `x` exists within its "house" of the function `f1`. You can't reach `x` from outside its house. Variables with local scope can only be accessed within the function (or lambda expression) that define them. After the function runs, the variable ceases to exist.
+That's because `x` exists within its "house" of the function `f1`. You can't reach `x` from outside its house. Variables in local scope can only be accessed within the function (or lambda expression) that define them. After the function runs, the variable ceases to exist.
 
 Global scope, on the other hand, contains variables defined at the top level of the module. Below, `x` is defined outside any function. And somehow... function `f2` knows how to find it.
 
@@ -168,7 +170,7 @@ Here's a function that gives you something to store your stuff:
 >>> collector = get_collector()
 ```
 
-The outer function `get_collector()` creates an empty list called `series` and returns the inner function `store()`. The `store()` function appends its input `x` into the variable `series` and returns the number of items in `series`. Of course, `series` is not defined in the inner function `store()`, so following the LEGB rule, the `series` variable found in the enclosing scope (of outer function `get_collector`) is supposedly used.
+The outer function `get_collector()` creates an empty list called `series` and returns the inner function `store()`. The `store()` function appends its input `x` to the variable `series` and returns the number of items in `series`. Of course, `series` is not defined in the inner function `store()`, so following the LEGB rule, the `series` variable found in the enclosing scope (of outer function `get_collector`) is supposedly used.
 
 We can test this. Let's load up our collector:
 
@@ -231,9 +233,9 @@ Traceback (most recent call last):
 UnboundLocalError: cannot access local variable 'counter' where it is not associated with a value
 ```
 
-Oops... I did it again. Here's what Python thought about the line `counter = counter + 1`. When you assign `counter` to a value (left side of `=`), Python compiles the function body with `counter` as a local variable. Later when you reference `counter` (right side of `=`), Python searches the local scope only and realizes it doesn't exist. That's what the UnboundLocalError message is saying.
+Oops... I did it again. Here's what Python thought about the line `counter = counter + 1`. When the interpreter reads the file, it sees `counter` is assigned to some object (left side of `=`); it thinks, "Oh, `counter` should be a local variable" as it compiles the function body. Later when the function is executed, Python sees a reference to `counter` (right side of `=`); because it's logged `counter` is a local variable, the interpreter searches the local scope only... to find `counter` doesn't exist. That's what the UnboundLocalError message is saying.
 
-But our intent was to update the global `counter`. It turns out you can't modify global objects while within a function. That's the default rule. And it's a good rule. Because you don't want your functions modifying global variables that other parts of your code depend on. That can make debugging a nightmare. 
+But our intent was to update the global `counter`. It turns out you can't modify global objects while within a function. That's the default rule. And it's a good rule. Because you don't want your functions modifying global variables that other parts of your code depend on. That makes debugging a nightmare. 
 
 But if you like living dangerously, you can stray from the safe path: Use the `global` keyword within your function.
 
@@ -250,7 +252,7 @@ But if you like living dangerously, you can stray from the safe path: Use the `g
 
 Near the top of the function, list the variables that should be accessed from the global scope. When the function attempts to modify those variables, it will affect the globally scoped variable instead of making a new local variable.
 
-Again, modifying global variables from within a function is bad practice. But hey, I'm not your Mom; you live your life and do what you want.
+Again, modifying global variables from within a function is bad practice. But hey, I'm not your mom; you live your life and do what you want.
 
 There's a similar story about changing variables in an enclosing scope from within an inner function:
 
@@ -302,4 +304,4 @@ There you go, you badass. Tattoo "LEGB" on your arm. You now see how names are f
 
 Improve the long-term maintainability of a project by keeping scope in mind. Proper scope usage reduces naming conflicts and improves code organization. Most importantly, it ensures the proper variable gets used.
 
-Are you being attacked by NameErrors and UnboundLocalErrors? [Reach out](https://kpdata.dev/) for help squashing those bugs.
+Are you pestered by NameErrors and UnboundLocalErrors? [Reach out](https://kpdata.dev/) for help squashing those bugs.
