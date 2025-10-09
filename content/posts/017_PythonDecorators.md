@@ -3,9 +3,10 @@ Date: 2025-10-09
 Slug: python-decorators
 Tags: python
 Summary: You've seen that @ symbol but aren't sure what it does. It's time to unravel the Python decorator.
-Status: draft
+Status: published
+MetaImage: /static/images/post017/DecoratorThumbnail.jpg
 
-It's fall. 
+It's fall.
 
 My neighbors are decorating their yards with pumpkins, fake leaves, and enough Halloween skeletons to fill a graveyard.
 
@@ -19,7 +20,7 @@ Grab your pumpkin-spiced whatever and enjoy the hay ride.
 
 
 ## Basics
-Let's get right to it: A decorator is a **function** that takes another **function** and returns a **function**.
+Let's get right to it: A decorator is a **function** that takes another **function** as an argument... and then returns a **function**.
 
 Whoa, whoa, whoa... let's break that down. We'll simplify by looking at two functions.
 
@@ -74,7 +75,7 @@ Back to the definition: A decorator is...
 
 Along the way, the original function's behavior is extended or modified.
 
-In practice, we use the `@` syntax to decorate the original function. We place `@` with the decorator name above the original definition; that's all it takes to modify the function. The two versions below are equivalent:
+In practice, the `@` syntax is used to decorate the original function. Place `@` with the decorator name above the original definition; that's all it takes to modify the function. The two snippets below are equivalent:
 
 <div class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div class="w-full md:w-[48%]">
@@ -123,12 +124,12 @@ That first decorator was boring. Let's spice it up.
 ```python
 def yell(func):
     def wrapper(*args, **kwargs):
-        result = func(*args, **kwargs)
-        return f"{result.upper()}!!!"
+        result = func(*args, **kwargs)   # run original function
+        return f"{result.upper()}!!!"    # modify output
     return wrapper
 ```
 
-This decorator modifies a function that returns a string. It makes the output uppercase and throws exclamation points at the end.
+This decorator modifies a function that returns a string. It uppercases the output and throws exclamation points at the end.
 
 <div class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div class="w-full md:w-[48%]">
@@ -168,7 +169,10 @@ And now those dementors are trembling.
 </div>
 
 
-We instantly changed the original function's return value. To do that, we designed `yell`'s wrapper function to receive any number of arguments. `wrapper` has two parameters in its signature: `*args` and `**kwargs`. (If you're unfamiliar with these parameters, check out this [post on Python function parameters](https://kpdata.dev/blog/python-function-parameters/).) Within `wrapper`, we call the original function (aliased as `func`) and store the response in a variable `result`. The uppercase version of `result` is returned with exclamation points.
+The original function's return value is instantly changed. Within `wrapper`, Python calls the original function (aliased as `func`) and stores the response in a variable `result`. The uppercase version of `result` is returned with exclamation points.
+
+Note that `yell` is designed to decorate any function because it can receive any number of arguments. To do that, `wrapper` has two parameters in its signature: `*args` and `**kwargs`. These variable parameters are later unpacked when calling `func`. (If you're unfamiliar with `*args` and `**kwargs`, check out this [post on Python function parameters](https://kpdata.dev/blog/python-function-parameters/).) 
+
 
 Bad news. In all this excitement, we lost something. Let's inspect the characteristics of `cast_spell`. 
 
@@ -195,7 +199,7 @@ We see the object that `cast_spell` points to, the type annotations, and the doc
 <div class="hidden md:block w-px bg-gray-300"></div>
 <div markdown=1 class="w-full md:w-[48%]">
 
-But when we decorate with `@yell`, the name `cast_spell` now points to the `wrapper` function... and we lose our type hints and documentation:
+But when decorating with `@yell`, the name `cast_spell` now points to the `wrapper` function... and we lose our type hints and documentation:
 
 ```python-console
 >>> @yell
@@ -215,7 +219,7 @@ But when we decorate with `@yell`, the name `cast_spell` now points to the `wrap
 </div>
 </div>
 
-Our code is less usable without this metadata, especially when it's time to debug. To retain the metadata of the original function, we can use yet another decorator from the standard libary: `functools.wraps`. It's main purpose is to make the `wrapper` function *look* like the function it's wrapping.
+Our code is less usable without this metadata, especially when it's time to debug. To retain the metadata of the original function, use a decorator from the standard libary: `functools.wraps`. It's main purpose is to make the `wrapper` function *look* like the function it's wrapping.
 
 ```python
 from functools import wraps
@@ -250,7 +254,7 @@ Yay!
 ## Example 2: Performance Profiling
 If you're lucky, your functions are efficient every time. 
 
-If you're like me, you need to wade through your code to figure out which part is taking so long. 
+If you're like me, you need to wade through your code to find which part is taking so long. 
 
 You could throw a series of `time.perf_counter()` calls around suspect sections of code. Or you could design a decorator to profile your functions. Here's a decorator `tictoc` that does three things: 
 
@@ -283,7 +287,7 @@ Hey Albus, I'm done working now!
 Function 'troublesome_function' ran in 5.013 seconds
 ```
 
-After the original function runs, we get an extra print statement about its performance. This demonstrates how decorators can perform logic before and after the original function runs.
+Now we get a print statement about the function's performance each time it's called. This demonstrates how decorators can perform logic before and after the original function runs.
 
 ## Example 3: Limit Function Calls by Retaining State
 
@@ -293,7 +297,7 @@ In the real world, that API will cut off you off quicker than a bartender.
 
 APIs have limits they place on each user. As a user, you need to keep track of how often you've called the API. 
 
-One option is to create a custom counter to log the count of API calls. Another option is... (you guessed it) a decorator!
+One option is to create a custom counter to log your API calls. Another option is... (you guessed it) a decorator!
 
 ```python
 import time
@@ -312,7 +316,7 @@ def rate_limit(func):
 
 This one's a bit more advanced. We'll go slowly. This decorator only calls `func` if it's been over 10 seconds since the last call.
 
-First, we need a way to track the last time `func` was called. That's done with the variable `last_called`. If we placed `last_called` within `wrapper`, we wouldn't be able to keep track of the last call; `last_called` would cease to exist after `wrapper` runs. That's why we place `last_called` outside of `wrapper`, in its enclosing scope. When `rate_limit` returns `wrapper`, we get a closure that still has access to the persistent `last_called`. (If that doesn't make sense, check out this [post about Python scopes and closures](https://kpdata.dev/blog/python-scope/).)
+First, we need a way to track the last time `func` was called. That's done with the variable `last_called`. If we placed `last_called` within `wrapper`, Python wouldn't be able to keep track of the last call; `last_called` would cease to exist after `wrapper` runs. That's why we place `last_called` outside of `wrapper`, in its enclosing scope. When `rate_limit` returns `wrapper`, we get a closure that still has access to the persistent `last_called`. (If that doesn't make sense, check out this [post about Python scopes and closures](https://kpdata.dev/blog/python-scope/).)
 
 When `wrapper` runs, it compares the current time to `last_called`. If the difference is less than 10 seconds, it stops everything and raises an Exception. But if more than 10 seconds have passed, it calls `func` and updates `last_updated` with the current time.
 
@@ -337,13 +341,15 @@ Traceback (most recent call last):
 Exception: Rate limit exceeded; wait 10 seconds
 ```
 
-The decorator protects us from abusing the API. This pattern uses closures to retain state. Since `wrapper` is a nested function within `rate_limit`, we can place any object in `wrapper`'s enclosing scope to store info about the original function's calls.
+The decorator protects us from abusing the API! 
+
+This decorator pattern uses closures to retain state. Since `wrapper` is a nested function within `rate_limit`, we can place any object in `wrapper`'s enclosing scope to store info we may need later.
 
 ## Example 4: Parameterized Decorator
 
-So far, we've used decorators that accept an input function and no other parameters. But sometimes, we need to give an extra argument to tweak the behavior of the decorator. 
+So far, we've used decorators that accept an input function and no other parameters. But sometimes, the decorator needs an extra argument to tweak the its behavior. 
 
-For example, we have a decorator `repeat` that runs the original function as many times as we want. By itself, `cast_spell` prints a spell once. But with the decorator `@repeat(5)`, we get 5 spell casts.
+For example, the decorator `repeat` runs the original function as many times as we ask. By itself, `cast_spell` prints a spell once. But with the decorator `@repeat(5)`, Python casts the spell 5 times.
 
 ```python-console
 >>> @repeat(5)
@@ -358,9 +364,11 @@ EXPELLIARMUS!!!
 EXPELLIARMUS!!!
 ```
 
-To declare how many times to run the function, we need a way to pass that number to the internal `wrapper` function. Parameterized decorators require decorator factories. That's a fancy term for a function that generates decorators. 
+But we need a way to pass the number `5` to internal `wrapper` function. 
 
-That's right, we're going 3 levels deep: a function within a function within a function. 
+Parameterized decorators require decorator factories. That's a fancy term for a function that generates decorators. 
+
+That's right, we're going 3 levels deep: a function within a function within a function. &#128526;
 
 ```python
 def repeat(num_times: int):
@@ -383,9 +391,13 @@ def cast_spell(spell_name: str):
     print(f"{spell_name.upper()}!!!")
 ```
 
-Like before, `decorator` returns a `wrapper` function that replaces the original `cast_spell` function. Now let's see how `wrapper` is able to reach the variable `num_times`.
+Like before, `decorator` returns a `wrapper` function that replaces the original `cast_spell` function. 
 
-When `wrapper` loops its range, it looks for the value of `num_times`. Since `num_times` is not defined in `wrapper`, Python follows the [scope rules](https://kpdata.dev/blog/python-scope/) to look in its enclosing scope, or the body of `decorator`. But `num_times` isn't in `decorator` either... so Python continues the search to the next enclosing scope, or the body of `repeat`. There in `repeat`, we have `num_times` declared as a local variable (via a function parameter).
+Now let's see how `wrapper` is able to reach the variable `num_times`. When `wrapper` loops through its range, it looks for the value of `num_times`. 
+
+- Since `num_times` is not defined in `wrapper`, Python follows the [scope rules](https://kpdata.dev/blog/python-scope/) to look in its enclosing scope, or the body of `decorator`. 
+- But `num_times` isn't in `decorator`'s body either... so Python continues the search to the next enclosing scope, or the body of `repeat`. 
+- Finally in `repeat`'s body, Python finds `num_times` declared as a local variable (via a function parameter).
 
 This is the same closure concept we saw earlier. But this time, `decorator` is a closure that has access to `num_times` in its enclosing scope after `repeat` runs.
 
@@ -393,6 +405,10 @@ Whew! This is one of the most complicated applications of decorators. It's okay 
 
 ---
 
-We just scratched the surface of decorators magic! Our discussion focused on functions. But really, decorators apply to any callable object, not just functions. The true definition of a decorator: A decorator is **callable** that takes a **callable** and returns another **callable**. This means decorators can be classes or apply to classes... but that's a post for another day.
+We just scratched the surface of decorator magic! Our discussion focused on functions. However, decorators apply to any callable object, not just functions. Here's the more complete definition of a decorator: A decorator is **callable** that takes a **callable** and returns another **callable**. This means decorators can be classes or apply to classes... but that's a post for another day.
 
-What are your favorite decorator use cases? Do you have a project with repeated boilerplate code? Give me a [call](https://kpdata.dev/) if you want to DRY up your repo.
+Let me know your favorite uses of decorators.
+
+Do you have a project with repeated boilerplate code? Decorators can make your code more maintainable. Give me a [call](https://kpdata.dev/) if you want help [DRY](https://en.wikipedia.org/wiki/Don%27t_repeat_yourself)ing it up.
+
+
