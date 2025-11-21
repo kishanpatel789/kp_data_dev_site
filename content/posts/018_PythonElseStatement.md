@@ -3,7 +3,8 @@ Date: 2025-11-21
 Slug: python-else-statement
 Tags: python
 Summary: Where can the `else` statement be used? We'll go beyond the if-statement to see everywhere Python allows `else`.
-Status: draft
+Status: published
+MetaImage: /static/images/post018/ElseThumbnail.jpg
 
 I thought I knew it all.
 
@@ -17,12 +18,12 @@ Then began my existential crisis. "What else am I wrong about in Python?"
 
 "What else does `else` do?" I wondered.
 
-This one's for you Pythonistas out there who thought `else` was limited to if-statements.
+This one's for you Pythonistas who thought `else` was limited to if-statements.
 
-We'll look at the 4 places Python allows the `else` statement.
+We'll look at the 4 places Python accepts the `else` clause.
 
 ## 1. The "if" Statement
-No big revelation here: You can use `else` in an if-statement.
+No big revelation here: `else` is used in if-statements.
 
 ```python
 if something_is_true:
@@ -31,12 +32,12 @@ else:
     print("do something else")
 ```
 
-The if-else statement is the proverbial fork-in-the-road. If something is true, take path A. If not, take path B.
+The if-else block is the proverbial fork-in-the-road. If something is true, take path A. If not, take path B.
 
-This is the OG of `else` statements.
+This is the OG of `else` clauses.
 
 ## 2. The "for" Loop
-News flash: You can use `else` statements after a for-loop. Take a look at this example. There are two versions of the for-loop. What do you think the output will be?
+News flash: The `else` clause can appear after a for-loop. Take a look at this example. There are two versions of the for-loop. What do you think the output will be?
 
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
@@ -89,9 +90,11 @@ Firebolt
 </div>
 </div>
 
-Did you catch it? The `else` statement only runs if the loop does not run into a `break` command. Said differently, the `else` statement only runs if the for-loop is allowed to run to completion.
+Did you catch it? The `else` clause only runs if the loop does not find a `break` command. Said differently, the `else` clause only runs if the for-loop is allowed to run to completion.
 
-Both Version 1 and Version 2 attempt to loop through a list of 3 broomsticks. With each iteration of the loop, the broomstick is printed. Version 2, however, performs an extra step of checking if the current broomstick is "Firebolt"; if so, the interpreter reaches a `break` command and the for-loop stops. This is why the `else` statement of Version 2 never runs.
+Both Version 1 and Version 2 step through a list of 3 broomsticks. In each iteration of the loop, the broomstick is printed. 
+
+Version 2, however, performs an extra step of checking if the current broomstick is "Firebolt". If so, Python reaches a `break` command, and the for-loop stops. This is why the `else` clause of Version 2 never runs.
 
 That's cool, but where would we ever use a for-else block?
 
@@ -113,7 +116,7 @@ Now let's search two lists for an admin user:
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
 
-**Search 1**: Three users (1 is admin)
+**Search 1**: Three users (1 admin)
 
 ```python
 users = [
@@ -144,7 +147,6 @@ Found one admin: User(name='Hermione', is_admin=True)
 users = [
     User(name="Harry", is_admin=False),
     User(name="Ron", is_admin=False),
-    # User(name="Hermione", is_admin=True), # no admin
 ]
 ```
 
@@ -162,7 +164,7 @@ No admin user found!
 </div>
 </div>
 
-Both for-else blocks are the exact same. The only thing that differs is the `users` list. In Search 2, we never hit the `break` statement because we never find a user with `is_admin=True`. As a result, the for-loop runs to completion, and the `else` block is allowed to run, telling us what happened.
+Both for-else blocks are the exact same. The `users` list is the only thing that differs. In Search 2, Python never hits the `break` statement because we never find a user with `is_admin=True`. As a result, the for-loop runs to completion, and the `else` clause is allowed to run, telling us what happened.
 
 Such searches don't require a for-else block. We could create a boolean flag to signal if an admin has been found or not, like this:
 
@@ -179,13 +181,13 @@ if not admin_found:
     print("No admin user found!")
 ```
 
-But this requires an extra variable `admin_found` and another if-statement to check whether an admin was found. The for-else performs the same logic more concisely!
+But this requires an extra variable `admin_found` and another if-statement to declare the failure. The for-else block performs the same logic more concisely!
 
 ## 3. The "while" Loop
 
-You can also use an `else` statement after a while-loop. 
+The `else` clause also appears after while-loops.
 
-The behavior is the same as a for-loop: The `else` statement only runs if the while-loop runs to completion without a `break` statement.
+The behavior is the same as a for-loop: The `else` clause only runs if the while-loop runs to completion without a `break` statement.
 
 Consider an example: We need to connect to a server and retry if our attempts fail.
 
@@ -194,11 +196,11 @@ Here's some boilerplate code to simulate connecting to a server:
 ```python
 import time
 
-def connect_to_server():
+def connect_to_server(): # pretend this is more complicated
     return "fail"
 ```
 
-We'll use a while-loop to try connecting to the server. If the attempt fails, we'll wait one second before trying again. After 3 attempts, the while-loop will end. 
+We'll use a while-loop to connect to the server. If the attempt fails, we'll wait one second before trying again. After 3 attempts, the while-loop will end. 
 
 Consider two versions of this while-loop:
 
@@ -209,13 +211,13 @@ Consider two versions of this while-loop:
 
 ```python
 attempts_made = 0
-success = False
+success = False # flag to store success or failure
 
 while attempts_made < 3:
     attempts_made += 1
     print(f"Connecting to server (attempt {attempts_made})...")
     if connect_to_server() == "success":
-        success = True
+        success = True # update flag
         print("Connected to server!")
         break
     time.sleep(1) # wait 1 second before trying again
@@ -271,19 +273,23 @@ TimeoutError: Failed to connect to server after 3 attempts
 </div>
 </div>
 
-The results of both while-loops are the same. After 3 attempts, a `TimeoutError` is raised. Like the last for-loop example, Version 1 requires a separate boolean variable and an if-statement to manage the outcome. Version 2's while-else structure clearly separates the successful path (where the loop breaks early) from the failure path (where the loop completes normally).
+The results of both while-loops are the same. After 3 attempts, a `TimeoutError` is raised. Like the last for-loop example, Version 1 uses a boolean variable and an if-statement to manage the outcome. Version 2's while-else structure clearly separates the successful path (where the loop breaks early) from the failure path (where the loop completes normally).
 
-A lot of this comes down to individual preference. Some people prefer the additional variable and if-statement of Version 1. Others like the concise while-else block in Version 2 with two indented paths. You pick whichever you want. I'm not your mother; I'm just giving you options.
+This comes down to individual preference. Some people prefer the additional variable and if-statement of Version 1. Others like the concise while-else block in Version 2 with two indented paths. You pick whichever you want. I'm not your mother; I'm just giving you options.
 
-This while-else pattern can also be used while waiting on a background job to complete, waiting on a network resource to be available, or to retry API calls a limited number of times.
+This while-else pattern is helpful when we need to wait or retry a task: 
+
+- Wait on a background job to complete
+- Wait on a network resource to be available 
+- Retry API calls a limited number of times
 
 ## 4. The "try-except" Block
-Somethings things go wrong. Python's "try-except" block let us handle failures more gracefully. 
+Sometimes things go wrong. Python's "try-except" block handles failures more gracefully. 
 
 A basic try-except block goes like this: 
 
 1. "try" to run this code...
-2. but if you catch an Exception (i.e. the code fails somewhere), run the `except` block. 
+2. but if you catch an Exception (i.e. the code fails somewhere), run the `except` clause. 
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
@@ -303,7 +309,7 @@ Output:
 in try block
 ```
 
-In Version 1, the `try` section runs successfully with no errors. This is why the `except` section is not executed.
+In Version 1, the `try` clause runs successfully with no errors. This is why the `except` clause is not executed.
 
 </div>
 <div class="hidden md:block w-px bg-gray-300"></div>
@@ -313,27 +319,25 @@ In Version 1, the `try` section runs successfully with no errors. This is why th
 
 ```python
 try:
-    print("in try block")
+    print("in try clause")
     raise ValueError # simulate an exception
 except:
-    print("in except block - something went wrong!")
+    print("in except clause - something went wrong!")
 ```
 
 Output:
 
 ```python-console
-in try block
-in except block - something went wrong!
+in try clause
+in except clause - something went wrong!
 ```
 
-In Version 2, we simulate an Exception by raising `ValueError` in the `try` section. The interpreter  looks for an `except` block that catches `ValueError`. Here, we have a generic `except` block that captures all exceptions and prints that something went wrong. 
+In Version 2, we simulate an Exception by raising `ValueError` in the `try` clause. The interpreter looks for an `except` clause that catches `ValueError`. Here, we have a generic `except` clause that captures all exceptions and prints that something went wrong. 
 
 </div>
 </div>
 
-
-
-Now let's add a 3rd layer to the try-except block: the `else` section! The `else` statement only runs if no exception is raised in `try` block. 
+Now let's add a 3rd layer to the try-except block: the `else` clause! The `else` clause only runs if no exception is raised in the `try` clause. 
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
@@ -342,9 +346,9 @@ Now let's add a 3rd layer to the try-except block: the `else` section! The `else
 
 ```python
 try:
-    print("in try block")
+    print("in try clause")
 except ValueError:
-    print("in except block - reached a ValueError")
+    print("in except clause - reached a ValueError")
 else:
     print("HIT THE ELSE STATEMENT - no ValueError")
 ```
@@ -352,7 +356,7 @@ else:
 Output:
 
 ```python-console
-in try block
+in try clause
 HIT THE ELSE STATEMENT - no ValueError
 ```
 
@@ -364,10 +368,10 @@ HIT THE ELSE STATEMENT - no ValueError
 
 ```python
 try:
-    print("in try block")
+    print("in try clause")
     raise ValueError # simulate an exception
 except ValueError:
-    print("in except block - reached a ValueError")
+    print("in except clause - reached a ValueError")
 else:
     print("HIT THE ELSE STATEMENT - no ValueError")
 ```
@@ -375,32 +379,59 @@ else:
 Output:
 
 ```python-console
-in try block
-in except block - reached a ValueError
+in try clause
+in except clause - reached a ValueError
 ```
 
 </div>
 </div>
 
-The `else` section is ideal for running follow-up code if the `try` section runs successfully. It's useful when you want to separate code that might fail (in `try` block) from code that should only run when everything goes well (`else` block).
+The `else` clause is ideal for running follow-up code if the `try` clause runs successfully. It's useful when we want to separate code that might fail (in `try` clause) from code that should only run when everything goes well (`else` clause).
 
-Here are more realistic examples. : 
+A realistic example involves working with databases. When running a query that would change data, we have the option to commit the change (i.e. save the change) or roll back our change (i.e. undo our work). This a perfect setup for try-except:
 
-eg. database error with sqlite3, filenotfound
+```python
+import sqlite3
 
-We could add a 4th layer to the try-except called `finally`, but that's a post for another day.
+conn = sqlite3.connect("test.db")  # create db connection
+
+try:                               # try to run an insert statement
+    cur = conn.execute("INSERT INTO my_table VALUES (?, ?)", (1, "harry"))
+except sqlite3.Error as e:         # rollback the changes if an error occurs
+    print(f"Something went wrong: {e}")
+    conn.rollback()
+else:                              # otherwise, commit the changes
+    print("Committing database changes")
+    conn.commit()
+finally:                           # clean up our environment - close connection
+    conn.close()
+```
+
+Here the action that might fail is a SQL insert statement, so that's placed in the `try` clause. After that one of two things happen: 
+
+1. If a SQL error is raised, the `except` clause runs, which rolls back the transaction
+2. If no SQL error is raised, the `else` clause runs, which commits the insert statement, effectively saving the database.
+
+Note we added a 4th layer to the try-except block called `finally`. The `finally` clause runs at the end of a try-except block, regardless of whether the `try` clause raised an Exception or not. It can be used to clean up our environment... but that's a post for another day.
 
 --- 
 
-There you have it! The `else` statement can be used in exactly 4 locations in Python. 
+There you go! The `else` statement can be used in exactly 4 locations in Python. Use this cheat sheet to impress your friends:
 
-Here's your cheatsheet of where the `else` statement appears.
+<div markdown=1 class="overflow-x-auto">
 
-else statement is skipped if an exception is raised or if interpreter meets a return/break/continue statement that causes control to jump out of main block
-else is a poor name. Instead of "run this loop, otherwise do that", it's more like "run this loop, THEN do that"
+| Control Flow              | When `else` Runs                       | Example Use Cases                       |
+| ------------------------- | --------------------------             | ------------------                      |
+| `if ... else`             | Condition in `if` statement is `False` | Run Path B if Path A is not viable      |
+| `for ... else`            | Loop completes without `break`         | Search for item (and declare not found) |
+| `while ... else`          | Loop ends without `break`              | Retry or poll for success               |
+| `try ... else`            | `try` clause does not raise exception  | Commit DB transaction                   |
 
-Perhaps a better name would've been "nobreak" or "noexception"
+</div>
 
+In general, the `else` clause is skipped if an exception is raised or if Python finds a `return`, `break`, or `continue` statement that causes control to jump away from the `else` clause. 
 
-Call me... or else.
+I have a gripe about `else`. It's a misleading name, especially in for-loops and while-loops. The word "else" suggests that either the `for` loop OR the `else` clause will run (but not both). Instead of "run this loop, OR do that", it's more like "run this loop, THEN do that". Perhaps a better name would've been "then" or "nobreak" or "noexception". Oh well, we're stuck with `else`. 
+
+How do you use `else` clauses in your code? [Call me](https://kpdata.dev/) and let me know... or else.
 

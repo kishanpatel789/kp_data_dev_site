@@ -27,7 +27,7 @@ def log_message(message, level):
 
 Give a `message` and `level`, and a formatted log entry is printed:
 
-```python
+```python-console
 >>> log_message("Hello World", "INFO")
 [2025-06-25 16:30:24] [INFO] Hello World
 ```
@@ -50,7 +50,7 @@ def log_message(message, level="INFO"):
 
 The user can give their own `level`, but if they don't, the default value is used. Now the function's easier to call; the user can enter just 1 of the 2 arguments:
 
-```python
+```python-console
 >>> log_message("Hello World")
 [2025-06-25 16:30:24] [INFO] Hello World
 ```
@@ -71,7 +71,7 @@ def process_events(events, warnings=[]):  # DANGER HERE
 
 It seems tame. But look what happens: 
 
-```python
+```python-console
 >>> # 1st batch
 >>> events1 = ["ok", "error:missing_field"]
 >>> process_events(events1)     # expected: ['error:missing_field']
@@ -137,7 +137,7 @@ def make_point(x, y, /):
 
 Now, if our user tries to switch the order using keyword arguments, they'll get an error: 
 
-```python
+```python-console
 >>> make_point(y=-4, x=5)
 Traceback (most recent call last):
   File "<input>", line 1, in <module>
@@ -157,7 +157,7 @@ def send_email(to, subject, cc, bcc, reply_to):
 
 Imagine how a user may call it: 
 
-```python
+```python-console
 >>> send_email('hermione@hogwarts.edu', 'I love you', 'harry@hogwarts.edu', 'molly@alumni.hogwarts.edu', 'ron@hogwarts.edu')
 ```
 
@@ -170,7 +170,7 @@ def send_email(to, subject, *, cc, bcc, reply_to):
 
 Now, if our function is called without keyword arguments, an error is raised: 
 
-```python
+```python-console
 >>> send_email('hermione@hogwarts.edu', 'I love you', 'harry@hogwarts.edu', 'molly@alumni.hogwarts.edu', 'ron@hogwarts.edu')
 Traceback (most recent call last):
   File "<input>", line 1, in <module>
@@ -181,7 +181,7 @@ TypeError: send_email() takes 2 positional arguments but 5 were given
 
 But this call will pass:
 
-```python
+```python-console
 >>> send_email('hermione@hogwarts.edu', 'I love you', 
 ...            cc='harry@hogwarts.edu',
 ...            bcc='molly@alumni.hogwarts.edu',
@@ -208,7 +208,7 @@ When picking a parameter type, remember the following:
 ## Level 25: Variable Parameters
 Sometimes, you just don't know. You don't know how many arguments a function will receive in the wild. Luckily, you can use the `*args` parameter to group extra positional arguments into a tuple:
 
-```python
+```python-console
 >>> def func(x, y, *args):
 ...     print(f"{x=}, {y=}, {args=}")
 ... 
@@ -220,7 +220,7 @@ Notice our function has positional parameters `x` and `y`. But when we called th
 
 Likewise, sometimes your function will receive a variable number of keyword arguments. Use the `**kwargs` parameter to gather extra keyword arguments into a dictionary: 
 
-```python
+```python-console
 >>> def func(x, y, **kwargs):
 ...     print(f"{x=}, {y=}, {kwargs=}")
 ... 
@@ -244,7 +244,7 @@ def log_message(*messages, level="INFO", **metadata):
 
 Now we send multiple events to `log_message`. Any extra info is passed as keyword arguments and stored in `metadata` to enhance the message:
 
-```python
+```python-console
 >>> log_message(
 ...     "Disk usage at 85%",
 ...     "Auto-scaling triggered",
