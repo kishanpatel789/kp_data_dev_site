@@ -566,6 +566,10 @@ video {
   position: fixed;
 }
 
+.absolute {
+  position: absolute;
+}
+
 .relative {
   position: relative;
 }
@@ -934,6 +938,11 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
+}
+
+.text-kpddaccent {
+  --tw-text-opacity: 1;
+  color: rgb(194 174 69 / var(--tw-text-opacity));
 }
 
 .underline {
