@@ -609,8 +609,16 @@ video {
   margin-bottom: 1rem;
 }
 
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
 .mb-8 {
   margin-bottom: 2rem;
+}
+
+.mt-4 {
+  margin-top: 1rem;
 }
 
 .mt-8 {
@@ -619,18 +627,6 @@ video {
 
 .mt-auto {
   margin-top: auto;
-}
-
-.mt-2 {
-  margin-top: 0.5rem;
-}
-
-.mb-6 {
-  margin-bottom: 1.5rem;
-}
-
-.mt-4 {
-  margin-top: 1rem;
 }
 
 .block {
@@ -785,16 +781,16 @@ video {
   border-radius: 0.25rem;
 }
 
+.rounded-lg {
+  border-radius: 0.5rem;
+}
+
 .rounded-md {
   border-radius: 0.375rem;
 }
 
 .rounded-xl {
   border-radius: 0.75rem;
-}
-
-.rounded-lg {
-  border-radius: 0.5rem;
 }
 
 .border {
@@ -810,11 +806,6 @@ video {
   border-bottom-width: 2px;
 }
 
-.border-kpddaccent {
-  --tw-border-opacity: 1;
-  border-color: rgb(194 174 69 / var(--tw-border-opacity));
-}
-
 .border-gray-200 {
   --tw-border-opacity: 1;
   border-color: rgb(229 231 235 / var(--tw-border-opacity));
@@ -823,6 +814,11 @@ video {
 .border-gray-300 {
   --tw-border-opacity: 1;
   border-color: rgb(209 213 219 / var(--tw-border-opacity));
+}
+
+.border-kpddaccent {
+  --tw-border-opacity: 1;
+  border-color: rgb(194 174 69 / var(--tw-border-opacity));
 }
 
 .bg-gray-300 {
@@ -856,18 +852,6 @@ video {
 
 .p-4 {
   padding: 1rem;
-}
-
-.p-8 {
-  padding: 2rem;
-}
-
-.p-6 {
-  padding: 1.5rem;
-}
-
-.p-3 {
-  padding: 0.75rem;
 }
 
 .px-2 {
@@ -992,6 +976,11 @@ video {
   color: rgb(156 163 175 / var(--tw-text-opacity));
 }
 
+.text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity));
+}
+
 .text-kpddaccent {
   --tw-text-opacity: 1;
   color: rgb(194 174 69 / var(--tw-text-opacity));
@@ -1005,11 +994,6 @@ video {
 .text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity));
-}
-
-.text-gray-700 {
-  --tw-text-opacity: 1;
-  color: rgb(55 65 81 / var(--tw-text-opacity));
 }
 
 .underline {
@@ -1220,12 +1204,12 @@ article table td {
     max-width: 42rem;
   }
 
-  .md\:max-w-xl {
-    max-width: 36rem;
-  }
-
   .md\:max-w-sm {
     max-width: 24rem;
+  }
+
+  .md\:max-w-xl {
+    max-width: 36rem;
   }
 
   .md\:flex-1 {
@@ -1238,10 +1222,6 @@ article table td {
 
   .md\:items-start {
     align-items: flex-start;
-  }
-
-  .md\:items-stretch {
-    align-items: stretch;
   }
 
   .md\:gap-2 {
