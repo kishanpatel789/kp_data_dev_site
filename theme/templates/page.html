@@ -13,6 +13,22 @@
 
 {% block link_canonical %}<link rel="canonical" href="{{ SITEURL }}/{{ page.url }}" />{% endblock %}
 
+{% block meta_og_image %}
+  {% if page.metadata.metaimage %}
+    <meta property="og:image" content="{{ SITEURL + page.metadata.metaimage|trim }}">
+  {% else %}
+    <meta property="og:image" content="{{ SITEURL }}/theme/svg/LightLogo_OG.svg">
+  {% endif %}
+{% endblock %}
+
+{% block meta_twitter_image %}
+  {% if page.metadata.metaimage %}
+    <meta property="twitter:image" content="{{ SITEURL + page.metadata.metaimage|trim }}">
+  {% else %}
+    <meta property="twitter:image" content="{{ SITEURL }}/theme/svg/LightLogo_OG.svg">
+  {% endif %}
+{% endblock %}
+
 {% block main %}
 
   {{ page.content }}
