@@ -57,3 +57,7 @@ article table td {
 .highlight pre {
   @apply overflow-x-auto whitespace-pre;
 }
+
+article .highlight-cell {
+  background-color: #fff3cd;
+}
