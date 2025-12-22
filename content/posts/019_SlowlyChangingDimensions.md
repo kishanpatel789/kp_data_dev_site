@@ -10,7 +10,7 @@ I mucked up the CFO's report.
 
 A huge customer moved to another state. Like a good minion, I updated the customer's address in the data warehouse.
 
-When the annual report went out, the CEO asked why the historical numbers by state were different.
+When the annual report went out, the CEO asked why the historical numbers by state were different. 😰
 
 Answer: The data warehouse now had no record of the customer's previous address.
 
@@ -22,7 +22,7 @@ Today we'll discuss what SCDs are and which types are commonly used. Let's go!
 
 ## Background
 
-In the world of data modeling, the Kimball Data Model features a fact table linked to several dimension tables. Records in a fact table describe an event, or something that happened. Rows may represent a transaction on Amazon or someone checking into the hospital.
+In the world of data modeling, the Kimball Data Model features a **fact** table linked to several **dimension** tables. Records in a fact table describe an event, or something that happened. Rows may represent a transaction on amazon.com or someone checking into the hospital.
 
 Here's a sample fact table of encounters at St. Mungo's Hospital for Magical Maladies and Injuries:
 
@@ -42,7 +42,7 @@ Here's a sample fact table of encounters at St. Mungo's Hospital for Magical Mal
 
 Each record represents what happened to a patient, like the diagnosis, treatment, and cost. 
 
-Dimension tables, on the other hand, describe things, like customers, dates, suppliers, etc.
+Dimension tables, on the other hand, describe things, like customers, products, locations, etc.
 
 Here's a dimension table that describes patients at St. Mungo's:
 
@@ -137,7 +137,7 @@ That said, there is a place for Type 1 SCDs. Type 1 tables are useful when you d
 
 ## SCD Type 2
 
-Type 2 SCDs are the next level. When a change occurs in real life, rather than updating the existing record, we insert a new record:
+Type 2 SCDs are the next level. When a change occurs, rather than updating the existing record, we insert a new record:
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
@@ -219,7 +219,7 @@ That's why Type 2 SCDs have helper columns to identify when each version of a ro
 <tbody>
 <tr>
 <td>P001</td>
-<td class="highlight-cell">1991-01-01</td>
+<td class="highlight-cell">1981-10-31</td>
 <td class="highlight-cell">1996-06-30</td>
 <td>Harry</td>
 <td class="highlight-cell">4 Privet Drive, Little Whinging</td>
@@ -250,9 +250,9 @@ That's why Type 2 SCDs have helper columns to identify when each version of a ro
 
 </div>
 
-Here, the first record was active from 1991-01-01 to 1996-06-30; the values of `start_date` and `end_date` tell us that. But second record is active from 1996-07-01 to... 9999-12-31?
+Here, the first record was active from 1981-10-31 to 1996-06-30; the values of `start_date` and `end_date` tell us that. But second record is active from 1996-07-01 to... 9999-12-31?
 
-This "high end date" is a convention used to indicate which record is active. It's useful when you're filtering records via SQL's BETWEEN statement. You may also see NULL values for the `end_date` of the active record.
+This "high end date" is a convention used to indicate which record is current. It's useful when you're filtering records via SQL's BETWEEN statement. You may also see NULL values for the `end_date` of the active record.
 
 When it's time to join the fact and dimension tables, our join may look like this:
 
@@ -267,7 +267,7 @@ JOIN dim_patient p
 There are other ways to indicate when each record is active.
 
 - Make a surrogate key for the dimension table. Each time the entity in a dimension table updates, the new record gets a new surrogate key, which uniquely identifies that entity. The record in the fact table would have a foreign key to the dimension table's surrogate key.
-- Set up additional flag columns like `is_active` with boolean values to indicate which rows are the most current.
+- Set up additional flag columns like `is_active` with boolean values to indicate which rows are current.
 - Add a version number field with the most up-to-date record having the highest value.
 
 The options go on. But for now, let's check out other SCD types.
@@ -330,8 +330,8 @@ This allows historic values to be "baked" into the row itself:
 
 However, there are two cons:
 
-- Type 3 SCDs track limited history. Mr. Potter moves again, we'll update `current_address` and lose track how he once lived at Grimmauld Place.
-- The field count can explode. Here we chose to add a field for address, so we have `original_address` and `current_address`. But what about other fields? Should we add current/original pairs for `last_name`, `phone_number`, `marital_status`?
+- Type 3 SCDs track limited history. When Mr. Potter moves again, we'll update `current_address` and lose track how he once lived at Grimmauld Place. Effectively, we can only keep track of "current" and "original" values.
+- The field count can explode. Here we chose to add a field for address, so we have `original_address` and `current_address`. But what about other fields? Should we add current/original pairs for `last_name`, `phone_number`, `marital_status`? The table can quickly become too wide to be manageable. 
 
 For these reasons, Type 3 SCDs are useful only to track one prior version of a value. It should not be used for full historical tracking.
 
@@ -339,17 +339,85 @@ For these reasons, Type 3 SCDs are useful only to track one prior version of a v
 
 Type 4 is where we begin parting the waters. This approach uses two separate tables for the dimension: a current table and a historic table. 
 
-When a record is updated, the 
+Unsurprisingly, the current table has only the current version of each record. The historic table has all versions with a timestamp of when the record became active. 
 
-Separate current and history table
+When a change occurs, the record in the current table is updated, and a new record is inserted in the historic table. 
 
-## SCD Type 6 - maybe nix
+Mr. Potter's new address can be modeled in tables `dim_patient` and `dim_patient_hist` as such:
+
+<div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
+<div markdown=1 class="w-full md:w-[48%]">
+
+<p class="text-center"><strong>Before</strong></p>
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
+
+<div markdown=1 class="overflow-x-auto">
+
+| id   | first_name | address                         |
+| ---  | ---        | ---                             |
+| P001 | Harry      | 4 Privet Drive, Little Whinging |
+
+</div>
+
+<p markdown=1 class="text-center">
+`dim_patient_hist`
+</p>
+
+<div markdown=1 class="overflow-x-auto">
+
+| id   | first_name | address                         | effective_date | 
+| ---  | ---        | ---                             | ---            | 
+| P001 | Harry      | 4 Privet Drive, Little Whinging | 1981-10-31     | 
+
+</div>
+
+</div>
+<div class="hidden md:block w-px bg-gray-300"></div>
+<div markdown=1 class="w-full md:w-[48%]">
+
+<p class="text-center"><strong>After</strong></p>
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
+
+<div class="overflow-x-auto">
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>first_name</th>
+<th>address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P001</td>
+<td>Harry</td>
+<td class="highlight-cell">12 Grimmauld Place, London</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+<p markdown=1 class="text-center">
+`dim_patient_hist`
+</p>
+
+</div>
+</div>
+
 
 ---
 
-[ insert cheatsheet on when to use each type ]
 
 The types of SCD go on to Type 5 and 6. You can check it out if curious.
+
+
+[ insert cheatsheet on when to use each type ]
 
 In practice, I've mainly seen type 1 or type 2.
 
