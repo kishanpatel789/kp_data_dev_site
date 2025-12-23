@@ -1,5 +1,5 @@
 Title: Slowly Changing Dimensions
-Date: 2025-12-19
+Date: 2025-12-24
 Slug: slowly-changing-dimensions
 Tags: data-engineering, data-modeling
 Summary: Good data modeling includes updating records without losing the old ones. Kimball introduces various types of slowly changing dimension records to do just that. 
@@ -10,21 +10,23 @@ I mucked up the CFO's report.
 
 A huge customer moved to another state. Like a good minion, I updated the customer's address in the data warehouse.
 
-When the annual report went out, the CEO asked why the historical numbers by state were different. 😰
+When the annual report went out, the CFO asked why the historical totals by state were different. 😰
 
-Answer: The data warehouse now had no record of the customer's previous address.
+Answer: The data warehouse had no record of the customer's previous address. My change overwrote the old address.
 
-That's when I felt the pain of poor data modeling. My data warehouse was not designed to reflect the real world, like customers hopping to new locations. 
+That's when I felt the pain of poor data modeling. My data warehouse was not designed to reflect what the company needed, like customer's current address AND their previous addresses. 
 
 That's also when I came across "Slowly Changing Dimension" tables.
 
-Today we'll discuss what SCDs are and which types are commonly used. Let's go!
+Save your butt from the CFO's fire. Use Slowly Changing Dimensions (SCDs) in your data warehouse.
 
 ## Background
 
-In the world of data modeling, the Kimball Data Model features a **fact** table linked to several **dimension** tables. Records in a fact table describe an event, or something that happened. Rows may represent a transaction on amazon.com or someone checking into the hospital.
+In the world of data modeling, the Kimball Data Model features a **fact** table linked to several **dimension** tables. 
 
-Here's a sample fact table of encounters at St. Mungo's Hospital for Magical Maladies and Injuries:
+Records in a fact table describe *events*. Rows may represent a transaction on amazon.com or someone checking into the hospital.
+
+Here's a sample fact table of medical encounters at St. Mungo's Hospital for Magical Maladies and Injuries:
 
 <p markdown=1 class="text-center">
 `fct_encounter`
@@ -42,9 +44,9 @@ Here's a sample fact table of encounters at St. Mungo's Hospital for Magical Mal
 
 Each record represents what happened to a patient, like the diagnosis, treatment, and cost. 
 
-Dimension tables, on the other hand, describe things, like customers, products, locations, etc.
+Dimension tables, on the other hand, describe *things*. Records in a dimension table may represent customers, products, or locations.
 
-Here's a dimension table that describes patients at St. Mungo's:
+Here's a dimension table of patients at St. Mungo's:
 
 <p markdown=1 class="text-center">
 `dim_patient`
@@ -71,9 +73,9 @@ SCDs have different types, or frameworks, for how to update the dimension table 
 
 ## SCD Type 1
 
-In Type 1 SCDs, an update to a record simply overwrites the record. A historic version of the record is not kept. I had a Type 1 SCD when I foolishly updated the address for that customer.
+In Type 1 SCDs, an update to a record overwrites the old record. A historic version of the record is not kept. I had a Type 1 SCD when I foolishly updated the address for that customer.
 
-For example, Harry lives with his aunt and uncle at 4 Privet Drive. But he later inherits his godfather's house. The `dim_patient` table would be updated as such:
+For example, Harry lives with his aunt and uncle at 4 Privet Drive. But he later inherits his godfather's house at 12 Grimmauld Place. The `dim_patient` table would be updated as such:
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
@@ -82,11 +84,11 @@ For example, Harry lives with his aunt and uncle at 4 Privet Drive. But he later
 
 <div markdown=1 class="overflow-x-auto">
 
-| id   | first_name | address                         |
-| ---  | ---        | ---                             |
-| P001 | Harry      | 4 Privet Drive, Little Whinging |
-| P002 | Ron        | The Burrow, Ottery St Catchpole |
-| P003 | Hermione   | 34 Tennyson Road, London        |
+| id   | first_name | address          |
+| ---  | ---        | ---              |
+| P001 | Harry      | 4 Privet Drive   |
+| P002 | Ron        | The Burrow       |
+| P003 | Hermione   | 34 Tennyson Road |
 
 </div>
 
@@ -110,17 +112,17 @@ For example, Harry lives with his aunt and uncle at 4 Privet Drive. But he later
 <tr>
 <td>P001</td>
 <td>Harry</td>
-<td class="highlight-cell">12 Grimmauld Place, London</td>
+<td class="highlight-cell">12 Grimmauld Place</td>
 </tr>
 <tr>
 <td>P002</td>
 <td>Ron</td>
-<td>The Burrow, Ottery St Catchpole</td>
+<td>The Burrow</td>
 </tr>
 <tr>
 <td>P003</td>
 <td>Hermione</td>
-<td>34 Tennyson Road, London</td>
+<td>34 Tennyson Road</td>
 </tr>
 </tbody>
 </table>
@@ -146,11 +148,11 @@ Type 2 SCDs are the next level. When a change occurs, rather than updating the e
 
 <div markdown=1 class="overflow-x-auto">
 
-| id   | first_name | address                         |
-| ---  | ---        | ---                             |
-| P001 | Harry      | 4 Privet Drive, Little Whinging |
-| P002 | Ron        | The Burrow, Ottery St Catchpole |
-| P003 | Hermione   | 34 Tennyson Road, London        |
+| id   | first_name | address          |
+| ---  | ---        | ---              |
+| P001 | Harry      | 4 Privet Drive   |
+| P002 | Ron        | The Burrow       |
+| P003 | Hermione   | 34 Tennyson Road |
 
 </div>
 
@@ -174,22 +176,22 @@ Type 2 SCDs are the next level. When a change occurs, rather than updating the e
 <tr>
 <td>P001</td>
 <td>Harry</td>
-<td>4 Privet Drive, Little Whinging</td>
+<td>4 Privet Drive</td>
 </tr>
 <tr class="highlight-cell">
 <td>P001</td>
 <td>Harry</td>
-<td>12 Grimmauld Place, London</td>
+<td>12 Grimmauld Place</td>
 </tr>
 <tr>
 <td>P002</td>
 <td>Ron</td>
-<td>The Burrow, Ottery St Catchpole</td>
+<td>The Burrow</td>
 </tr>
 <tr>
 <td>P003</td>
 <td>Hermione</td>
-<td>34 Tennyson Road, London</td>
+<td>34 Tennyson Road</td>
 </tr>
 </tbody>
 </table>
@@ -200,7 +202,7 @@ Type 2 SCDs are the next level. When a change occurs, rather than updating the e
 </div>
 
 
-Great. Now we have two records for Harry. But when it comes to join the dimension table to fact tables... which record of Harry should we use? It's hard to tell.
+Great. Now we have two records for Harry. But when joining the dimension table to fact tables... which record of Harry should we use? It's hard to tell.
 
 That's why Type 2 SCDs have helper columns to identify when each version of a row is active. For instance, the `start_date` and `end_date` columns outline the window of time each record is effective. If we update Harry's address on 1996-06-30, `dim_patient` looks like this:
 
@@ -222,35 +224,35 @@ That's why Type 2 SCDs have helper columns to identify when each version of a ro
 <td class="highlight-cell">1981-10-31</td>
 <td class="highlight-cell">1996-06-30</td>
 <td>Harry</td>
-<td class="highlight-cell">4 Privet Drive, Little Whinging</td>
+<td class="highlight-cell">4 Privet Drive</td>
 </tr>
 <tr>
 <td>P001</td>
 <td class="highlight-cell">1996-07-01</td>
 <td class="highlight-cell">9999-12-31</td>
 <td>Harry</td>
-<td class="highlight-cell">12 Grimmauld Place, London</td>
+<td class="highlight-cell">12 Grimmauld Place</td>
 </tr>
 <tr>
 <td>P002</td>
 <td>1990-01-01</td>
 <td>9999-12-31</td>
 <td>Ron</td>
-<td>The Burrow, Ottery St Catchpole</td>
+<td>The Burrow</td>
 </tr>
 <tr>
 <td>P003</td>
 <td>1992-07-01</td>
 <td>9999-12-31</td>
 <td>Hermione</td>
-<td>34 Tennyson Road, London</td>
+<td>34 Tennyson Road</td>
 </tr>
 </tbody>
 </table>
 
 </div>
 
-Here, the first record was active from 1981-10-31 to 1996-06-30; the values of `start_date` and `end_date` tell us that. But second record is active from 1996-07-01 to... 9999-12-31?
+Here, the first record was active from 1981-10-31 to 1996-06-30; the values of `start_date` and `end_date` tell us that. The second record is active from 1996-07-01 to... 9999-12-31?
 
 This "high end date" is a convention used to indicate which record is current. It's useful when you're filtering records via SQL's BETWEEN statement. You may also see NULL values for the `end_date` of the active record.
 
@@ -264,11 +266,76 @@ JOIN dim_patient p
     AND e.treatment_date BETWEEN p.start_date AND p.end_date;
 ```
 
-There are other ways to indicate when each record is active.
+There are other ways to indicate which record is current:
 
-- Make a surrogate key for the dimension table. Each time the entity in a dimension table updates, the new record gets a new surrogate key, which uniquely identifies that entity. The record in the fact table would have a foreign key to the dimension table's surrogate key.
 - Set up additional flag columns like `is_active` with boolean values to indicate which rows are current.
-- Add a version number field with the most up-to-date record having the highest value.
+
+<div class="overflow-x-auto">
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>effective_date</th>
+<th class="highlight-cell">is_active</th>
+<th>first_name</th>
+<th>address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P001</td>
+<td>1981-10-31</td>
+<td class="highlight-cell">FALSE</td>
+<td>Harry</td>
+<td>4 Privet Drive</td>
+</tr>
+<tr>
+<td>P001</td>
+<td>1996-07-01</td>
+<td class="highlight-cell">TRUE</td>
+<td>Harry</td>
+<td>12 Grimmauld Place</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
+- Add a `version` field with the most up-to-date record having the highest value.
+
+<div class="overflow-x-auto">
+
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>effective_date</th>
+<th class="highlight-cell">version</th>
+<th>first_name</th>
+<th>address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P001</td>
+<td>1981-10-31</td>
+<td class="highlight-cell" style="text-align: right;">1</td>
+<td>Harry</td>
+<td>4 Privet Drive</td>
+</tr>
+<tr>
+<td>P001</td>
+<td>1996-07-01</td>
+<td class="highlight-cell" style="text-align: right;">2</td>
+<td>Harry</td>
+<td>12 Grimmauld Place</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+
 
 The options go on. But for now, let's check out other SCD types.
 
@@ -279,7 +346,7 @@ Spoiler alert: I don't like Type 3. Here it goes: When a dimension record change
 
 The first time an address changes, the column `address` is renamed to `original_address`. Then new columns `current_address` and `effective_date` are added. This shows the original and current values in separate columns while `effective_date` indicates when the current address took effect. 
 
-This allows historic values to be "baked" into the row itself:
+This approach "bakes" historic values into the row itself:
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
@@ -288,9 +355,9 @@ This allows historic values to be "baked" into the row itself:
 
 <div markdown=1 class="overflow-x-auto">
 
-| id   | first_name | address                         |
-| ---  | ---        | ---                             |
-| P001 | Harry      | 4 Privet Drive, Little Whinging |
+| id   | first_name | address        |
+| ---  | ---        | ---            |
+| P001 | Harry      | 4 Privet Drive |
 
 </div>
 
@@ -316,8 +383,8 @@ This allows historic values to be "baked" into the row itself:
 <tr>
 <td>P001</td>
 <td>Harry</td>
-<td>4 Privet Drive, Little Whinging</td>
-<td class="highlight-cell">12 Grimmauld Place, London</td>
+<td>4 Privet Drive</td>
+<td class="highlight-cell">12 Grimmauld Place</td>
 <td class="highlight-cell">1996-07-01</td>
 </tr>
 </tbody>
@@ -330,20 +397,20 @@ This allows historic values to be "baked" into the row itself:
 
 However, there are two cons:
 
-- Type 3 SCDs track limited history. When Mr. Potter moves again, we'll update `current_address` and lose track how he once lived at Grimmauld Place. Effectively, we can only keep track of "current" and "original" values.
-- The field count can explode. Here we chose to add a field for address, so we have `original_address` and `current_address`. But what about other fields? Should we add current/original pairs for `last_name`, `phone_number`, `marital_status`? The table can quickly become too wide to be manageable. 
+- Type 3 SCDs track limited history. When Mr. Potter moves again, we'll update `current_address` and lose track of how he once lived at Grimmauld Place. Effectively, we can only keep track of "current" and "original" values.
+- The field count can explode. Here we chose to track changes to the address, so we have `original_address` and `current_address`. But what about other fields? Should we add current/original pairs for `last_name`, `phone_number`, `marital_status`? The table can quickly become too wide to be manageable. 
 
 For these reasons, Type 3 SCDs are useful only to track one prior version of a value. It should not be used for full historical tracking.
 
 ## SCD Type 4
 
-Type 4 is where we begin parting the waters. This approach uses two separate tables for the dimension: a current table and a historic table. 
+Type 4 is where we part the waters. This approach uses two separate tables for the dimension: a current table and a historic table. 
 
 Unsurprisingly, the current table has only the current version of each record. The historic table has all versions with a timestamp of when the record became active. 
 
 When a change occurs, the record in the current table is updated, and a new record is inserted in the historic table. 
 
-Mr. Potter's new address can be modeled in tables `dim_patient` and `dim_patient_hist` as such:
+Mr. Potter's address change can be modeled in tables `dim_patient` and `dim_patient_hist` as such:
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
@@ -355,9 +422,9 @@ Mr. Potter's new address can be modeled in tables `dim_patient` and `dim_patient
 
 <div markdown=1 class="overflow-x-auto">
 
-| id   | first_name | address                         |
-| ---  | ---        | ---                             |
-| P001 | Harry      | 4 Privet Drive, Little Whinging |
+| id   | first_name | address        |
+| ---  | ---        | ---            |
+| P001 | Harry      | 4 Privet Drive |
 
 </div>
 
@@ -367,9 +434,9 @@ Mr. Potter's new address can be modeled in tables `dim_patient` and `dim_patient
 
 <div markdown=1 class="overflow-x-auto">
 
-| id   | first_name | address                         | effective_date | 
-| ---  | ---        | ---                             | ---            | 
-| P001 | Harry      | 4 Privet Drive, Little Whinging | 1981-10-31     | 
+| id   | first_name | address        | effective_date | 
+| ---  | ---        | ---            | ---            | 
+| P001 | Harry      | 4 Privet Drive | 1981-10-31     | 
 
 </div>
 
@@ -396,7 +463,7 @@ Mr. Potter's new address can be modeled in tables `dim_patient` and `dim_patient
 <tr>
 <td>P001</td>
 <td>Harry</td>
-<td class="highlight-cell">12 Grimmauld Place, London</td>
+<td class="highlight-cell">12 Grimmauld Place</td>
 </tr>
 </tbody>
 </table>
@@ -407,17 +474,56 @@ Mr. Potter's new address can be modeled in tables `dim_patient` and `dim_patient
 `dim_patient_hist`
 </p>
 
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>first_name</th>
+<th>address</th>
+<th>effective_date</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>P001</td>
+<td>Harry</td>
+<td>4 Privet Drive</td>
+<td>1981-10-31</td>
+</tr>
+<tr class="highlight-cell">
+<td>P001</td>
+<td>Harry</td>
+<td>12 Grimmauld Place</td>
+<td>1996-07-01</td>
+</tr>
+</tbody>
+</table>
+
 </div>
 </div>
 
+
+Originally, Harry's record in `dim_patient` and `dim_patient_hist` are basically the same. But once he inherits the new house, his address is updated in `dim_patient`, and a new record is inserted in `dim_patient_hist` with the effective date.
+
+Type 4 SCDs are useful when it makes sense to separate current and historic records. Sometimes, we only need the current version of an entity, which we can pull from the current table. For those few times we need to perform historic analysis, we can use the historic table.
 
 ---
 
+SCDs continue to Types 5 and 6. But I've never seen them used in practice. You can [check them out](https://en.wikipedia.org/wiki/Slowly_changing_dimension) if curious.
 
-The types of SCD go on to Type 5 and 6. You can check it out if curious.
+Most of the time, engineers choose to use Type 1 or Type 2 SCDs. 
 
 
-[ insert cheatsheet on when to use each type ]
+Again, Slowly Changing Dimension tables describe "things" and are designed to reflect current values while potentially giving access to historic values. Here's the cheatsheet of how each type handles data change:
 
-In practice, I've mainly seen type 1 or type 2.
+| SCD Type | Description                                                                             | 
+| :-:      | ---                                                                                     |
+| 1        | New record replaces original record. Old record is lost.                                |
+| 2        | New record added to table. Other columns identify when records are in effect. |
+| 3        | Original record is modified. Extra column gives old value. |                                                            
+| 4        | Current dimension table is updated. New record added to historic table.                          |
+
+Hopefully this saves you some headache as your data warehouse evolves. 
+
+Is the C-suite knocking on your door about data accuracy? [Call me](https://kpdata.dev/) if you need help with data modeling. 
 
