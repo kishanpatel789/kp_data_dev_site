@@ -499,6 +499,8 @@ Mr. Potter's address change can be modeled in tables `dim_patient` and `dim_pati
 `dim_patient_hist`
 </p>
 
+<div markdown=1 class="overflow-x-auto">
+
 <table>
 <thead>
 <tr>
@@ -525,6 +527,8 @@ Mr. Potter's address change can be modeled in tables `dim_patient` and `dim_pati
 </table>
 
 </div>
+
+</div>
 </div>
 
 
@@ -538,12 +542,16 @@ SCDs continue to evolve to Types 5 and 6. But I've never seen them used in pract
 
 Again, Slowly Changing Dimension tables describe "things." They're designed to reflect current values while potentially giving access to historical values. Here's the cheatsheet of how each type handles data change:
 
+<div markdown=1 class="overflow-x-auto">
+
 | SCD Type | Update Description                                                            | 
 | :-:      | ---                                                                           |
 | 1        | New record replaces original record. Old record is lost.                      |
 | 2        | New record added to table. Other columns identify when records are in effect. |
 | 3        | Original record is modified. Extra column gives old value.                    | 
 | 4        | Current dimension table is updated. New record is added to historical table.  |
+
+</div>
 
 Your data warehouse seems perfect on day 1. But the business will change. The unexpected will happen. Building well-designed tables will future-proof your warehouse and spare you some headache. 
 
