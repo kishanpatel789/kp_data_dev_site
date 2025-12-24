@@ -2,8 +2,9 @@ Title: Slowly Changing Dimensions
 Date: 2025-12-24
 Slug: slowly-changing-dimensions
 Tags: data-engineering, data-modeling
-Summary: Good data modeling includes updating records without losing the old ones. Kimball introduces various types of slowly changing dimension records to do just that. 
-Status: draft
+Summary: Good data modeling updates records without losing the old ones. Kimball introduces slowly changing dimension tables to do just that. 
+Status: published
+MetaImage: /static/images/post019/SCDThumbnail.jpg
 
 
 I mucked up the CFO's report.
@@ -14,7 +15,7 @@ When the annual report went out, the CFO asked why the historical totals by stat
 
 Answer: The data warehouse had no record of the customer's previous address. My change overwrote the old address.
 
-That's when I felt the pain of poor data modeling. My data warehouse was not designed to reflect what the company needed, like customer's current address AND their previous addresses. 
+That's when I felt the pain of poor data modeling. My data warehouse was not designed to reflect what the company needed, like customers' current address AND their previous addresses. 
 
 That's also when I came across "Slowly Changing Dimension" tables.
 
@@ -63,25 +64,28 @@ Here's a dimension table of patients at St. Mungo's:
 </div>
 
 
-This dimension table lets us to look up patients by their IDs. We see patients' names, birth dates, addresses, etc.
+This dimension table lets us to look up patients by their IDs. We see patients' names, birthdates, addresses, etc.
 
 Fact tables are joined to dimension tables by keys. For example, joining these two tables on `fct_encounter.patient_id = dim_patient.id` shows us that us Harry (P001) was hit with basilisk venom and a wand backfire; Ron (P002) experienced a bludger blow.
 
-But what makes a dimension table "slowly changing?" In general, records in dimension tables should not change. It's uncommon for someone to change their name and near impossible to change their birth date. But every now and then, data in dimension tables need to be updated... hence, "slowly changing."
+But what makes a dimension table "slowly changing?" In general, records in dimension tables should not change. It's uncommon for someone to change their name and near impossible to change their birthdate. But every now and then, data in dimension tables need to be updated... hence, "slowly changing."
 
-SCDs have different types, or frameworks, for how to update the dimension table with such changes. These frameworks maintain the current value of each attribute (i.e. each column for a given row) and give a way to capture historical values.
+SCDs have different types, or frameworks, for how to update the dimension table with such changes. These frameworks maintain the current value of each attribute (i.e. each column in a table), and some give a way to keep historical values.
 
 ## SCD Type 1
 
-In Type 1 SCDs, an update to a record overwrites the old record. A historic version of the record is not kept. I had a Type 1 SCD when I foolishly updated the address for that customer.
+In Type 1 SCDs, new info replaces old info. Every time a change occurs, the new value overwrites the old one. A historical version of the record is not kept. I had a Type 1 SCD when I foolishly updated the address for that customer.
 
-For example, Harry lives with his aunt and uncle at 4 Privet Drive. But he later inherits his godfather's house at 12 Grimmauld Place. The `dim_patient` table would be updated as such:
+For example, Harry lives with his aunt and uncle at 4 Privet Drive. But he later inherits his godfather's house at 12 Grimmauld Place. A Type 1 `dim_patient` table is updated as such:
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
 
 <p class="text-center"><strong>Before</strong></p>
 
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
 <div markdown=1 class="overflow-x-auto">
 
 | id   | first_name | address          |
@@ -98,6 +102,9 @@ For example, Harry lives with his aunt and uncle at 4 Privet Drive. But he later
 
 <p class="text-center"><strong>After</strong></p>
 
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
 <div class="overflow-x-auto">
 
 <table>
@@ -133,19 +140,22 @@ For example, Harry lives with his aunt and uncle at 4 Privet Drive. But he later
 </div>
 
 
-This approach gives you a current snapshot of the dimension state. But you lose historical records. And when finance inevitably asks you to run a historic report, you're stuck. You don't know where Harry lived before 12 Grimmauld Place.
+This approach gives the current state of the dimension. But you lose historical records. And when the CFO inevitably asks for a report about the past, you're cooked. You don't know where Harry lived before 12 Grimmauld Place.
 
 That said, there is a place for Type 1 SCDs. Type 1 tables are useful when you don't care about historical analysis. Sometimes only the current value matters, like when you need contact info for customers. 
 
 ## SCD Type 2
 
-Type 2 SCDs are the next level. When a change occurs, rather than updating the existing record, we insert a new record:
+Type 2 SCDs are the next level. When a change occurs, rather than updating the existing record, you insert a new record:
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
 
 <p class="text-center"><strong>Before</strong></p>
 
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
 <div markdown=1 class="overflow-x-auto">
 
 | id   | first_name | address          |
@@ -162,6 +172,9 @@ Type 2 SCDs are the next level. When a change occurs, rather than updating the e
 
 <p class="text-center"><strong>After</strong></p>
 
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
 <div class="overflow-x-auto">
 
 <table>
@@ -202,10 +215,13 @@ Type 2 SCDs are the next level. When a change occurs, rather than updating the e
 </div>
 
 
-Great. Now we have two records for Harry. But when joining the dimension table to fact tables... which record of Harry should we use? It's hard to tell.
+Great. Now there are two records for Harry. But when joining the dimension table to fact tables... which record of Harry should you use? It's hard to tell.
 
-That's why Type 2 SCDs have helper columns to identify when each version of a row is active. For instance, the `start_date` and `end_date` columns outline the window of time each record is effective. If we update Harry's address on 1996-06-30, `dim_patient` looks like this:
+That's why Type 2 SCDs have helper columns to identify when each version of a row is active. For instance, the `start_date` and `end_date` columns outline the window of time each record is effective. If Harry's address changes on 1996-06-30, `dim_patient` looks like this:
 
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
 <div class="overflow-x-auto">
 
 <table>
@@ -254,21 +270,23 @@ That's why Type 2 SCDs have helper columns to identify when each version of a ro
 
 Here, the first record was active from 1981-10-31 to 1996-06-30; the values of `start_date` and `end_date` tell us that. The second record is active from 1996-07-01 to... 9999-12-31?
 
-This "high end date" is a convention used to indicate which record is current. It's useful when you're filtering records via SQL's BETWEEN statement. You may also see NULL values for the `end_date` of the active record.
+This "high end date" is a convention used to indicate which record is current. It's useful when you're filtering records with SQL's BETWEEN statement. You may also see NULL values for the `end_date` of the active record.
 
-When it's time to join the fact and dimension tables, our join may look like this:
+When it's time to join the fact and dimension tables, our query may look like this:
 
 ```sql
 SELECT *
 FROM fct_encounter e
 JOIN dim_patient p
     ON e.patient_id = p.id
-    AND e.treatment_date BETWEEN p.start_date AND p.end_date;
+    AND e.encounter_date BETWEEN p.start_date AND p.end_date;
 ```
+
+We pick the proper patient record (i.e. the proper record for Harry) in the join by making sure the `encounter_date` in the fact table is between the `start_date` and `end_date` in the dimension table. This effectively captures the dimension record that was active when the event in the fact table occurred. 
 
 There are other ways to indicate which record is current:
 
-- Set up additional flag columns like `is_active` with boolean values to indicate which rows are current.
+- Set up flag columns like `is_active` with boolean values to indicate which rows are current.
 
 <div class="overflow-x-auto">
 
@@ -337,22 +355,26 @@ There are other ways to indicate which record is current:
 </div>
 
 
-The options go on. But for now, let's check out other SCD types.
+The methods for identifying current records go on and on. 
 
+The beauty of Type 2 SCDs is that each version of a record get its own row. This keeps a full history of changes, which enables historical analysis. The downside is that multiple rows represent the same thing (e.g. two rows both represent the same Harry), so you need to carefully filter the table for the version you want.
 
 ## SCD Type 3
 
-Spoiler alert: I don't like Type 3. Here it goes: When a dimension record changes, Type 3 tables do not create a new row. Instead new fields are added to mark the old value and the new value.
+Spoiler alert: I don't like Type 3. Here it goes: When a change occurs, Type 3 tables do not create a new row. Instead new fields are added to mark the old value and the new value.
 
-The first time an address changes, the column `address` is renamed to `original_address`. Then new columns `current_address` and `effective_date` are added. This shows the original and current values in separate columns while `effective_date` indicates when the current address took effect. 
+The first time an address changes, the column `address` is renamed to `original_address`. Then new columns `current_address` and `effective_date` are added. The original and current values appear in separate columns while `effective_date` indicates when the current address took effect. 
 
-This approach "bakes" historic values into the row itself:
+This approach "bakes" historical values into the row itself:
 
 <div markdown=1 class="flex flex-col md:flex-row md:space-x-2 md:gap-2 py-2 items-stretch">
 <div markdown=1 class="w-full md:w-[48%]">
 
 <p class="text-center"><strong>Before</strong></p>
 
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
 <div markdown=1 class="overflow-x-auto">
 
 | id   | first_name | address        |
@@ -367,6 +389,9 @@ This approach "bakes" historic values into the row itself:
 
 <p class="text-center"><strong>After</strong></p>
 
+<p markdown=1 class="text-center">
+`dim_patient`
+</p>
 <div class="overflow-x-auto">
 
 <table>
@@ -397,18 +422,18 @@ This approach "bakes" historic values into the row itself:
 
 However, there are two cons:
 
-- Type 3 SCDs track limited history. When Mr. Potter moves again, we'll update `current_address` and lose track of how he once lived at Grimmauld Place. Effectively, we can only keep track of "current" and "original" values.
-- The field count can explode. Here we chose to track changes to the address, so we have `original_address` and `current_address`. But what about other fields? Should we add current/original pairs for `last_name`, `phone_number`, `marital_status`? The table can quickly become too wide to be manageable. 
+- Type 3 SCDs track limited history. When Mr. Potter moves again, you'll update `current_address` and lose track of how he once lived at Grimmauld Place. You can only keep track of "current" and "original" values.
+- The field count can explode. This table tracks changes to the address, so you have `original_address` and `current_address`. But what about other fields? Should you add current/original pairs for `last_name`, `phone_number`, `marital_status`? The table can quickly become too wide to be manageable. 
 
 For these reasons, Type 3 SCDs are useful only to track one prior version of a value. It should not be used for full historical tracking.
 
 ## SCD Type 4
 
-Type 4 is where we part the waters. This approach uses two separate tables for the dimension: a current table and a historic table. 
+Type 4 is where we part the waters. This approach uses two separate tables for the dimension: a current table and a historical table. 
 
-Unsurprisingly, the current table has only the current version of each record. The historic table has all versions with a timestamp of when the record became active. 
+Unsurprisingly, the current table has only the current version of each record. The historical table has all versions with a timestamp of when each record became active. 
 
-When a change occurs, the record in the current table is updated, and a new record is inserted in the historic table. 
+When a change occurs, the record in the current table is updated, and a new record is inserted in the historical table. 
 
 Mr. Potter's address change can be modeled in tables `dim_patient` and `dim_patient_hist` as such:
 
@@ -505,25 +530,22 @@ Mr. Potter's address change can be modeled in tables `dim_patient` and `dim_pati
 
 Originally, Harry's record in `dim_patient` and `dim_patient_hist` are basically the same. But once he inherits the new house, his address is updated in `dim_patient`, and a new record is inserted in `dim_patient_hist` with the effective date.
 
-Type 4 SCDs are useful when it makes sense to separate current and historic records. Sometimes, we only need the current version of an entity, which we can pull from the current table. For those few times we need to perform historic analysis, we can use the historic table.
+Type 4 SCDs keep the current dimension table small and fast for querying. You don't have to worry about multiple rows representing the same entity, like in Type 2 (e.g. there's only one row for Harry in Type 4 `dim_patient`). And for those few times you need to perform historical analysis, you use the historical table. 
 
 ---
 
-SCDs continue to Types 5 and 6. But I've never seen them used in practice. You can [check them out](https://en.wikipedia.org/wiki/Slowly_changing_dimension) if curious.
+SCDs continue to evolve to Types 5 and 6. But I've never seen them used in practice. [Check them out](https://en.wikipedia.org/wiki/Slowly_changing_dimension) if you're curious. Most of the time, engineers are happy with Type 1 and Type 2 SCDs. 
 
-Most of the time, engineers choose to use Type 1 or Type 2 SCDs. 
+Again, Slowly Changing Dimension tables describe "things." They're designed to reflect current values while potentially giving access to historical values. Here's the cheatsheet of how each type handles data change:
 
-
-Again, Slowly Changing Dimension tables describe "things" and are designed to reflect current values while potentially giving access to historic values. Here's the cheatsheet of how each type handles data change:
-
-| SCD Type | Description                                                                             | 
-| :-:      | ---                                                                                     |
-| 1        | New record replaces original record. Old record is lost.                                |
+| SCD Type | Update Description                                                            | 
+| :-:      | ---                                                                           |
+| 1        | New record replaces original record. Old record is lost.                      |
 | 2        | New record added to table. Other columns identify when records are in effect. |
-| 3        | Original record is modified. Extra column gives old value. |                                                            
-| 4        | Current dimension table is updated. New record added to historic table.                          |
+| 3        | Original record is modified. Extra column gives old value.                    | 
+| 4        | Current dimension table is updated. New record is added to historical table.  |
 
-Hopefully this saves you some headache as your data warehouse evolves. 
+Your data warehouse seems perfect on day 1. But the business will change. The unexpected will happen. Building well-designed tables will future-proof your warehouse and spare you some headache. 
 
-Is the C-suite knocking on your door about data accuracy? [Call me](https://kpdata.dev/) if you need help with data modeling. 
+Are stakeholders knocking on your door about data accuracy? [Call me](https://kpdata.dev/) if you need a data model 😘. 
 
