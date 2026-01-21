@@ -14,12 +14,16 @@ Picture it: The CSV file sits on your laptop. You need to get it into Snowflake.
 
 But how?
 
-[ this needs rework ]
+Today, we'll simulate a week of a data engineer. Files will be delivered to your computer each day. And you're job is to get the files into Snowflake. 
 
+Let's go!
 
 ## Set Up
 
 To keep things simple, our CSV file is small: 6 columns and 5 rows.
+
+
+<div markdown=1 class="overflow-x-auto">
 
 | visit_id | patient_id | visit_date | department  | visit_cost | is_emergency |
 |---       | ---        | ---        | ---         | ---        | ---          |
@@ -29,7 +33,9 @@ To keep things simple, our CSV file is small: 6 columns and 5 rows.
 | V1004    | P004       | 2026-01-01 | Orthopedics | 875.50     | false        |
 | V1005    | P005       | 2026-01-01 | Oncology    | 1500.00    | true         |
 
-It represents patient visits at a hospital on one day (1/1/26). The application team says we'll get a new file each day.
+</div>
+
+It represents patient visits at a hospital on one day. The application team says we'll get a new file each day.
 
 On the Snowflake side, we have a table that will receive the records in the CSV file. It's created like this:
 
@@ -46,11 +52,9 @@ CREATE OR REPLACE TABLE demo.public.patient_visits (
 
 Alright, we have the source (CSV file on our laptop) and the destination (the Snowflake table).
 
-Before you can transfer the file contents into a Snowflake table, you need to stage the file. Think of a stage as a waiting zone of files.
+Before you can transfer the file contents into a Snowflake table, you need to stage the file. Think of a stage as a waiting zone of files. Once the files are staged, the data within the files can be loaded into the Snowflake table.
 
-simple graphic of loading
-Local file -> Snowflake Stage -> Snowflake table
-           ^ stage the file    ^ load the file
+<img alt="Load steps" src="/static/images/post020/load_steps.png" class="w-full md:w-auto md:max-w-3xl mx-auto">
 
 Keep this in mind. Get some sleep. Tomorrow we're going loading.
 
@@ -124,6 +128,8 @@ Yay! You did it. Go get a donut from the break room.
 
 The second file is here: `patient_visit_2026_01_02.csv`
 
+<div markdown=1 class="overflow-x-auto">
+
 | visit_id | patient_id | visit_date | department  | visit_cost | is_emergency |
 |---       | ---        | ---        | ---         | ---        | ---          |
 | V1006    | P006       | 2026-01-02 | Emergency   | 980.25     | true         |
@@ -131,6 +137,8 @@ The second file is here: `patient_visit_2026_01_02.csv`
 | V1008    | P007       | 2026-01-02 | Dermatology | 150.00     | false        |
 | V1009    | P008       | 2026-01-02 | Pediatrics  | 0.00       | false        |
 | V1010    | P009       | 2026-01-02 | Neurology   | 2200.99    | true         |
+
+</div>
 
 Here we go again! Stage the file:
 
@@ -168,15 +176,18 @@ FILE_FORMAT = (
 
 We're done!
 
-Let's slow down here. Note the FROM clause of the COPY INTO statement. We told Snowflake to grab all files located in `@~/visits/` and push the content into the `patient_visits` table.
+Let's slow down here. Check out the FROM clause of the COPY INTO statement. We told Snowflake to grab all files located in `@~/visits/` and push the content into the `patient_visits` table.
 
 But look at the query output; only ONE file was loaded, the new file from 1/2. Snowflake's smart enough to know which files in the stage have been loaded and which ones have not. After evaluating the FROM clause, Snowflake will only process new files by default. That's nice.
 
-Oh yeah, what's that `FILE_FORMAT` line in the COPY INTO statement? That's where we tell Snowflake what the file looks like, so it knows how to interpret the file. Here we declare the staged file is a CSV file. We also tell Snowflake to skip the first line of the file since the first line just gives the column names. This is a minimal file format that works until...
+Oh yeah, what's that `FILE_FORMAT` line in the COPY INTO statement? That's where we tell Snowflake what the file looks like, so it knows how to interpret the file. Here we declare the staged file is a CSV file. We also tell Snowflake to skip the first line of the file since the first line just gives the column names. This minimal file format works until...
 
 ## Day 3
 
 A new day, a new file: `patient_visit_2026_01_03.csv`
+
+
+<div class="overflow-x-auto">
 
 <table>
 <thead>
@@ -239,6 +250,8 @@ A new day, a new file: `patient_visit_2026_01_03.csv`
 </tbody>
 </table>
 
+</div>
+
 Notice anything off? Let's see what happens.
 
 Stage the file:
@@ -284,7 +297,7 @@ Bad news: Now we have some more gobbledegook to decipher. Looks like an extra co
 
 At this point, we're going to burn our afternoon repeatedly trying COPY INTO until the file issues are resolved. It'd be nice if we can see ALL our file issues before we try loading the data. If only there was something...
 
-There is! Enter "validation mode." Validation mode does not try to insert records into the table. It parses the file to see if there are any issues. Look at the feedback!
+There is! Enter "validation mode." Validation mode does not try to insert records into the table. Instead it parses the file to see if there are any issues. Look at the feedback!
 
 ```sql
 COPY INTO demo.public.patient_visits
@@ -299,7 +312,7 @@ VALIDATION_MODE = RETURN_ERRORS; -- show errors in file
 
 ![Day 3 - validation mode](/static/images/post020/day3_3_validation.png)
 
-The output gives the 4 errors clearly. It even tells us which line the errors occur on. If we scroll to the right in Snowsight, the output even shows the column creating the error.
+The output gives 4 errors clearly. It tells us which line the errors occur on. If we scroll to the right in Snowsight, the output even shows the column creating the error.
 
 Now we know what to do. We can fix the 4 errors in the CSV file, staged the corrected file, and load into the table again. Hurray! I'll leave that to you.
 
