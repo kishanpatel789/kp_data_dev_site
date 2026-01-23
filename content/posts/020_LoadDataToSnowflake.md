@@ -1,16 +1,17 @@
 Title: Load Data to Snowflake
-Date: 2026-01-21
+Date: 2026-01-22
 Slug: load-data-to-snowflake
 Tags: data-engineering, snowflake
 Summary: Snowflake makes it easy to analyze data. The hardest part is getting data into snowflake. Let's see how it's done!
-Status: draft
+Status: published
+MetaImage: /static/images/post020/LoadSnowflakeThumbnail.jpg
 
 
-Snowflake is makes it easy to work with your data. Once your data is in the warehouse, you can perform all kinds of analysis.
+Snowflake is makes it easy to play with your data. Once data is in the warehouse, you can perform all kinds of analysis.
 
 The tricky part is getting data INTO the warehouse.
 
-Picture it: The CSV file sits on your laptop. You need to get it into Snowflake.
+Picture it: A CSV file sits on your laptop. You need to get it into Snowflake.
 
 But how?
 
@@ -49,9 +50,9 @@ CREATE OR REPLACE TABLE demo.public.patient_visits (
 );
 ```
 
-Alright, you have the source (CSV file on our laptop) and the destination (the Snowflake table).
+Alright, you have the source (CSV file on your laptop) and the destination (the Snowflake table).
 
-Before you can transfer the file contents into a Snowflake table, you need to <u>stage the file</u>. Think of a stage as a waiting zone of files. Once the files are staged, the data within the files can be loaded into the Snowflake table.
+Before you can transfer the file contents into a Snowflake table, you need to **stage the file**. Think of a stage as a waiting zone of files. Once the file is staged, the data within the file can be loaded into the Snowflake table.
 
 <img alt="Load steps" src="/static/images/post020/load_steps.png" class="w-full md:w-auto md:max-w-3xl mx-auto">
 
@@ -94,7 +95,7 @@ You can verify the file exists in the user stage by running a `LIST` command:
 
 Step 2: Transfer the file contents into the Snowflake table. 
 
-You want to copy data into a table called `patient_visits` from all files that are in the user stage's `visits/` folder. You declare that with a `COPY INTO` command in Snowsight:
+You want to copy data **into** a table called `patient_visits` **from** all files that are in the user stage's `visits/` folder. You declare that with a `COPY INTO` command in Snowsight:
 
 ```sql
 COPY INTO demo.public.patient_visits  -- destination: snowflake table
@@ -180,7 +181,7 @@ You're done!
 
 Let's slow down here. Check out the FROM clause of the COPY INTO statement. You told Snowflake to grab all files located in `@~/visits/` and push the content into the `patient_visits` table.
 
-But look at the query output; only ONE file was loaded, the new file from 1/2. Snowflake's smart enough to know which files in the stage have been loaded and which ones have not. After evaluating the FROM clause, Snowflake processes only new files by default. That's nice.
+But look at the query output; only ONE file was loaded, the new file from January 2. Snowflake's smart enough to know which files in the stage have been loaded and which ones have not. After evaluating the FROM clause, Snowflake processes only new files by default. That's nice.
 
 Oh yeah, did you notice that `FILE_FORMAT` line in the COPY INTO statement? That's where you tell Snowflake what the file looks like, so it knows how to interpret the file. Here you declare the staged file is a CSV file (`TYPE = CSV`). With `SKIP_HEADER = 1`, you tell Snowflake to skip the first line of the file; the first line gives the column names and doesn't need to be loaded.
 
@@ -281,7 +282,7 @@ Uh what? Welcome to a real day, buttercup.
 
 This 3rd file is mucked up. There's a new column `insurance_provider`. Snowflake's screaming because the column counts between the Snowflake table and the CSV file don't match. Try doing what the error recommends: use `ERROR_ON_COLUMN_COUNT_MISMATCH` in the `FILE_FORMAT`.
 
-This setting is set to `True` by default, so Snowflake normally halts the load process if the number of columns do not match. But when the setting is `False`, mismatched column counts do not raise an error. Instead, any extra columns are not loaded. Give it a whirl:
+This setting is set to `True` by default, so Snowflake normally stops the load process if the number of columns do not match. But when the setting is `False`, mismatched column counts do not raise an error. Instead, any extra columns are not loaded. Give it a whirl:
 
 ```sql
 COPY INTO demo.public.patient_visits
@@ -320,7 +321,9 @@ Look at the feedback!
 
 The output declares 4 errors clearly. It tells which line each error occurs on. If you scroll to the right in Snowsight, the output even shows the column creating the error.
 
-Now you know what to do. You can fix the 4 errors in the CSV file, stage the corrected file, and load into the table again. Hooray! I'll leave that to you.
+Now you know what to do. You can fix the 4 errors in the CSV file, stage the corrected file, and load into the table again. Hooray! I'll leave that to you; I'm getting more donuts.
+
+This fiasco is common for incremental data loads (where someone sends you new files regularly). The initial data loads are typically flawless. Eventually though, the source application team will change the schema by adding a column. Occasionally, bad data will be delivered. Thankfully, Snowflake's COPY INTO statement has features to debug and resolve such issues.
 
 ## Clean Up
 
@@ -365,23 +368,23 @@ PURGE = TRUE; -- remove files from stage after loading
 
 ## Wait, what's a stage again?
 
-A stage is where the files are stored for loading and unloading. It's the area where data lives before being loaded into a Snowflake table. It's also the area data lands after being unloaded from a Snowflake table.
+A stage is where the files are stored for loading and unloading. It's the area where data lives before being loaded into a Snowflake table. It's also where data lands after being unloaded from a Snowflake table.
 
 There are two groups of stages: internal and external. The difference is in the name. 
 
-When you transfer a file to an internal stage, the file is stored within Snowflake. Within the world of internal stages, there are 3 types:
-
-PICK UP HERE
+With an internal stage, files are stored within Snowflake. In the world of internal stages, there are 3 types:
 
 - User stage: every user has their own private user stage, accessible via the path `@~`.
-- Table stage: every table has its own stage to store supporting files; can be accessed via path `@%<name-of-table>`
-- Named internal stage: like a user stage, but accessible to multiple users
+- Table stage: every table has its own stage to store supporting files, accessible via the path `@%<name-of-table>`.
+- Named internal stage: these stages are like a user stage, but available to multiple users. They are accessed via the path `@<name-of-stage>`.
 
-An external on the other hand is... external to Snowflake. The files are not stored on Snowflake but somewhere else like AWS S3, Azure Blob Storage, etc.
-
-
+An external stage on the other hand is... external to Snowflake. The files are not stored in Snowflake but somewhere else like AWS S3 or Azure Blob Storage. You'd want to use an external stage when you already store files in external cloud storage. External stages are especially helpful when you want to load massive amounts of data, especially if you're already using S3 as a data lake. 
 
 --- 
+
+Not bad, buttercup. You made it through a few days of data engineering. Now that the data's available in Snowflake, those analysts can work their magic. 
+
+Data can be loaded into Snowflake in [multiple ways](https://docs.snowflake.com/en/user-guide/data-load-overview). We've just looked at one approach. In general though, getting data into Snowflake is a two-step process: stage and load. Remembering that can get you pretty far. 
 
 Do you need help getting your data into Snowflake? [Call me](https://kpdata.dev/). I'm ready to take the stage. 
 
