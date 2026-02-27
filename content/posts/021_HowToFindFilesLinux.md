@@ -1,18 +1,19 @@
 Title: How to Find Files from the Command Line
-Date: 2026-02-26
-Slug: how-to-find-files-linux
+Date: 2026-02-27
+Slug: how-to-find-files-from-the-command-line
 Tags: linux, command-line
-Summary: Boost productivity by finding files from the command line!
-Status: draft
+Summary: Boost productivity by finding files from the command line! You'll say goodbye to Finder and Windows Explorer. 
+Status: published
+MetaImage: /static/images/post021/FindFilesThumbnail.jpg
 
 
 Quick! You need more space on your laptop.
 
-Those precious cat videos are several GB. They keep you from installing the new sexy MacOS.
+Those precious cat videos are several GB. They keep you from installing the new sexy MacOS. 😢
 
 How do you find those bloated files to delete them?
 
-The command line is your super power.
+The command line is your super power. 💪
 
 Today, we'll look at the `find` command to... well... find files.
 
@@ -49,9 +50,9 @@ $ find . -name "some_file.txt"
 
 `find` will spit out the location of any matching files. Note how `find` searched the current directory and all nested directories recursively. The target file is in the nested folder `./super/secret/location/`.
 
-Sometimes, you know the file name but are not sure of capitalization. No problem. Use the `-iname` flag (instead of `-name`) to search by name without case sensitivity.
+Do you know the file name but are not sure of capitalization? No problem. Use the `-iname` flag (instead of `-name`) to search by name without case sensitivity.
 
-Other times, you kinda know the file name but not the full name. Then use metacharacters like `*` or `?` in the search pattern. Like many bash commands, `*` is a placeholder for any number of characters while `?` represents exactly one character.
+Perhaps you kinda know the file name but not the full name. Then use metacharacters like `*` or `?` in the search pattern. Like many bash commands, `*` is a placeholder for any number of characters while `?` represents exactly one character.
 
 To get all files with names containing "me_file" while ignoring capitalization, enter this:
 
@@ -62,7 +63,7 @@ $ find . -iname "*me_file*"
 ./super/SOME_FILE.txt
 ```
 
-And we get three matches! 
+And we get three matches! 😃
 
 ### By modified time
 
@@ -100,11 +101,15 @@ $ find . -size +30M
 ./Videos/fall_2025/PXL_20251012_124044856.TS.mp4
 ```
 
+There are those cat videos... 🐱
+
 ## Doing Stuff with Those Files
 
-Great! We can find files. But that's not interesting. Let's see what we can DO with the those files. `find` has an `-exec` action to run some command on each of the files it returns.
+Great! You can find files. But that's not interesting. Let's see what we can DO with those files. `find` has an `-exec` action to run some command for each file it returns.
 
-For example, now that we have a pile of large files, we may want to sort them by size. First we run the command `du` to get each file's size.
+For example, now that you have a pile of large files, you may want to sort them by size. 
+
+The first part of `find` is the same as before. At the end, you add `-exec` and the command to run for each file: `du -h {}`
 
 ```bash
 $ find . -size +30M -exec du -h {} \;
@@ -117,9 +122,11 @@ $ find . -size +30M -exec du -h {} \;
 207M    ./Videos/fall_2025/PXL_20251012_124044856.TS.mp4
 ```
 
-This command will get all files in the current folder that are over 30MB and run `du` on them. The `{}` is a placeholder. After `find` has a list of matching files, it will place each file's path in place of `{}` and then run the `du` command. Note we end the command with a semicolon. This indicates the command we're running for each found file is over. We need to escape the semicolon with a backslash (`\`) so the shell interprets the command termination properly. The output of `du` gives the file size and the path to the file.
+The `{}` is a placeholder. After `find` has a list of matching files, it replaces `{}` with each file's path and then runs the `du` command. 
 
-Next, we sort the results by piping the output to the `sort` command. The `-n` flag sorts numbers numerically instead of by strings. `-r` reverses the order so largest files are at the top.
+The command ends with a semicolon. This indicates the command we're running for each file is over. You need to escape the semicolon with a backslash (`\;`) so the shell interprets the command termination properly. The output of `du` gives the file size and the path to the file.
+
+With the file size now visible, you sort the results by piping the `du` output to the `sort` command. The `-n` flag sorts numbers numerically instead of by strings. `-r` reverses the order so the largest files are at the top.
 
 ```bash
 $ find . -size +30M -exec du -h {} \; | sort -nr
@@ -134,7 +141,7 @@ $ find . -size +30M -exec du -h {} \; | sort -nr
 
 Now we have a hit list of which files to delete first. 😎
 
-`find` with `-exec` can also be used to perform file deletion. But be careful! This command can remove more than you want. Run the `rm` command with the `-i` option to give confirmation each file should be deleted.
+`find` with `-exec` can also be used to perform file deletion. But be careful! 🚨 This command can remove more than you want. Run the `rm` command with the `-i` option to give confirmation each file should be deleted.
 
 ```bash
 $ find . -size +30m -exec rm -i {} \;
@@ -147,21 +154,21 @@ rm: remove regular file './videos/fall_2025/img_7013.mov'? y
 rm: remove regular file './videos/fall_2025/pxl_20251012_124044856.ts.mp4'? y
 ```
 
-And just like that, you've removed the largest files and freed up storage space! That's faster than clicking through the GUI to find and delete files, right?
+And just like that, you've removed the largest files and freed up storage space! That's faster than clicking through the GUI to find and delete files, right? 😏
 
 We've just scratched the surface of the `find` command. Check out the [man page](https://man7.org/linux/man-pages/man1/find.1.html) to see all the neat things you can do with it.
 
 ## FZF
 
-The `find` command is great. But my go-to tool for finding files by name is [FZF](https://github.com/junegunn/fzf). This nifty tool gives an interactive way to search any list using fuzzy matching. You simply type a few letters of the file you want, and `fzf` instantly gives results.
+The `find` command is great. But [FZF](https://github.com/junegunn/fzf) is my go-to tool for finding files by name. `fzf` gives an interactive way to search any list using fuzzy matching. You simply type a few letters of the file you want, and `fzf` instantly gives results.
 
 It goes like this. I enter the `fzf` command, and the terminal switches to the `fzf` interface, waiting for my search pattern. As I enter a few letters, the list reduces to files that match. 
 
 ![FZF flow](/static/images/post021/fzf_flow.png)
 
-Neat! But FZF can do so much more. Pass the `--preview` flag and you can see what's inside the file as you search. 
+Neat! But FZF can do so much more. Pass the `--preview` flag to see what's inside each file as you search. 
 
-Suppose you're in a Django project looking for `models.py` files. On the command line, you enter `fzf` with `--preview`; then enter a tool used to display file content. The example below uses the [bat](https://github.com/sharkdp/bat) util. The option `--color=always` applies syntax highlight to the file content. 
+Suppose you're in a Django project looking for `models.py` files. On the command line, you enter `fzf` with `--preview`; then enter a tool used to display file content. The example below uses the [bat](https://github.com/sharkdp/bat) util. The option `--color=always` applies syntax highlighting to the file content. 
 
 ```bash
 fzf --preview 'bat --color=always {}'
@@ -181,6 +188,6 @@ Think of `fzf` as a Lego block that you can combine with other Unix commands. It
 
 ---
 
-Hopefully you believe me now. You can use a GUI-based file explorer to find files. But command line tools like `find` and `fzf` make your search easier. `fzf` is fantastic for finding files by name. `find` shines when you need advanced search criteria and when you want to do something with the search results. 
+Hopefully you believe me now. 😅 You can use a GUI-based file explorer to find files. But command line tools like `find` and `fzf` make your search easier. `fzf` is fantastic for finding files by name. `find` shines when you need advanced search criteria or when you want to do something with the search results. 
 
 What other tools do you use to find files efficiently? Let me know! You don't need the `find` command to [find me](https://kpdata.dev/).
