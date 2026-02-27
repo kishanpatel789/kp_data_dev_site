@@ -7,7 +7,7 @@ Status: published
 MetaImage: /static/images/post020/LoadSnowflakeThumbnail.jpg
 
 
-Snowflake is makes it easy to play with your data. Once data is in the warehouse, you can perform all kinds of analysis.
+Snowflake makes it easy to play with your data. Once data is in the warehouse, you can perform all kinds of analysis.
 
 The tricky part is getting data INTO the warehouse.
 
