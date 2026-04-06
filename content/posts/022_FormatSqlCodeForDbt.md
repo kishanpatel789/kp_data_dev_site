@@ -1,0 +1,245 @@
+Title: Format SQL Code for dbt
+Date: 2026-04-08
+Slug: format-sql-code-for-dbt
+Tags: data-engineering, dbt
+Summary: Stop fighting over spaces and commas. Use sqlfmt to settle debates and move on to the real work.
+Status: draft
+
+Want to have a bad day?
+
+Read this SQL Snippet:
+
+```sql
+SeLeCt S.FIRST_NAME, s.last_name, s.year, h.house_NAME, COUNT(e.class_id) as class_Count, max(e.enrolled_at) AS LAST_ENROLLMENT_DATE FrOm student as S JoIn house as h ON S.house_id = h.id leFT join enrollment as e ON s.id=e.student_id where s.year > 4 and (h.house_NAME = 'Gryffindor' or h.house_NAME = 'Ravenclaw') and e.is_active = TRUE GROUP by s.name,h.house_name having count(e.class_id)>2;
+```
+
+Yay.
+
+What's this query even saying?
+
+You study the code to decipher the logic. Your eyes tear up under the strain.
+
+You start editing the code to be more readable... manually.
+
+"There's got to be a better way to do this," you groan.
+
+There is. Use `sqlfmt`.
+
+Throw this into the terminal...
+
+```bash
+sqlfmt terrible_query.sql
+```
+
+And the file is transformed:
+
+```sql
+-- terrible_query.sql
+select
+    s.first_name,
+    s.last_name,
+    s.year,
+    h.house_name,
+    count(e.class_id) as class_count,
+    max(e.enrolled_at) as last_enrollment_date
+from student as s
+join house as h on s.house_id = h.id
+left join enrollment as e on s.id = e.student_id
+where
+    s.year > 4
+    and (h.house_name = 'Gryffindor' or h.house_name = 'Ravenclaw')
+    and e.is_active = true
+group by s.name, h.house_name
+having count(e.class_id) > 2
+;
+```
+
+Ah... that's better. :)
+
+## What is it?
+
+`sqlfmt` is a developer tool to auto-format SQL code. It's specifically designed for dbt.
+
+`sqlfmt` aspires to end debates within developer teams. No more fighting over lower case vs uppercase, leading commas vs trailing commas. No more nit-picking about indentation. That's right, there is no custom configuration allowed. (Well, there is ONE thing you change: the line length. Default is 88 characters per line if you're curious.)
+
+It's like the `black` formatter for Python code. There's only one way to format the SQL.
+
+Auto-formatters handle the boring work of how your code is organized while you focus on the actual logic. :D
+
+## How Do I Get It?
+
+Use your favorite Python package manager to install `sqlfmt`. The easiest way is to use `uv` tools.
+
+```bash
+uv tool install "shandy-sqlfmt[jinjafmt]"
+```
+
+If all goes well, the `sqlfmt` command should be available from the command line:
+
+```bash
+$ sqlfmt --version
+sqlfmt, version 0.29.0
+```
+
+## How Do I Use It?
+
+The simplest way is to run `sqlfmt` from the command line. Without any arguments, it will format any SQL file it recursively finds in the current folder. Or you can pass a specific files to format.
+
+But be warned! Running `sqlfmt` without any flags will change and save your files. It's best to use git to version control the files before using `sqlfmt` for the first time.
+ 
+Let's see what else `sqlfmt` can do with this sample SQL file:
+
+```sql
+-- busy_student_query.sql
+with busy_students as(select s.id,s.name,count(e.class_id) as class_count from students s join enrollments e on s.id=e.student_id group by s.id,s.name having count(e.class_id)>3)select * from busy_students where name like '%Granger%';
+```
+
+First, check if the query complies with `sqlfmt` standards using the `--check` flag. (Obviously it does not).
+
+```bash
+$ sqlfmt --check busy_student_query.sql
+1 file failed formatting check.
+0 files passed formatting check.
+busy_student_query.sql failed formatting check.
+```
+
+Here we can see the file failed the formatting check.
+
+Next, see what changes `sqlfmt` would make if it auto-formatted the file with the `--diff` flag.
+
+
+![sqlfmt with --diff flag](/static/images/post022/sqlfmt_diff.png)
+
+```bash
+$ sqlfmt --diff busy_student_query.sql
+1 file failed formatting check.
+0 files passed formatting check.
+busy_student_query.sql failed formatting check.
+--- source_query
++++ formatted_query
+@@ -1 +1,12 @@
+-with busy_students as(select s.id,s.name,count(e.class_id) as class_count from students s join enrollments e on s.id=e.student_id group by s.id,s.name having count(e.class_id)>3)select * from busy_students where name like '%Granger%';
++with
++    busy_students as (
++        select s.id, s.name, count(e.class_id) as class_count
++        from students s
++        join enrollments e on s.id = e.student_id
++        group by s.id, s.name
++        having count(e.class_id) > 3
++    )
++select *
++from busy_students
++where name like '%Granger%'
++;
+```
+
+[ FIGURE OUT HOW TO ADD COLOR TO CODE SNIPPET ]
+
+The output shows a git-like difference between the current lines (prefixed with "-") and the potential cleansed lines (prefixed with "+"). Again, run `sqlfmt busy_student_query.sql` with out the `--diff` flag to actually apply the formatting change.
+
+Remember sqlfmt is designed for dbt, so it handles Jinja tags incredibly well. Here's a query using Jinja to handle `config`, `ref`, and `source` tags:
+
+```jinja
+{{config(materialized='table',tags=['hogwarts','students'],schema='analytics')}}with student_base as(select id,first_name,last_name,house_id,year,gpa from {{ref('student')}}),house_lookup as(select id,house_name,founder_name from {{source('core','house')}}),enrollments as(select student_id,class_id,is_active,enrolled_at from {{ref('enrollment')}}),aggregated as(select s.id,s.first_name,s.last_name,h.house_name,count(e.class_id) as class_count,max(e.enrolled_at) as last_enrolled_at from student_base s left join enrollments e on s.id=e.student_id join house_lookup h on s.house_id=h.id group by s.id,s.first_name,s.last_name,h.house_name)select id,first_name,last_name,house_name,class_count,last_enrolled_at from aggregated order by class_count desc;
+```
+
+```bash
+sqlfmt dbt_query.sql
+```
+
+```jinja
+-- dbt_query.sql after formatting
+{{ config(materialized="table", tags=["hogwarts", "students"], schema="analytics") }}
+with
+    student_base as (select id, first_name, last_name from {{ ref("student") }}),
+    house_lookup as (select id, house_name from {{ source("core", "house") }}),
+    enrollments as (
+        select student_id, class_id, enrolled_at from {{ ref("enrollment") }}
+    ),
+    aggregated as (
+        select
+            s.id,
+            s.first_name,
+            s.last_name,
+            h.house_name,
+            count(e.class_id) as class_count,
+            max(e.enrolled_at) as last_enrolled_at
+        from student_base s
+        left join enrollments e on s.id = e.student_id
+        join house_lookup h on s.house_id = h.id
+        group by s.id, s.first_name, s.last_name, h.house_name
+    )
+select id, first_name, last_name, house_name, class_count, last_enrolled_at
+from aggregated
+order by class_count desc
+```
+
+Delicious! 
+
+There is a caveat. As sqlfmt is designed primarily for dbt workflows, it cannot format all kinds of SQL commands. It's designed to format `select` statements that are prevalent in dbt projects. It's not as effective on DDL statements like `create table` or other DML statements like `insert`. `sqlfmt` will try its best to format these other SQL statements but makes no guarantees.
+
+## How Do I Automate It?
+
+A tool is only useful if it's used. When developing, it's easy to forget to format the code before pushing commits. That's where a second tool comes in handy: `pre-commit`.
+
+`pre-commit` runs every time you attempt to make a git commit. It runs tools that check the quality of your code, including things like syntax, format, and styling. Here's how to add `sqlfmt` as a pre-commit hook:
+
+First install `pre-commit`:
+
+```bash
+uv tool install pre-commit
+```
+
+Then create a `pre-commit-config.yaml` file in the root of your git repo. List any packages you want to run as a git pre-commit hook. Here we list `sqlfmt` tool by identifying its repo on Github:
+
+```yaml
+repos:
+  - repo: https://github.com/tconbeer/sqlfmt
+    rev: v0.29.0
+    hooks:
+      - id: sqlfmt
+        language_version: python
+        additional_dependencies: ['.[jinjafmt]']
+```
+
+Back on the command line, install the declared packages:
+
+```bash
+$ pre-commit install
+pre-commit installed at .git/hooks/pre-commit
+```
+
+It's helpful to run pre-commit on all files that already exist and are committed: 
+
+```bash
+$ pre-commit run --all-files
+sqlfmt...................................................................Failed
+- hook id: sqlfmt
+- files were modified by this hook
+
+3 files formatted.
+0 files left unchanged.
+busy_student_query.sql formatted.
+dbt_query.sql formatted.
+terrible_query.sql formatted.
+```
+
+This `run --all-file` command is a one-time request to apply `sqlfmt` to existing files. From now on, pre-commit will apply sqlfmt to any changed files when you make future commits. 
+
+```bash
+$ git commit -m "Test commit"
+sqlfmt...................................................................Failed
+- hook id: sqlfmt
+- files were modified by this hook
+
+1 file formatted.
+0 files left unchanged.
+dbt_query.sql formatted.
+```
+
+
+---
+
+Life's to short to nit-pick over spacing and capitalization. Let `sqlfmt` handle the grunt work for you while you focus on the actual logic. 
+
+Need help cleaning up your dbt project? You know where to [find me]().
