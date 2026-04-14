@@ -1189,6 +1189,10 @@ article .highlight-cell {
     max-width: 28rem;
   }
 
+  .sm\:max-w-xl {
+    max-width: 36rem;
+  }
+
   .sm\:space-x-4 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
     margin-right: calc(1rem * var(--tw-space-x-reverse));
@@ -1217,16 +1221,16 @@ article .highlight-cell {
     max-width: 42rem;
   }
 
+  .md\:max-w-3xl {
+    max-width: 48rem;
+  }
+
   .md\:max-w-sm {
     max-width: 24rem;
   }
 
   .md\:max-w-xl {
     max-width: 36rem;
-  }
-
-  .md\:max-w-3xl {
-    max-width: 48rem;
   }
 
   .md\:flex-1 {
