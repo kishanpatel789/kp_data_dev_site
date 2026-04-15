@@ -7,7 +7,7 @@ Status: draft
 
 Want to have a bad day?
 
-Read this SQL Snippet:
+Read this SQL snippet:
 
 ```sql
 SeLeCt S.FIRST_NAME, s.last_name, s.year, h.house_NAME, COUNT(e.class_id) as class_Count, max(e.enrolled_at) 
@@ -83,7 +83,7 @@ If all goes well, the `sqlfmt` command should be available from the command line
 
 ## How Do I Use It?
 
-The simplest way is to run `sqlfmt` from the command line. Without any arguments, it will format any SQL file it finds in the current folder recursively. Or you can pass specific files to format.
+The simplest way is to run `sqlfmt` from the command line. Without any arguments, it will format all SQL files in the current folder recursively. Or you can pass specific files to format.
 
 But be warned! Running `sqlfmt` without any flags will change and save your files. It's best to use git to version control the files before using `sqlfmt` for the first time.
  
@@ -107,7 +107,7 @@ Next, see what changes `sqlfmt` would make if it auto-formatted the file with th
 
 <img alt="sqlfmt --diff" src="/static/images/post022/sqlfmt_diff.png" class="w-full md:w-auto md:max-w-3xl mx-auto rounded-lg">
 
-The output shows a git-like difference between the current lines (prefixed with "-") and the potential cleansed lines (prefixed with "+"). Again, run `sqlfmt busy_student_query.sql` with out the `--diff` flag to actually apply the formatting change.
+The output shows a git-like difference between the current lines (prefixed with "-") and the potential cleansed lines (prefixed with "+"). Again, run `sqlfmt busy_student_query.sql` without the `--diff` flag to actually apply the change.
 
 Remember sqlfmt is designed for dbt, so it handles Jinja tags incredibly well. Here's a query using Jinja to handle `config`, `ref`, and `source` tags:
 
@@ -221,4 +221,6 @@ dbt_query.sql formatted.
 
 Life's to short to nit-pick over spacing and capitalization. Let `sqlfmt` handle the grunt work for you while you focus on the actual logic. 
 
-Need help cleaning up your dbt project? You know where to [find me]().
+Check out the [sqlfmt docs](https://sqlfmt.com/docs/intro) and [precommit docs](https://pre-commit.com/#intro) for more info. 
+
+Need help cleaning up your dbt project? You know where to [find me](https://kpdata.dev/).
