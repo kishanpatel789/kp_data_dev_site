@@ -1,9 +1,11 @@
 Title: Format SQL Code for dbt
-Date: 2026-04-08
+Date: 2026-04-16
 Slug: format-sql-code-for-dbt
 Tags: data-engineering, dbt
-Summary: Stop fighting over spaces and commas. Use sqlfmt to settle debates and move on to the real work.
-Status: draft
+Summary: Stop fighting over spaces and commas in SQL. Use sqlfmt to settle debates and move on to the real work.
+Status: published
+MetaImage: /static/images/post022/sqlfmt_thumbnail.jpg
+
 
 Want to have a bad day?
 
@@ -65,13 +67,13 @@ Ah... that's better. ☺️
 
 `sqlfmt` aspires to end debates within developer teams. No more fighting over "lower case versus uppercase" or "leading commas versus trailing commas." No more nit-picking about indentation.
 
-It's like the `black` formatter for Python. There's only ONE way to format the SQL. That's right, there is no custom configuration allowed. (Well, there is one thing you can change: the line length. Default is 88 characters per line if you're curious.)
+It's like the `black` formatter for Python. There's only ONE way to format the SQL. That's right, there is no custom configuration allowed. (Well, there is one thing you can change: the line length. The default is 88 characters per line if you're curious.)
 
 Auto-formatters handle the boring work of how your code is organized while you focus on the actual logic. 😁
 
 ## How Do I Get It?
 
-Use your favorite Python package manager to install `sqlfmt`. The easiest way is to use `uv` tools.
+Use your favorite Python package manager to install `sqlfmt`. Here's the installation command with `uv` tools.
 
 ```bash
 uv tool install "shandy-sqlfmt[jinjafmt]"
@@ -83,7 +85,7 @@ If all goes well, the `sqlfmt` command should be available from the command line
 
 ## How Do I Use It?
 
-The simplest way is to run `sqlfmt` from the command line. Without any arguments, it will format all SQL files in the current folder recursively. Or you can pass specific files to format.
+The simplest way is to run `sqlfmt` from the command line. Without any arguments, it will format all SQL files in the current folder recursively. 
 
 But be warned! Running `sqlfmt` without any flags will change and save your files. It's best to use git to version control the files before using `sqlfmt` for the first time.
  
@@ -96,8 +98,7 @@ s join enrollments e on s.id=e.student_id group by s.id,s.name HAVING count(e.cl
 fRom busy_students where name like '%Granger%';
 ```
 
-First, check if the query complies with `sqlfmt` standards using the `--check` flag. (Obviously it does not).
-
+First, check if the query complies with `sqlfmt` standards using the `--check` flag. (Obviously it does not). We pass the name of the file to the command to avoid checking all files in the folder:
 
 <img alt="sqlfmt --check" src="/static/images/post022/sqlfmt_check.png" class="w-full sm:w-auto sm:max-w-xl mx-auto rounded-lg">
 
@@ -109,7 +110,7 @@ Next, see what changes `sqlfmt` would make if it auto-formatted the file with th
 
 The output shows a git-like difference between the current lines (prefixed with "-") and the potential cleansed lines (prefixed with "+"). Again, run `sqlfmt busy_student_query.sql` without the `--diff` flag to actually apply the change.
 
-Remember sqlfmt is designed for dbt, so it handles Jinja tags incredibly well. Here's a query using Jinja to handle `config`, `ref`, and `source` tags:
+Remember `sqlfmt` is designed for dbt, so it handles Jinja tags incredibly well. Here's a query using the Jinja tags `config`, `ref`, and `source`:
 
 ```jinja
 -- dbt_query.sql before formatting
@@ -155,23 +156,26 @@ order by class_count desc
 
 Delicious! 
 
-There is a caveat. As `sqlfmt` is designed primarily for dbt workflows, it cannot format all kinds of SQL commands. It's designed to format `select` statements that are prevalent in dbt projects. It's not as effective on DDL statements like `create table` or other DML statements like `insert`. `sqlfmt` will try its best to format these other SQL statements but makes no guarantees.
+There is a caveat. As `sqlfmt` is designed primarily for dbt workflows, it cannot format all kinds of SQL commands. It's great at formatting `select` statements that are prevalent in dbt projects. It's not as effective on DDL statements like `create table` or other DML statements like `insert`. `sqlfmt` will try its best to format these other SQL statements but makes no guarantees.
 
 ## How Do I Automate It?
 
 A tool is only useful if it's used. When developing, it's easy to forget to format the code before pushing commits. That's where a second tool comes in handy: `pre-commit`.
 
-`pre-commit` runs every time you attempt to make a git commit. It runs tools that check the quality of your code, including things like syntax, format, and styling. Here's how to add `sqlfmt` as a pre-commit hook:
+`pre-commit` executes every time you make a git commit. It runs tools that check the quality of your code, including things like syntax, format, and styling. Here's how to add `sqlfmt` as a pre-commit hook:
 
 First install `pre-commit`:
+
+
 
 ```bash
 uv tool install pre-commit
 ```
 
-Then create a `pre-commit-config.yaml` file in the root of your git repo. List any packages you want to run as a git pre-commit hook. Here we list `sqlfmt` tool by identifying its repo on Github:
+Then create a `.pre-commit-config.yaml` file in the root of your git repo. This file lists any packages you want to run as git pre-commit hooks. Here we list `sqlfmt` by identifying its repo on Github:
 
 ```yaml
+# .pre-commit-config.yaml
 repos:
   - repo: https://github.com/tconbeer/sqlfmt
     rev: v0.29.0
@@ -181,46 +185,34 @@ repos:
         additional_dependencies: ['.[jinjafmt]']
 ```
 
-Back on the command line, install the declared packages:
+Back on the command line, install `pre-commit` into the "git hooks" folder of your repo:
 
-```bash
-$ pre-commit install
-pre-commit installed at .git/hooks/pre-commit
-```
 
-It's helpful to run pre-commit on all files that already exist and are committed: 
+<img alt="pre-commit install" src="/static/images/post022/precommit_install.png" class="w-full md:w-auto md:max-w-xl mx-auto rounded-lg">
 
-```bash
-$ pre-commit run --all-files
-sqlfmt...................................................................Failed
-- hook id: sqlfmt
-- files were modified by this hook
+Now `pre-commit` will run every time you execute `git commit`. It's helpful to run `pre-commit` on all files that already exist and are committed: 
 
-3 files formatted.
-0 files left unchanged.
-busy_student_query.sql formatted.
-dbt_query.sql formatted.
-terrible_query.sql formatted.
-```
 
-This `run --all-file` command is a one-time request to apply `sqlfmt` to existing files. From now on, pre-commit will apply sqlfmt to any changed files when you make future commits. 
+<img alt="pre-commit run --allfiles" src="/static/images/post022/precommit_allfiles.png" class="w-full md:w-auto md:max-w-3xl mx-auto rounded-lg">
 
-```bash
-$ git commit -m "Test commit"
-sqlfmt...................................................................Failed
-- hook id: sqlfmt
-- files were modified by this hook
+This manual `pre-commit` command is a one-time call to run `sqlfmt` on existing files. From now on, `pre-commit` will apply `sqlfmt` to any changed files when you make future commits.
 
-1 file formatted.
-0 files left unchanged.
-dbt_query.sql formatted.
-```
+For example, suppose you make edits to `dbt_query.sql` and then stage the changes. When running `git commit`, the `sqlfmt` hook will run. 
 
+- If the file is formatted to `sqlfmt` standards, the commit will continue. 
+- If not, the commit will stop, and `sqlfmt` will auto-format on your behalf: 
+
+
+<img alt="git commit test" src="/static/images/post022/precommit_testcommit.png" class="w-full md:w-auto md:max-w-3xl mx-auto rounded-lg">
+
+Here the pre-commit hook stopped the commit because the code fails `sqlfmt`'s formatting check. You can review the auto-formatted code, and then re-stage the file before committing again.
+
+That's it! Think of the pre-commit hook as a gatekeeper that makes sure your code is clean for you.
 
 ---
 
-Life's to short to nit-pick over spacing and capitalization. Let `sqlfmt` handle the grunt work for you while you focus on the actual logic. 
+Life's too short to nit-pick over spacing and capitalization. Let `sqlfmt` handle the grunt work for you while you focus on the actual logic. 
 
-Check out the [sqlfmt docs](https://sqlfmt.com/docs/intro) and [precommit docs](https://pre-commit.com/#intro) for more info. 
+Check out the [sqlfmt docs](https://sqlfmt.com/docs/intro) and [pre-commit docs](https://pre-commit.com/#intro) for more info. 
 
-Need help cleaning up your dbt project? You know where to [find me](https://kpdata.dev/).
+Need help cleaning up your dbt project? I'm ready with my [mop and bucket](https://kpdata.dev/).
