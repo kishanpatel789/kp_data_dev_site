@@ -1,17 +1,19 @@
 Title: Git Stash
-Date: 2026-04-16
+Date: 2026-05-20
 Slug: git-stash
 Tags: git, command-line
-Summary: What's that git stash? 
+Summary: It's the git command you've avoid: git stash. Let's see how embracing the stash can improve your workflow.
 Status: draft
 
 You know how to `git push` and `git pull`.
 
-You've worked with `git merge`. When you're feeling spunky, you may even `git rebase`. 🤓
+You've worked with `git merge`. 
+
+When you're feeling spunky, you may even `git rebase`. 🤓
 
 But there's one git command you've avoided: `git stash`. This esoteric command has eluded you. But no longer.
 
-Let's see how `git stash` can make your workflow as smooth as my newborn's bottom.
+Let's see how `git stash` can make your workflow as smooth as my baby's bottom.
 
 ## When would I use this?
 
@@ -19,7 +21,7 @@ Let's see how `git stash` can make your workflow as smooth as my newborn's botto
 
 **Scenario 1**: You're in deep work, cranking out some code for a new feature.
 
-*Ping*. The boss says there's a bug in the `main` branch you need to look at. But you're not in a good spot to save (i.e. commit) your work. 🙁
+*Ping*. The boss says there's a bug in the `main` branch you need to look at. But you're not in a good spot to save your work. 🙁
 
 ```text
 > git status
@@ -42,7 +44,7 @@ On branch new-feature
 nothing to commit, working tree clean
 ```
 
-You use `git stash` to save your work and reset the working directory. (We'll talk about the `-u` and `-m` flags later.)
+`git stash` saves your work and resets the working directory. (We'll talk about the `-u` and `-m` flags later.)
 
 Then you jump over to the `main` branch to fix the bug. When you're done with battle, you return to your work:
 
@@ -74,6 +76,10 @@ nothing added to commit but untracked files present (use "git add" to track)
 Dropped refs/stash@{0} (d32db6e265fd2c68d0291dfc222441a151eff6c2)
 ```
 
+Without `git stash`, you'd make a temporary commit on the `new-feature` branch, fix the bug on `main`, return to `new-feature`, and perform git gymnastics with something like `git reset --soft HEAD^` to undo the temporary commit. 🤢
+
+So just use `git stash`.
+
 **Scenario 2**: Oops, I'm working on `main`
 
 You start the day eager to start work. You make changes and are about to commit... only to realize you're still on the `main` branch. 😱
@@ -89,9 +95,11 @@ Changes not staged for commit:
 no changes added to commit (use "git add" and/or "git commit -a")
 ```
 
-Unfortunately, your team policy prohibits direct commits to `main`. These changes to `file.txt` should have been made in a dev branch.
+Unfortunately, your team prohibits direct commits to `main`. These changes to `file.txt` should have been made in a dev branch.
 
-No matter. You stash the work you have, open a dev branch, and apply the stash there.
+You could undo your work and manually reapply the changes in a dev branch. 
+
+Or... You stash the work you have, open a dev branch, and apply the stash there:
 
 ```text
 > git stash -m "My exciting work"
@@ -115,33 +123,79 @@ no changes added to commit (use "git add" and/or "git commit -a")
 Dropped refs/stash@{0} (c39ef47fb2a7bcd21a316e0c604ced62b92d491d)
 ```
 
-Now the changes to `file.txt` are on the branch `dev-branch`. You commit the changes in this branch and push the dev branch to remote. 
+Now the changes to `file.txt` are on the branch `dev-branch`. Commit the changes in this branch, and push the dev branch to remote. 
 
 Then open a pull request for your team to see your sensational code!
 
 **Scenario 3**: Pulling into a stale branch
 
-TODO: flesh this scenario out
-
-You've been working on a dev branch with your teammate. The branch is tracked to follow a remote branch. You make changes to the dev branch... only to realize you haven't gotten your teammate's latest changes. You run `git pull` only to get this message:
-
-[ INSERT uncommit warning? ]
-
-That's okay. You stash your changes, run git pull to get the latest version of the branch. Then you pop the stash to make your own commit.
+You've been working on a `dev` branch with your teammate. The branch is tracked to follow a remote branch. You make changes to the dev branch on your computer... but then realize you don't have your teammate's latest changes. You run `git pull` to get his updates and get this scary message:
 
 ```text
-git stash -m "Wait for me"
-git pull
-git stash pop
-git add .
-git commit -m "Here's my change, Tommy"
-git push
+> git pull
+Updating 9601e5e..bbe0ee6
+error: Your local changes to the following files would be overwritten by merge:
+        file.txt
+Please commit your changes or stash them before you merge.
+Aborting
 ```
 
+Git's complaining that you made changes to `file.txt`, and an attempt to pull changes from remote would overwrite your change.
 
-## How does it work?
+That's okay. You stash your changes as the error message recommends. Then run `git pull` to get the latest version of the branch. 
 
-To create a stash, run `git stash`. Git will take any changes you've made to tracked files and move them to the stash list. It will also revert the working directory to the last commit. Include untracked files by running `git stash -u` (u for untracked). Include a message with the `-m` flag.
+
+```text
+> git stash -m "Wait for me"
+Saved working directory and index state On dev: Wait for me
+
+> git pull
+Updating 9601e5e..bbe0ee6
+Fast-forward
+ file.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+```
+
+Now that your local branch is in sync with the remote branch, you pop the stash.
+
+```text
+> git stash pop
+Auto-merging file.txt
+On branch dev
+Your branch is up to date with 'origin/dev'.
+
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+        modified:   file.txt
+
+no changes added to commit (use "git add" and/or "git commit -a")
+Dropped refs/stash@{0} (0bed94bacac95e7d33f43642d7e9c2c102a376cd)
+
+```
+
+Git applies the stash state to the branch's working directory. Then you re-stage the updated file and push your own commit to remote.
+
+```text
+> git commit -a -m "Here's my change, Tommy"
+[dev a512cb1] Here's my change, Tommy
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+> git push
+...
+```
+
+That's how you work with colleagues! Don't forget to tell Tommy to pull your changes.
+
+
+## What are all these "git stash" commands doing?
+
+### Create a Stash
+As you've seen, creating a stash is a simple as running `git stash`. Git will take any changes you've made to tracked files and move them to the stash list. It will also revert the working directory to the last commit. 
+
+Include *untracked* files by running `git stash -u` (u for untracked). Include a message with the `-m` flag.
+
+### View Stashes
 
 Run `git stash list` to see the stash objects:
 
