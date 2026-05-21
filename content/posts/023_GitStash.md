@@ -1,9 +1,11 @@
 Title: Git Stash
-Date: 2026-05-20
+Date: 2026-05-21
 Slug: git-stash
 Tags: git, command-line
-Summary: It's the git command you've avoid: git stash. Let's see how embracing the stash can improve your workflow.
-Status: draft
+Summary: It's the git command you've avoided: git stash. Embrace the stash and improve your coding workflow!
+Status: published
+MetaImage: /static/images/post023/git_stash_thumbnail.jpg
+
 
 You know how to `git push` and `git pull`.
 
@@ -11,17 +13,19 @@ You've worked with `git merge`.
 
 When you're feeling spunky, you may even `git rebase`. 🤓
 
-But there's one git command you've avoided: `git stash`. This esoteric command has eluded you. But no longer.
+But there's one git command you've avoided: `git stash`. This exotic tool has baffled you. But no longer.
 
 Let's see how `git stash` can make your workflow as smooth as my baby's bottom.
 
 ## When would I use this?
 
-`git stash` saves your local changes changes and reverts the working directory to the last commit (i.e. `HEAD`). That's useful when you're not quite ready to make a record in the commit history. And that might happen in a few scenarios.
+`git stash` saves your local changes changes and reverts the working directory to the last commit (i.e. `HEAD`). That's useful when you're not ready to make a record in the commit history. And that might happen in a few scenarios.
 
-**Scenario 1**: You're in deep work, cranking out some code for a new feature.
+**Scenario 1**: The Interruption
 
-*Ping*. The boss says there's a bug in the `main` branch you need to look at. But you're not in a good spot to save your work. 🙁
+You're in deep work, cranking out some code for a new feature.
+
+*Ping*. The boss demands you fix a bug in the `main` branch ASAP. But you're not in a good spot to save your work. 🙁
 
 ```text
 > git status
@@ -62,7 +66,7 @@ On branch new-feature
 nothing to commit, working tree clean
 ```
 
-Once back on the `new-feature` branch, you use `git pop` to reapply the changes saved in the stash. This restores your working state before your boss called you. Now you can continue working on `awesome_code_here.txt`.
+Once back on the `new-feature` branch, you use `git pop` to reapply the changes saved in the stash. This restores your working state before your boss summoned you. Now you continue working on `awesome_code_here.txt`.
 
 ```text
 > git stash pop
@@ -82,7 +86,7 @@ So just use `git stash`.
 
 **Scenario 2**: Oops, I'm working on `main`
 
-You start the day eager to start work. You make changes and are about to commit... only to realize you're still on the `main` branch. 😱
+You start the day eager to work. You make changes and are about to commit... only to realize you're still on the `main` branch. 😱
 
 ```text
 > git status
@@ -97,9 +101,9 @@ no changes added to commit (use "git add" and/or "git commit -a")
 
 Unfortunately, your team prohibits direct commits to `main`. These changes to `file.txt` should have been made in a dev branch.
 
-You could undo your work and manually reapply the changes in a dev branch. 
+You could undo your work and manually reapply the changes in a dev branch...
 
-Or... You stash the work you have, open a dev branch, and apply the stash there:
+Or you stash the work you have, open a dev branch, and apply the stash there:
 
 ```text
 > git stash -m "My exciting work"
@@ -188,12 +192,12 @@ Git applies the stash state to the branch's working directory. Then you re-stage
 That's how you work with colleagues! Don't forget to tell Tommy to pull your changes.
 
 
-## What are all these "git stash" commands doing?
+## The "git stash" Cheatsheet 
 
 ### Create a Stash
-As you've seen, creating a stash is a simple as running `git stash`. Git will take any changes you've made to tracked files and move them to the stash list. It will also revert the working directory to the last commit. 
+As you've seen, creating a stash is a simple as running `git stash`. Git will take any changes you've made to tracked files and move them to the stash list. It will also revert the working directory to the last commit.
 
-Include *untracked* files by running `git stash -u` (u for untracked). Include a message with the `-m` flag.
+Include *untracked* files by running `git stash -u` (u for untracked). Or write a helpful message with the `-m` flag.
 
 ### View Stashes
 
@@ -206,13 +210,19 @@ stash@{1}: On main: Oops, worked on main
 stash@{2}: WIP on new-feature: a45c0a7 Initial commit
 ```
 
-Here, you have 3 stashes. The newest stash has an index of 0 and is identified as `stash@{0}`. The next most recent stash has an index of 1, and so on. When a new stash is created, all existing stashes move down the list, and the new stash takes the place of `stash@{0}`.
+Here, you have 3 stashes. The newest stash has an index of 0 and is identified as `stash@{0}`. The next most recent stash is `stash@{1}`, and so on. When a new stash is created, all existing stashes move down the list, and the new stash takes the place of `stash@{0}`.
 
-You have a few ways to manage your stashes. To re-apply the changes from a stash, hit `git stash pop`. That will apply the latest stash to the working directory AND remove the stash from the list.
+The output of `git stash list` also gives the branch that was current when the stash was made along with the stash message.
 
-Or you can hit `git stash apply`. That will apply the latest stash like `git stash pop` but still keep the change in the stash list.
+### Apply a Stash
+
+You have a few ways to manage stashes. To re-apply the changes from a stash, run `git stash pop`. That will apply the latest stash to the working directory AND remove the stash from the list.
+
+Or hit `git stash apply`. That will apply the latest stash like `git stash pop` but still keep the change in the stash list.
 
 Without any arguments, `git stash pop` and `git stash apply` will apply the 0th stash. To target another stash, pass the stash index to the command. For example, `git stash apply stash@{2}` applies the stash at index 2.
+
+### View Stash Content
 
 Not sure what a stash contains? Check it out with `git stash show`:
 
@@ -236,6 +246,8 @@ index ce01362..bc47e45 100644
 +making a change here
 ```
 
+### Remove Stashes
+
 Ready to clean up your stash list? Run `git stash drop stash@{2}` to remove the stash in the 2nd index position from the list.
 
 ```text
@@ -243,15 +255,14 @@ Ready to clean up your stash list? Run `git stash drop stash@{2}` to remove the 
 Dropped stash@{2} (74994016db843c9f3ff2b7c8d355afe084db1ec2)
 ```
 
-Or run `git stash clear` to remove all stashes. Obviously, be careful with this command. You don't want to delete stashes too quickly.
-
-
+Or run `git stash clear` to remove all stashes. Be careful with this command! You don't want to delete stashes too quickly.
 
 ---
 
-That's all you need to know about `git stash` for day-to-day work. `git stash` makes it easy to save your current unfinished work without mucking up the commit history. Without stashes, you'd have to make temporary commits, switch branches, and then run git gymnastics with `git reset` to clean up the commit history. 😬
+That's all you need to know about `git stash` for day-to-day work. `git stash` makes it easy to save your current unfinished work without mucking up the commit history. This frees you to work on something else and then come back to the stash content.
 
-[ add better closer]
+Without stashes, you'd have to make temporary commits, switch branches, and then run git gymnastics with `git reset` to clean up the commit history. 😬 Life's too short to mess with that.
 
+Want more tips to improve the coding experience? Let me know; my [stash is ready](https://kpdata.dev/).
 
 
