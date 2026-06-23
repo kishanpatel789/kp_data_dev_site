@@ -18,36 +18,32 @@ We're checking out the `jq` command line tool!
 By the end, you'll be wrangling JSON data with your `jq` lasso. Giddy up, cowboy. 🤠
 
 ## The Basics
-First up, think of `jq` as a filter on a stream of JSON data. It receives some input and returns some output.
+Tink of `jq` as a filter on a stream of JSON data. It receives some input and returns some output.
 
 Filters either extract something from the JSON content or manipulate something within the content. 
 
-Let's look at example filters with a toy JSON object:
+Let's look at filters with some example JSON in the `hogwarts.json` file:
 
 ```json
 {"school":"Hogwarts","headmaster":"Albus Dumbledore","students":[{"name":"Harry Potter","house":"Gryffindor","year":5,"owl_count":7},{"name":"Hermione Granger","house":"Gryffindor","year":5,"owl_count":10},{"name":"Draco Malfoy","house":"Slytherin","year":5,"owl_count":6}],"subjects":["Potions","Defense Against the Dark Arts","Transfiguration"]}
 ```
 
-Yes, it's not fun to scroll. Don't worry; `jq` will help us view the JSON.
+Yes, it's not fun to scroll. Don't worry; `jq` will make it easier to view the file.
 
-`jq` will either read a stream of JSON objects from `stdin`. Or if given a file path, `jq` will read JSON objects from the file.
+But first, how exactly do you pass data to the tool? `jq` reads a stream of JSON objects from `stdin`. Or if given a file path, `jq` reads JSON objects from the file.
 
 Here's one way to apply a filter to a file: `jq '<filter>' <file>`
 
-The simplest filter is `.`, or the "identity filter." This returns the data as it is:
+The simplest filter is `.`, or the "identity filter." This returns the data as it is... but with indentation and syntax highlighting 😍:
 
-<img alt="sqlfmt version test" src="/static/images/post024/identity_filter.png" class="w-full md:w-auto md:max-w-xl mx-auto rounded-lg">
+<img alt="Identity filter" src="/static/images/post024/identity_filter.png" class="w-full md:w-auto md:max-w-lg mx-auto rounded-lg">
 
-The `.` filter is not super exciting, but at the very least, it pretty-prints the JSON.
-
-When you see the `.`, think if it as "this object."
+When you see the `.`, think of it as "this object."
 
 To make the file size smaller, the JSON can be minified using the compact flag `-c`.
 
-```bash
-> jq -c '.' hogwarts.json
-{"school":"Hogwarts","headmaster":"Albus Dumbledore","students":[{"name":"Harry Potter","house":"Gryffindor","year":5,"owl_count":7},{"name":"Hermione Granger","house":"Gryffindor","year":5,"owl_count":10},{"name":"Draco Malfoy","house":"Slytherin","year":5,"owl_count":6}],"subjects":["Potions","Defense Against the Dark Arts","Transfiguration"]}
-```
+
+<img alt="Identity filter with compact flag" src="/static/images/post024/identity_filter_compact.png" class="w-full md:w-auto md:max-w-3xl mx-auto rounded-lg">
 
 Nice! Let's dig into this JSON object.
 
@@ -60,7 +56,7 @@ To get the value of a certain key, use the `.<key-name>` filter:
 
 This returns the value `"Hogwarts"` for the key `"school"`.
 
-Want to extract an array? No problem:
+Want to extract those students? No problem:
 
 ```bash
 > jq '.students' hogwarts.json
@@ -86,7 +82,9 @@ Want to extract an array? No problem:
 ]
 ```
 
-The `.students` filter returns the array associated with the `"students"` key. To return each element of the array as a separate JSON object, use the array iterator `.[]`. For example, the snippet below uses the `.students[]` filter. Note how the output is no longer an array; it's 3 separate JSON objects. (There's no enclosing brackets `[]` or commas between the objects.)
+The `.students` filter returns the array associated with the `"students"` key. 
+
+To return each element of the array as a separate JSON object, use the array iterator `.[]`. For example, the snippet below uses the `.students[]` filter. Note how the output is no longer an array; it's 3 separate JSON objects. (There's no enclosing brackets `[]` or commas between the objects.)
 
 ```bash
 > jq '.students[]' hogwarts.json
@@ -110,7 +108,7 @@ The `.students` filter returns the array associated with the `"students"` key. T
 }
 ```
 
-That same `.[]` notation is used for indexing and slicing. What if we wanted the name of the 2nd student the students array?
+That same `.[]` notation is used for indexing and slicing. What if you want the name of the 2nd student the `"students"` array?
 
 
 ```bash
