@@ -1,15 +1,16 @@
 Title: Process JSON with jq
-Date: 2026-06-22
+Date: 2026-06-24
 Slug: process-json-with-jq
 Tags: command-line, data-engineering
-Summary: jq will make you love JSON.
-Status: draft
+Summary: Tired of processing those API responses? jq will make you love JSON. Let's see how to filter and transform JSON to get what you want.
+Status: published
+MetaImage: /static/images/post024/jq_thumbnail.jpg
 
 I have a love-hate relationship with JSON.
 
 It gets the job done, but the syntax can be annoying.
 
-That's why have a love-love relationship with `jq`. 😍
+That's why I have a love-love relationship with `jq`. 😍
 
 No matter how messy the JSON gets, `jq` is there to make sense of it.
 
@@ -18,11 +19,11 @@ We're checking out the `jq` command line tool!
 By the end, you'll be wrangling JSON data with your `jq` lasso. Giddy up, cowboy. 🤠
 
 ## The Basics
-Tink of `jq` as a filter on a stream of JSON data. It receives some input and returns some output.
+Think of `jq` as a filter on a stream of JSON data. It receives some input and returns some output.
 
 Filters either extract something from the JSON content or manipulate something within the content. 
 
-Let's look at filters with some example JSON in the `hogwarts.json` file:
+You'll see some filters below. Let's work with some example JSON in the `hogwarts.json` file:
 
 ```json
 {"school":"Hogwarts","headmaster":"Albus Dumbledore","students":[{"name":"Harry Potter","house":"Gryffindor","year":5,"owl_count":7},{"name":"Hermione Granger","house":"Gryffindor","year":5,"owl_count":10},{"name":"Draco Malfoy","house":"Slytherin","year":5,"owl_count":6}],"subjects":["Potions","Defense Against the Dark Arts","Transfiguration"]}
@@ -84,7 +85,7 @@ Want to extract those students? No problem:
 
 The `.students` filter returns the array associated with the `"students"` key. 
 
-To return each element of the array as a separate JSON object, use the array iterator `.[]`. For example, the snippet below uses the `.students[]` filter. Note how the output is no longer an array; it's 3 separate JSON objects. (There's no enclosing brackets `[]` or commas between the objects.)
+To return each element of the array as a separate JSON object, use the array iterator `.[]`. For example, the snippet below uses the `.students[]` filter. Note how the output is no longer an array; it's a stream of 3 separate JSON objects. (There's no enclosing brackets `[]` or commas between the objects.)
 
 ```bash
 > jq '.students[]' hogwarts.json
@@ -108,7 +109,7 @@ To return each element of the array as a separate JSON object, use the array ite
 }
 ```
 
-That same `.[]` notation is used for indexing and slicing. What if you want the name of the 2nd student the `"students"` array?
+That same `.[]` notation is used for indexing and slicing. What if you want the name of the 2nd student in the `"students"` array?
 
 
 ```bash
@@ -123,21 +124,21 @@ That same `.[]` notation is used for indexing and slicing. What if you want the 
 
 That's right, `jq` uses 0-based indexing. `.students[1]` gives the item in the 2nd position of the array.
 
-Maybe that's too much output. We can string keys together to get nested values. Here's how to get the value for the `name` key for the 2nd student:
+Maybe that's too much output. You can string keys together to get nested values. Here's how to get the value for the `name` key for the 2nd student:
 
 ```bash
 > jq '.students[1].name' hogwarts.json
 "Hermione Granger"
 ```
 
-By default, `jq` returns string types with JSON quotes. If we want simple strings without quotes, we can use the `-r` flag ("r" for raw):
+By default, `jq` returns string types with JSON quotes (as you just saw above). If you want simple strings without quotes, use the `-r` flag ("r" for raw):
 
 ```bash
 > jq -r '.students[1].name' hogwarts.json
 Hermione Granger
 ```
 
-The `-r` flag is essential when pipeing `jq` output to another command line tool. The standard JSON quotes can get in the way of other tools.
+The `-r` flag is essential when piping `jq` output to another command line tool. The standard JSON quotes can get in the way of other tools.
 
 Let's camp out on the students array. Suppose you want to figure out how many elements are in the array. That can be done by using the `length` filter.
 
@@ -164,9 +165,9 @@ What if you want to filter the students array to get our favorite Gryffindor mem
 }
 ```
 
-Here's a chain of 3 filters. The 2nd filter `select(.house == "Gryffindor")` emits any objects where the key "house" has a value of "Gryffindor". Think of this as the `where` clause from good 'ole SQL-land.
+Here's a chain of 3 filters. The 2nd filter `select(.house == "Gryffindor")` emits any objects where the key "house" has a value of "Gryffindor". This is like the `where` clause from good 'ole SQL-land.
 
-The 3rd filter `{name, house}` picks the keys we want in the final output; this removes the `year` and `owl_count` key-values.
+The 3rd filter `{name, house}` picks the keys you want in the final output; this removes the `year` and `owl_count` key-values.
 
 `jq` also allows arithmetic. Suppose someone causes mischief and fudges the `owl_count` 😱: 
 
@@ -186,7 +187,7 @@ The 3rd filter `{name, house}` picks the keys we want in the final output; this 
 }
 ```
 
-Here, the `owl_count` value is subtracted by 5. The other operations you may expect are in `jq`, too (addition , multiplication, exponents, etc)
+Here, the `owl_count` value is subtracted by 5. The other operations you may expect are in `jq` too (addition , multiplication, exponents, etc.).
 
 ## The Real World
 
@@ -204,7 +205,7 @@ Alright, those examples are cute. But real JSON isn't so small. In the real worl
 
 Be thankful. I'm showing you just the first 2,000 characters. There's a lot more.
 
-`jq` shines with large JSON content that happens to be minified. The tool is incredibly useful when exploring new JSON or filtering for the sections you care about. 
+`jq` shines with large JSON content. The tool is incredibly useful when exploring new JSON or filtering for the sections you care about. 
 
 Let's pick apart this API output to better understand it. First, what keys does the response have?
 
@@ -217,14 +218,14 @@ Let's pick apart this API output to better understand it. First, what keys does 
 ]
 ```
 
-Looks like there 3 keys. Let's see what's in the `"data"` key:
+Looks like there are 3 keys. Let's see what's in the `"data"` key:
 
 ```bash
 > jq '.data | length' spells.json
 100
 ```
 
-There are 100 objects in `"data"`! Definitely don't want to print all of that at once. But you can inspect the first object:
+There are 100 objects in `"data"`! You definitely don't want to print all of that at once. But you can inspect the first object:
 
 ```bash
 > jq '.data[0]' spells.json
@@ -270,7 +271,7 @@ Ah, so this is a collection of spells. There's a lot of extra information here. 
 # ... continues
 ```
 
-Okay, now we have a sense of the API response. We can also get the categories of each spell. Here we create a JSON array (with `[]`) containing each spell's category. The array is then piped to the `unique` filter to deduplicate the categories: 
+Okay, now you're getting a sense of the API response. But what categories of spells are there? Here you create a JSON array (with `[]`) containing each spell's category. The array is then piped to the `unique` filter to deduplicate the categories: 
 
 ```bash
 > jq '[.data[].attributes.category] | unique' spells.json
@@ -301,19 +302,21 @@ Okay, now we have a sense of the API response. We can also get the categories of
 
 Interesting! Clearly, there is opportunity for data cleanup here. 😅
 
-How many of these spells emit a Red light?
+One more: How many of these spells emit red light?
 
 ```bash
 > jq '.data | map(select(.attributes.light == "Red")) | length' spells.json
 3
 ```
 
-I can keep going, but hopefully you see the point. Without `jq`, you'd manually go through the huge JSON content to get to the parts we want. Or you'd write a custom Python script to parse the content. But neither approach is necessary when the humble `jq` tool is here.
+3 spells with red light! This chain of filters routes the `"data"` object to the `map` filter. In general, `map` applies some expression to each value in its input array or object; it then outputs an array. In this case, `map` is calling the `select` filter to narrow down the spells for those with "Red" light. Finally, the `length` filter is called to tell us there are 3 items in the final array. Whew! That's powerful.
+
+I can keep going, but hopefully you see the point. Without `jq`, you'd manually go through the huge JSON content to get to the parts you want. Or you'd write a custom Python script to parse the content. But neither approach is necessary when the humble `jq` tool is here. 🙂
 
 ---
 
 We've just begun with `jq`. It's a full-fledged language with many bells and whistles. `jq` has conditional statements like if-then. It also allows variables! There is much to learn at the [jq docs](https://jqlang.org/manual/).
 
-`jq` typically comes pre-loaded on Linux distros and MacOS. In case you don't have it, check the [jq download page](https://jqlang.org/download/).
+`jq` typically comes pre-loaded on Linux distros and MacOS. If you don't have it, check the [jq download page](https://jqlang.org/download/). The two JSON examples can be found on [Github](https://github.com/kishanpatel789/kp_data_dev_blog_repos/tree/main/024_process_json_with_jq).
 
 JSON is the lingua franca of web communication. But processing it can be a pain. The next time you have a mountain of JSON to look at, give `jq` a whirl. You'll [thank me](https://kpdata.dev/) one day. 
