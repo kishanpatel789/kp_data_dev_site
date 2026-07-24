@@ -8,41 +8,44 @@ Status: draft
 
 Things change.
 
-That's a good thing... Until you need to know what things were like before.
+That's good... Until you need to know what things were like before. 🤔
 
-In the data world, changes to tables are often managed by Slowly Changing Dimensions.
+In the data world, changes are often tracked by [Slowly Changing Dimensions (SCDs)]({filename}/posts/019_SlowlyChangingDimensions.md).
 
+It's simple: To update a table while preseving history, add two columns to mark the row's effective "begin date" and "end date." That gives a window for when each row is active. "Current" records have a NULL end date or some fake high end date like 9999-12-31. When a change occurs, dig through the table to find the previous record; update its "end date" to today. Then insert a new record with an "begin date" that perfectly matches the previous record's "end date." 🥴
 
-Slowly Changing Dimension Type 2 tables are a common way to track changes to data tables. What's that you ask? SCD Type II tables track changes to records. The basic idea is that each row has an effective begin date and end date. "Current" records have a NULL end date or some fake high end date like 9999-12-31. When the record updates, the previous records has its end date updated to something like today, and a new record is inserted with an effective date that matches the previous record's end date.
+Okay, so it's not simple. It's quite difficult to get right, and there's a high risk of messing up the SCD. 
 
-All this is montonous to implement by yourself. And there's a high risk of error. Which is why dbt Snapshots are helpful.
+Which is why dbt Snapshots are helpful.
 
-dbt Snapshots are dbt's way of handling Slowly Changing Dimension Type 2 tables.
+Snapshots are dbt's implementation of Slowly Changing Dimension Type 2 tables. Give dbt a few details on what you want to track, and dbt will automagically handle the grunt work for you.
 
 ## Basics 
 
-It goes like this: First, you pick a source table to keep track off. Then when you run `dbt snapshot`, dbt will generate a snapshot table with SCD Type 2 columns. Each time you run the snapshot command, dbt will compare the source and snapshot tables. Any new rows will be added. Any modified rows will be reflected in the table. That's it!
+It goes like this: First, pick a source table to keep track of. Then when you run `dbt snapshot`, dbt will generate a snapshot table with SCD Type 2 columns. Each time you run the snapshot command, dbt will compare the source and snapshot tables. Any new rows will be added. Any modified rows will be reflected in the snapshot. That's it!
 
 Well, there's a bit more set up you need. 😅
 
-You need to figure out HOW to determine if records in the source table have changed. There are two strategies: "timestamp" and "check".
+How does dbt know which rows in the snapshot are associated with a row from the table? That's where the `unique_key` comes in. The `unique_key` is some combination of columns in the source table that identifies a single row in the table. Think if `unique_key` as the primary key of the table. dbt will use the `unique_key` to play matchmaker: it will link rows in the snapshot to rows in the source table.
 
-The easiest way is to use a timestamp based approach. Ideally, the source table has some kind of timestamp column indicating when the row was updated. Such a column can be used to determine if a given records in the snapshot is stale and out of date with the source table. Of course, the question arises, how do I match rows from the snapshot with rows from the source table. THat's where the unique_id comes in; the unique_id is some combination of columns in the source table that can be used to identify a single row in the table. With a timestamp based snapshot, dbt compares the rows by unique-id and compares the updated timestamp field. If the snapshot's update for a given unique_id is older than the source table's for the same row... the row is updated in the snapshot and a new row is generated.
+After rows are matched, how does dbt determine if the source row has changed? You get to decide by picking one of two strategies: **timestamp** and **check**.
 
-Alternatively, a column based approach is available in dbt Snapshots. With this approach, you declare which columns you want to keep track of. Only if changes to these columns occur does dbt snapshot generate a new row in the snapshot table. This approach is more fragile, especially if the schema changes. A column in the watched columns may drop. Or a new column that you want to track may enter. Both would require an update to the snapshot configuration.
+The timestamp strategy is the easiest. Ideally, the source table has some kind of timestamp column indicating when the row was updated. This column is used to decide if a record in the snapshot is stale or out-of-date with the source table. If the source row's update timestamp is newer than the last time the snapshot ran, dbt will update the stale row in the snapshot and create a new snapshot row (if needed).
+
+The check strategy works well for source tables that don't have a column marking the row's last update. dbt compares a list of columns between the snapshot and the source table. If any of these columns has changed, dbt updates the satle row in teh snapshot and creates a new row. But if all columns in the source match the latest version in the snapshot, dbt does nothing.  This approach is more fragile, especially if the schema changes. A column in the list-of-columns-to-watch may drop. Or a new column that you want to track may enter the table. Both schema evolutions require an update to the snapshot configuration.
 
 ## Demo
 
-Enough talk, let's set up a snapshot! We'll walk through a timestamp strategy.
+Enough talk, let's set up a snapshot!
 
-First, here's our source table: `students`. I'll pretend in my Snowflake wonderland and using database `demo` and schema `core`.
+First, here's our source table: `students`. We'll play in a Snowflake wonderland, using database `demo` and schema `core`.
 
 | id  | name  | house      | last_updated |
 | --- | ---   | ---        | ---          |
 | 1   | Harry | Gryffindor | 2026-07-23   |
 | 2   | Draco | Slytherin  | 2027-07-23   |
 
-Nowadays, snapshots are configured in a yaml file. Enter the source table. Determine the strategy (timestamp or check). Add the unique_id. If you picked timestamp, declare the updated_at column. If you picked check, declare the columns to check.
+Nowadays, snapshots are configured in a yaml file. Enter the source table. Determine the strategy (timestamp or check). Add the `unique_id`. If you picked timestamp, declare the `updated_at` column. If you picked check, declare the columns to check in `check_cols`. Here's an example configuration using a timestamp strategy:
 
 ```yaml
 # snapshots/students_snapshot.yml
@@ -52,13 +55,32 @@ snapshots:
     config:
       database: demo
       schema: snapshot
-      strategy: timestamp
       unique_key: id
+      strategy: timestamp
       updated_at: last_updated
 ```
 
-What did we do here? 
- [ explain yaml file]
+Declare name of the snapshot table with `name`. Declare the source table with `relation`; this can be either a `source` tag or a `ref` tag. Then within the `config` node, indicate the database and schema the snapshot should live in. Also give the required `unique_key` and `strategy`. Since the `strategy` is "timestamp," identify the name of the column that represents when each row is updated in source (`updated_at: last_updated`).
+
+The YAML file can live in the `models` folder or the `snapshots` folder of the dbt project. 
+
+```bash
+.
+├── analyses
+├── dbt_project.yml
+├── logs
+├── macros
+├── models
+│   └── sources.yml
+├── README.md
+├── seeds
+├── snapshots
+│   └── students_snapshot.yml  # <--- put the YAML file in the snapshot folder if you're sane
+└── tests
+```
+
+
+PICK UP: walk through 1st snapshot
 
 [ create 1st snapshot and show snapshot table ]
 
