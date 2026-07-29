@@ -1,9 +1,10 @@
 Title: dbt Snapshots
 Date: 2026-07-29
 Slug: dbt-snapshots
-Tags: dbt, data-engineering
+Tags: data-engineering, dbt
 Summary: Did you mess up that Slowly Change Dimension Type 2 again? dbt snapshots make it easier by implement SCDs for you.
-Status: draft
+Status: published
+MetaImage: /static/images/post025/dbt_snapshots_thumbnail.jpg
 
 
 Things change.
@@ -12,7 +13,7 @@ That's good... Until you need to see how things were before. 🤔
 
 In the data world, changes are often tracked by [Slowly Changing Dimensions (SCDs)]({filename}/posts/019_SlowlyChangingDimensions.md).
 
-It's simple: To update a table while preseving history, add two columns to mark the row's effective "begin date" and "end date." That gives a window for when each row is active. "Current" records have a NULL end date or some fake high end date like 9999-12-31. When a change occurs, dig through the table to find the previous record; update its "end date" to today. Then insert a new record with a "begin date" that perfectly matches the previous record's "end date." 🥴
+It's simple: To update a table while preserving history, add two columns to mark the row's effective "begin date" and "end date." That gives a window for when each row is active. "Current" records have a NULL end date or some fake end date like 9999-12-31. When a change occurs, dig through the table to find the previous record; update its "end date" to today. Then insert a new record with a "begin date" that perfectly matches the previous record's "end date." 🥴
 
 Okay, so it's not simple. It's quite difficult to get SCDs right. 
 
@@ -22,28 +23,30 @@ Snapshots are dbt's implementation of Slowly Changing Dimension Type 2 tables. G
 
 ## Basics 
 
-It goes like this: First, pick a source table to keep track of. Then when you run `dbt snapshot`, dbt generates a 2nd table (a "snapshot" table) with SCD Type 2 columns. Each time you run the snapshot command, dbt will compare the source and snapshot tables. New rows in the source will be added to the snapshot. Any modified rows will be reflected in the snapshot. That's it!
+It goes like this: First, pick a source table to track. Then when you run `dbt snapshot`, dbt generates a 2nd table (a "snapshot" table) with SCD Type 2 columns. Each time you run the snapshot command, dbt compares the source and snapshot tables. If needed, dbt updates the snapshot to show changes in the source. 
+
+New rows in the source are added to the snapshot. Any modified rows are reflected in the snapshot. That's it!
 
 Well, there's a bit more set up you need. 😅
 
-How does dbt know which rows in the snapshot map to a row from the source? That's where the `unique_key` comes in. The `unique_key` is some combination of columns in the source table that identifies a single row in the table. Think of `unique_key` as the primary key of the table. dbt will use the `unique_key` to play matchmaker: it will link rows in the snapshot to rows in the source table.
+How does dbt know which rows in the snapshot map to a row from the source? That's where the `unique_key` comes in. The `unique_key` is some combination of columns in the source table that identifies a single row in the table. Think of `unique_key` as the primary key of the table. dbt uses the `unique_key` to play matchmaker: It links rows in the snapshot to rows in the source table.
 
 After rows are matched, how does dbt determine if the source row has changed? YOU get to decide by picking one of two strategies: **timestamp** or **check**.
 
-The timestamp strategy is easier. Ideally, the source table has some kind of timestamp column indicating when the row was updated. This column is used to decide if a record in the snapshot is stale or out-of-date with the source table. If the source row's update timestamp is newer than the last time the snapshot ran, dbt will update the stale row in the snapshot and create a new snapshot row.
+The timestamp strategy is easier. Ideally, the source table has some kind of timestamp column indicating when the row was updated. dbt uses this column to decide if a record in the snapshot is out-of-date with the source table. If the source row's update timestamp is newer than the last time the snapshot ran, dbt updates the stale row in the snapshot and creates a new snapshot row.
 
-The check strategy works well for source tables that don't have a column marking the row's last update. dbt "checks" a list of columns between the snapshot and the source table. If any of these columns have changed, dbt updates the stale row in the snapshot and creates a new row. But if all columns in the source match the latest version in the snapshot, dbt does nothing.  This approach is more fragile, especially when the schema changes. A column in the list-of-columns-to-watch may drop. Or a new column that you want to track may enter the table. Both schema evolutions require an update to the snapshot configuration.
+The check strategy works well for source tables that don't have a column marking the row's last update. For each row, dbt "checks" a list of columns between the snapshot and the source table. If any of these columns have changed, dbt updates the stale row in the snapshot and creates a new row. But if all columns in the source match the latest version in the snapshot, dbt does nothing.  This approach is more fragile, especially when the schema changes. A column in the list-of-columns-to-watch may drop. Or a new column that you want to track may enter the table. Both schema evolutions require an update to the snapshot configuration.
 
 ## Demo
 
 Enough talk, let's set up a snapshot!
 
-First, here's our source table: `students`. When a row changes, its value in the `last_updated` column updates to the current time.
+First, here's your source table: `students`. When a row changes, its value in the `last_updated` column updates to the current time.
 
 | id  | name  | house      | last_updated |
 | --- | ---   | ---        | ---          |
-| 1   | Harry | Gryffindor | 2026-07-23   |
-| 2   | Draco | Slytherin  | 2027-07-23   |
+| 1   | Harry | Gryffindor | 2026-07-27   |
+| 2   | Draco | Slytherin  | 2027-07-27   |
 
 We'll play in a Snowflake wonderland, using database `demo` and schema `core` for this table.
 
@@ -73,9 +76,9 @@ snapshots:
 
 Here, the `name` key stores the snapshot's name (`students_snapshot`). The `relation` key points to the `students` table as the source of the snapshot. The source can be either a dbt `source` tag or a `ref` tag.
 
-Then `config` node indicates the database and schema the snapshot should live in. Unsurprisingly the `unique_key` is `id`. And since the `strategy` is "timestamp," the `updated_at` key is set to `last_updated` (i.e. the column that represents when each row was last updated).
+The `config` node indicates the database and schema the snapshot should live in. Unsurprisingly the `unique_key` is `id`. And since the `strategy` is "timestamp," the `updated_at` key is set to `last_updated` (i.e. the column that represents when each row was last updated).
 
-The YAML file can live in the `models` folder or the `snapshots` folder of the dbt project. But I'm a purist and like to keep my snapshots in `snapshots/` while my models live in `models/`. 😁 Here's where snapshots should go in a standard dbt project structure:
+The YAML file can live in the `models` folder or the `snapshots` folder of the dbt project. But I'm a purist. I like to keep my snapshots in `snapshots/` while my models live in `models/`. 😁 Here's where snapshots should go in a standard dbt project structure:
 
 ```bash
 .
@@ -122,21 +125,23 @@ Notice how the snapshot has the same columns as the source table. But it also ha
 
 - `dbt_valid_from`: indicates when the record starts being active.
 - `dbt_valid_to`: indicates when the record stops being active. Right now, all rows have a NULL `dbt_valid_to`, meaning all rows are active.
-- `dbt_scd_id`: used internally by dbt when updating snapshots. `dbt_scd_id` is a combination of the `unique_key` and a timestamp of when the row was updated. Its values look funny because it's a hash of the the concatenation. The `dbt_scd_id` is used to determine which rows need to be updated when dbt snapshot runs.
+- `dbt_scd_id`: used internally by dbt when updating snapshots. `dbt_scd_id` is a combination of the `unique_key` and a timestamp of when the row was updated. Its values look funny because it's a hash of the concatenation. The `dbt_scd_id` is used to determine which rows need to be updated when dbt snapshot runs.
 - `dbt_updated_at`: says when the row was modified or inserted into the source table.
 
 Neat! Now let's change our source table and see how the snapshot reacts. You'll add a row, modify a row, and delete a row.
 
 ### Add a New Row
 
-Let's add our favorite witch to the party: 
+Let's add a boss witch to the party: 
 
 ```sql
 insert into students values
 (3, 'Hermione', 'Gryffindor', current_timestamp());
 ```
 
-A new record now appears in the source `students` table. Then re-run the snapshot. Remember, dbt will attempt to find any new rows or any modified rows in the source:
+A new record now appears in the source `students` table.
+
+Then re-run the snapshot. Remember, dbt will attempt to find any new rows or any modified rows in the source:
 
 ![dbt snapshot command after adding row](/static/images/post025/dbt_snapshot_002_add.png)
 
@@ -163,11 +168,11 @@ This time you see 1 row is impacted in the snapshot. This makes sense because yo
 +---------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 ```
 
-As expected, the new record was added to the snapshot `students_snapshot` as well! 
+As expected, the new record (Hermione) was added to the snapshot `students_snapshot` as well! Note the different values for `dbt_updated_at` and `dbt_valid_from`.
 
 ### Modify a Row
 
-Now, let's make things more interesting. You'll modify a row in the source and re-snapshot the table. 
+Now, let's make things interesting. You'll modify a row in the source and re-snapshot the table. 
 
 ```sql
 update students
@@ -175,7 +180,7 @@ set name = 'HARRY', last_updated = current_timestamp()
 where id = 1;
 ```
 
-Here you target row with `id = 1` and update the `name` to be uppercase. Of course, you update the `last_updated` column to tell the reader when this row was updated.
+Here you target Harry's row with `id = 1` and update the `name` to be uppercase. Of course, you update the `last_updated` column to tell the reader when this row was updated.
 
 Running `dbt snapshot` again will show that 1 row was updated:
 
@@ -216,7 +221,7 @@ Drumroll please...
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 ```
 
-WHOA! Now the snapshot has 2 versions of Harry's row. Check out how the `dbt_valid_from` and `dbt_valid_to` values dance together for the 1st two rows. The first record is active from 13:51 to 14:37. The 2nd row becomes active exactly when the 1st row becomes invalid. This is a functioning SCD Type 2 table!
+WHOA! Now the snapshot has two versions of Harry's row. Check out how the `dbt_valid_from` and `dbt_valid_to` values dance together for the first two rows. The first record is active from 13:51 to 14:37. The 2nd row becomes active exactly when the 1st row becomes invalid. This is a functioning SCD Type 2 table!
 
 ### Delete a Row
 
@@ -227,8 +232,7 @@ delete from students
 where id = 2;
 ```
 
-
-Interestingly, another `dbt snapshot` call shows 0 rows were updated. 
+Surprisingly, another `dbt snapshot` call shows 0 rows were updated. 
 
 ```text
 > dbt snapshot
@@ -243,7 +247,7 @@ Interestingly, another `dbt snapshot` call shows 0 rows were updated.
 21:44:01  Done. PASS=1 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=1
 ```
 
-And if you check the source and snapshot again, you see the record WAS removed from the source but the snapshot doesn't reflect that. Draco's row still has a NULL `dbt_valid_to`. 🫢
+And if you check the source and snapshot again, you see the record WAS removed from the source, but the snapshot doesn't reflect that. Draco's row still has a NULL `dbt_valid_to`. 🫢
 
 ```text
  > select * from demo.core.students;
@@ -266,11 +270,11 @@ And if you check the source and snapshot again, you see the record WAS removed f
 +-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 ```
 
-What happened!? By default, if a row is deleted from the source table, dbt won't do anything to the corresponding record in the snapshot. That may not be ideal as the record would still show as "current" in the snapshot. 
+What happened!? By default, if a row is deleted from the source table, dbt won't do anything to the corresponding record in the snapshot. That may not be ideal as the record still shows as "current" in the snapshot. 
 
-Use the `hard_deletes` parameter to change things. By default, `hard_deletes` is set to `ignore`, meaning dbt will take no action on the snapshot if a row is deleted from the source. 
+Declaring the `hard_deletes` parameter changes this behavior. By default, `hard_deletes` is set to `ignore`, meaning dbt will take no action on the snapshot if a row is deleted from the source. 
 
-Setting `hard_deletes` to `invalidate` will update `dbt_valid_to` to whenever the snapshot was refreshed. This still isn't ideal because `dbt_valid_to` doesn't reflect when the record actually dropped out of the source table, but it's better than nothing.
+But setting `hard_deletes` to `invalidate` will update `dbt_valid_to` to whenever the snapshot was refreshed. This still isn't ideal because `dbt_valid_to` doesn't reflect when the record actually dropped out of the source table, but it's better than nothing.
 
 One place to set `hard_deletes` is in the same YAML file that defines the snapshot:
 
@@ -323,9 +327,10 @@ The 3rd and final option for `hard_deletes` is `new_record`. This updates `dbt_v
 
 --- 
 
-Hopefully you're excited about how powerful dbt snapshots are! These simple examples with a few records seem petty. But for a huge table with millions of rows, snapshots are a life saver. Snapshots automate the complexity of SCD Type 2 tables, so you don't have write custom code to keep your rows perfectly in sync.
+Hopefully you're excited about how powerful dbt snapshots are! 🤓 Snapshots automate the complexity of SCD Type 2 tables, so you don't have write custom code to keep your rows perfectly in sync. These small examples seem petty. But for a huge table with millions of rows, snapshots are a life saver. 
 
 There are more ways to tweak a dbt snapshot. Check out the [dbt docs](https://docs.getdbt.com/docs/build/snapshots?version=1.12&name=v1) to see how to configure snapshots to your heart's desire. 
 
-[ENTER CLOSER]
+Need help managing historical views of your tables with dbt? [Snap your fingers](https://kpdata.dev/), and I'll be there. 
+
 
