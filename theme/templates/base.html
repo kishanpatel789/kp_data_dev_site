@@ -12,7 +12,7 @@
         gtag('config', '{{GOOGLE_ANALYTICS}}');
       </script>
     {% endif %}
-    
+
     <title>{% block title %}{{ SITENAME|striptags }}{% endblock title %}</title>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,9 +34,10 @@
     {% block meta_twitter_image %}<meta name="twitter:image" content="{{ SITEURL }}/theme/svg/LightLogo_OG.svg">{% endblock %}
     {% block meta_twitter_url %}<meta property="twitter:url" content="{{ SITEURL }}">{% endblock %}
     <meta property="twitter:domain" content="kpdata.dev">
-    
+
     {% block link_canonical %}<link rel="canonical" href="{{ SITEURL }}" />{% endblock %}
     {% block stylesheets %}<link rel="stylesheet" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/css/main.css" />{% endblock %}
+    <link rel="icon" type="image/png" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/png/Favicon.png" />
     <link rel="icon" type="image/svg+xml" href="{{ SITEURL }}/{{ THEME_STATIC_DIR }}/svg/Favicon.svg" />
   {% endblock head %}
 </head>
