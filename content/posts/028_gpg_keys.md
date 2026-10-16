@@ -1,7 +1,7 @@
 Title: gpg Keys
 Date: 2026-10-16
 Slug: gpg-keys
-Tags: command-line, linux
+Tags: command-line, linux, privacy
 Summary: Stop trusting big tech to encrypt your communication. Do it yourself with gpg keys.
 Status: draft
 
@@ -10,9 +10,9 @@ I send messages to my boo. 🥰
 
 But I don't want tech giants (I'm looking at you Zuck) to access the message content.
 
-I could let channels like WhatsApp provide "end-to-end ecryption" between me and my contacts. 
+I could let channels like WhatsApp provide "end-to-end encryption" between me and my contacts.
 
-But I'm a control freak. I must take privacy into my own hands. So I encrypt the message myself.
+But I'm a control freak. I must take privacy into my own hands. So I encrypt the message myself. 🤓
 
 That means instead of sending a message like this...
 
@@ -35,15 +35,17 @@ No one but the intended recipient can decrypt that gobbledegook and understand m
 
 I don't have to trust Meta, Apple, or Google to supposedly keep the message private. 
 
-Today we'll look at `gpg`, a Linux tool for handling encryption tasks. By the end, you'll be pulling off some Jason-Bourne-level espionage. 😎
+Today we'll look at `gpg`, a Linux tool for handling encryption tasks. 
+
+By the end, you'll be running some Jason-Bourne-like espionage. 😎
 
 ## Basics
 
-First some terminology: GPG and PGP. These are two different things. OpenPGP stands for Open **P**retty-**G**ood-**P**rivacy. It's a collection of standards for how data should be encrypted, decrypted, and signed. GPG, on the other hand, stands for **G**NU **P**rivacy **G**uard. GPG is the GNU implementation of OpenPGP. 
+First some terminology: GPG and OpenPGP. These are two different things. OpenPGP stands for Open **P**retty-**G**ood-**P**rivacy. It's a collection of standards for how data should be encrypted, decrypted, and signed. GPG, on the other hand, stands for **G**NU **P**rivacy **G**uard. GPG is the GNU implementation of OpenPGP. 
 
 Hopefully you have some knowledge of key pairs. If you don't, here's the crash course. 
 
-One of the most secure encryption techinques is asymmetric encryption, which requires 2 related keys: a private key 🗝️ and a public key 🔑. What one key encrypts only the other key can decrypt. That is, if a public key encrypts a message, only the corresponding private key can decrypt it. Ideally, each person has a public key and a private key. The public key is available for anyone to use (that's why it's "public"). But the private key is super secret and held only by the person it belongs to.
+One of the most secure encryption techniques is asymmetric encryption, which requires 2 related keys: a private key 🗝️ and a public key 🔑. What one key encrypts only the other key can decrypt. That is, if a public key encrypts a message, only the corresponding private key can decrypt it. Ideally, each person has a public key and a private key. The public key is available for anyone to use (that's why it's "public"). But the private key is super secret and held only by the person it belongs to.
 
 Why is that helpful? Well say Harry has a message for Ginny. He wants only her to be able to read that message. So Harry encrypts the message with Ginny's public key. When Ginny receives the encrypted message, she decrypts it with her private key. In fact, ONLY Ginny's private key can decrypt the message. So when big brother Ron tries to intervene, he can't read the message! 
 
@@ -57,13 +59,18 @@ Enter this command to generate a new key:
 > gpg --full-generate-key
 ```
 
-`gpg` will ask questions about the key pair before building the keys. For the kind of key, choose the default of `ECC (sign and encrypt)`. For the algorithm, choose the default elliptic curve of `Curve 25519`. This is the modern recommended encryption algorithm, but RSA is also a decent option.
+`gpg` asks questions before building the key pair:
 
-After entering how long the key should be valid before expiration, you'll be asked to enter your name and email address. No messages will be sent to the email address. You can enter an inactive address. The email address serves as a user ID to distinguish one key from another.
+- For the kind of key, choose the default of `ECC (sign and encrypt)`. 
+- For the algorithm, choose the default elliptic curve of `Curve 25519`. 
+    - This is the modern recommended encryption algorithm, but RSA is also a decent option.
+- Choose how long the key should be valid before expiration. 
+- Enter your name and email address. 
+    - No messages will be sent to the email address. You can enter an inactive address. The email address serves as a user ID to distinguish one key from another.
+- Finally you'll be prompted for a passphrase. 
+    - Choose something difficult to guess but easy to remember. You must have this passphrase to use the key!
 
-Finally you'll be prompted for a passphrase. Choose something difficult to guess but easy to remember. You must have this passphrase to use the key!
-
-Boom! You have a gpg key pair. You can view the private key like this:
+Boom! You have a GPG key pair. You can view the private key summary with the `--list-secret-keys` command:
 
 ```text
 > gpg --list-secret-keys
@@ -74,11 +81,11 @@ uid           [ultimate] Harry Potter <harry@hogwarts.edu>
 ssb   cv25519 2026-10-12 [E] [expires: 2027-10-12]
 ```
 
-This gives a fingerprint of the private key, which identifies the key. The fingerprint is safe to share and is often used to check if two people have properly exchanged public keys.
+This gives a fingerprint of the key pair: `6F9FC456AF0968078DD68C3ED9F6A60E2A0735D8`. The fingerprint identifies the key and is safe to share. Often, two people compare fingerprints to check if they've properly exchanged public keys.
 
 ## Encrypt Message
 
-Now let's encrypt a message that Harry (you 🪄) sends to Ginny. Assume you have Ginny's public key 🔑 saved in your `gpg` public keyring. (Your public keyring is a collection of public keys you've gathered from your friends.)
+Now let's encrypt a message that Harry (you 🪄) is sending to Ginny. Assume you have Ginny's public key 🔑 saved in your GPG public keyring. (Your public keyring is a collection of public keys you've gathered from your friends.)
 
 Here's the unencrypted file `message.txt`: 
 
@@ -87,7 +94,7 @@ Here's the unencrypted file `message.txt`:
 I love you, Ginny.
 ```
 
-Time to encrypt the file. `gpg` expects the intended recipient and the `--encrypt` command. With the following command, `gpg` will use Ginny's public key (stored in your keyring) to encrypt the file.
+Time to encrypt the file with the `--encrypt` command. `gpg` also expects the intended recipient, which is passed with the `--recipient` option. With the below command, `gpg` will use Ginny's public key (stored in your keyring) to encrypt the file.
 
 ```text
 > gpg --recipient ginny@hogwarts.edu --encrypt message.txt
@@ -181,9 +188,9 @@ Closely related to encrypting data is signing it. When you sign data, you're say
 
 Here's how signing works: `gpg` hashes the data and uses your private signing key 🗝️ to create a signature from the hash. The encrypted hash (i.e. the signature) is included with the file to be sent.
 
-Upon receiving the file, the recipient verifies the signature against the file content using your public key 🔑. If verification passes, the received file matches the original file that was signed, proving the data has not been tampered with. Successful verification also tells the recipient that your private key was involved in the signing process, suggesting you wrote the file itself.
+Upon receiving the file, the recipient verifies the signature against the file content using your public key 🔑. If verification passes, the received file matches the original file that was signed, proving the data has not been tampered with. Successful verification also tells the recipient that your private key was involved in the signing process, suggesting you wrote the file.
 
-Of course, `gpg` handles both signing and verification for you. Let's clear the directory and have Harry (you) sign the message he's sending to Ginny. The `--local-user` flag indicates which private key should be used for signing. The `--detach-sign` option tells `gpg` to create a separate file for the signature.
+Of course, `gpg` handles both signing and verification for you. Let's clear the directory and have Harry (you) sign the message he's sending to Ginny. The `--local-user` flag indicates which private key should be used for signing. The `--detach-sign` command tells `gpg` to create a separate file for the signature.
 
 ```text
 > ls
@@ -212,7 +219,7 @@ But wait! The file itself is still in plain text! 😱
 I love you, Ginny.
 ```
 
-Often, people choose to sign a file and encrypt the file at the same time. Let's clear the directory and do that.
+Often, people choose to sign a file AND encrypt the file at the same time. Let's clear the directory and do that:
 
 ```text
 > rm message.txt.sig
@@ -242,17 +249,17 @@ gpg: Good signature from "Harry Potter <harry@hogwarts.edu>" [ultimate]
 
 The output says the content was encrypted with Ginny's key and the signature was signed using Harry's key.
 
-Whew, that's a lot! Here's the breakdown between encrypting a file and signing a file: 
+Whew, that's a lot! Here's a summary of encrypting vs signing a file: 
 
 1. **Encrypt Only**: Only the recipient with the corresponding private key can decrypt content. But encryption alone doesn't establish you created the content.
 2. **Sign Only**: Anyone with your public key can verify you created the file. Anyone can read the file because the content is not encrypted.
-3. **Encrypt and Sign**: The recipient with the corresponding private key can decrypt the content and verify your signature (i.e. that your private key created the signature)
+3. **Encrypt and Sign**: Only the recipient with the corresponding private key can decrypt the content and verify your signature (i.e. that your private key created the signature)
 
 There are use cases for each of the 3 scenarios. When in doubt, go with "encrypt and sign."
 
 ## Key maintenance
 
-Like your car that broke down for the 5th time this year, gpg keys need some maintenance. Here are 3 of the most common chores:
+Like your car that broke down for the 5th time this year, GPG keys need some maintenance. Here are 3 common chores:
 
 ### 1. Change Passphrase
 
@@ -265,7 +272,7 @@ Run the `--passwd` command with the user ID of the private key to update:
 > gpg --passwd harry@hogwarts.edu
 ```
 
-`gpg` will prompt you for the current passphrase first. Then you can enter the new passphrase.
+`gpg` will prompt you for the current passphrase first. Then you enter the new passphrase.
 
 
 ### 2. Export Public Key
@@ -291,13 +298,13 @@ J/QCGwwFCQHhM4AACgkQ2famDioHNdjqsgD+IxDBb+uw2eO1JcEYltl/zj5JN6WR
 -----END PGP PUBLIC KEY BLOCK-----
 ```
 
-Share this text with your friends using whichever channel you want. They would import this public key into their gpg keychain, enabling them to encrypt messages intended for you. Again, the public key is safe to share; only the private key should be guarded with your life. 
+Share this text with your friends using whichever channel you want. They would import this public key into their GPG keychain, enabling them to encrypt messages intended for you. Again, the public key is safe to share; only the private key should be guarded with your life. ⚔️
 
 ### 3. Edit Expiration Date
 
-When your gpg key expires, you don't create a new one. Instead you extend the expiration date of the existing key.
+When your GPG key expires, you don't create a new one. Instead you extend the expiration date of the existing key.
 
-First, let's talk more about Harry's secret key. Upon listing the key, you see a couple of keys associated with `harry@hogwarts.edu`. `gpg` creates multiple private keys (or subkeys). Each key or subkey is used for a specific purpose. 
+First, let's talk more about Harry's secret key. Upon listing the key, you see a couple of keys associated with `harry@hogwarts.edu`:
 
 ```text
 > gpg --list-secret-keys harry@hogwarts.edu
@@ -307,14 +314,14 @@ uid           [ultimate] Harry Potter <harry@hogwarts.edu>
 ssb   cv25519 2026-10-12 [E] [expires: 2027-10-12]
 ``` 
 
-Check out the headers in the output to understand the two private keys here:
+`gpg` creates multiple private keys (or subkeys). Each key or subkey is used for a specific purpose. Check out the headers in the output to understand the two private keys here:
 
 1. `sec`: This is the primary secret key ("sec" = "secret"). On the same line, `[SC]` indicates that this key is used for signing and certifying.
 2. `ssb`: This is the subkey ("ssb" = "secret sub"). On this line, `[E]` indicates `gpg` uses this key for encryption.
 
-This separation of concerns is a security measure. The primary key estabilishes your identity and is used for signing. It should be used infrequently to avoid being compromised. The subkey is used for more day-to-day encryption tasks.
+This separation of concerns is a security measure. The primary key establishes your identity and is used for signing. It should be used infrequently to avoid being compromised. The subkey is used for more day-to-day encryption tasks.
 
-Anyway, how do we extend the expiration date? Run this command:
+Anyway, how do we extend the expiration date? Run the `--edit-key` command:
 
 ```text
 > gpg --edit-key harry@hogwarts.edu
@@ -331,7 +338,7 @@ ssb  cv25519/B50D74485E66A5DC
 gpg>
 ```
 
-This will drop you into an interactive gpg menu with a `gpg>` prompt. Here are the gpg menu commands you need:
+This will drop you into an interactive `gpg` menu with a `gpg>` prompt. Here are the gpg menu commands you need:
 
 1. `expire <i>`: change the expiration date of the selected key or subkey
 2. `save`: save changes to disk
@@ -359,13 +366,13 @@ ssb  cv25519/B50D74485E66A5DC
 [ultimate] (1). Harry Potter <harry@hogwarts.edu>
 ```
 
-Here the key is set to be valid for 10 years (`10y`). Note the primary key's expiration is updated from 2027-10-12 to 2036-10-12 while the subkey still has 2027-10-12. Run `expire 1` to update the subkey. Finally hit `save` to update the keys on disk and `quit` to exit the `gpg` menu.
+Here the key is set to be valid for 10 years (`10y`). Note the primary key's expiration is updated from 2027-10-12 to 2036-10-12 while the subkey still expires on 2027-10-12. Run `expire 1` to update the subkey. Finally hit `save` to update the keys on disk and `quit` to exit the `gpg` menu.
 
-Then distribute the updated public key with your friends so they know your key is valid for a bit longer. Otherwise, their instance of gpg won't use your expired public key for encryption... which you means your friends won't talk to you. 😢
+Then distribute the updated public key with your friends so they know your key is valid for a bit longer. Otherwise, their instance of `gpg` won't use your expired public key for encryption... which means your friends won't talk to you. 😢
 
 ---
 
-The `gpg` framework can be tough to learn at first. But once you've practiced some commands, you'll encrypting and signing like a pro. Then you can secure your communication without trusting apps to respect your privacy. 💪
+You made it! The `gpg` framework can be tough to learn at first. But once you've practiced some commands, you'll be encrypting and signing like a pro. Then you can secure your communication without wondering if apps really respect your privacy. 💪
 
 Need more help with encryption or signing? Send me a message... securely. Here's my key fingerprint: `A61F 1F7C E5D1 5B1D 36C9  C03C 228A A3F8 CC9F 5E29`.
 
