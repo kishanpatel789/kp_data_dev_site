@@ -3,7 +3,8 @@ Date: 2026-10-16
 Slug: gpg-keys
 Tags: command-line, linux, privacy
 Summary: Stop trusting big tech to encrypt your communication. Do it yourself with gpg keys.
-Status: draft
+Status: published
+MetaImage: /static/images/post028/gpg_keys_thumbnail.jpg
 
 
 I send messages to my boo. 🥰
