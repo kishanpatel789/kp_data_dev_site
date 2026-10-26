@@ -1,8 +1,8 @@
-Title: gpg Keys
+Title: GPG Keys
 Date: 2026-10-16
 Slug: gpg-keys
 Tags: command-line, linux, privacy
-Summary: Stop trusting big tech to encrypt your communication. Do it yourself with gpg keys.
+Summary: Stop trusting big tech to encrypt your communication. Do it yourself with GPG keys.
 Status: published
 MetaImage: /static/images/post028/gpg_keys_thumbnail.jpg
 
