@@ -2,8 +2,9 @@ Title: Snowflake Lateral Flatten
 Date: 2026-10-25
 Slug: snowflake-lateral-flatten
 Tags: snowflake, sql, data-engineering
-Summary: What does the mysterious "lateral flatten" do in Snowflake? Unlock the mystery to wrangle those objects and arrays.
-Status: draft
+Summary: What does the esoteric "lateral flatten" do in Snowflake? Unlock the mystery to wrangle those objects and arrays.
+Status: published
+MetaImage: /static/images/post029/snowflake_lateral_flatten_thumbnail.jpg
 
 
 Snowflake makes data work easy.
